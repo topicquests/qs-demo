@@ -260,7 +260,7 @@ const conversationStore = useConversationStore();
 const  isMember = ref(false);
 let activeQuests: Quest[] = [];
 const prompt = ref(false);
-const guildId = ref<number | undefined>(undefined);
+const guildId = ref<number | null>(null);
 const {member} = storeToRefs(memberStore)
 const allRoles = roleStore.role
 let memberPlaysQuestInThisGuild = false;
@@ -512,22 +512,25 @@ function getGuildMembers(): PublicMember[] | undefined{
     );
   }
   async function initialize() {
-    guildId.value = Number.parseInt(route.params.guild_id);
+    if (typeof route.params.guild_id === 'string') {
+      guildId.value = Number.parseInt(route.params.guild_id);
+    }
+    const guild_id = guildId.value;
     //await userLoaded;
-    guildStore.setCurrentGuild(guildId.value);
+    guildStore.setCurrentGuild(guild_id!);
     await Promise.all([
       questStore.ensureAllQuests(),
-      guildStore.ensureGuild(guildId.value),
-      //roleStore.ensureAllRoles(),
-      channelStore.ensureChannels(guildId.value),
-      membersStore.ensureMembersOfGuild({ guildId: guildId.value }),
+      guildStore.ensureGuild(guild_id!),
+      roleStore.ensureAllRoles(),
+      channelStore.ensureChannels(guild_id!),
+      membersStore.ensureMembersOfGuild({guildId:guild_id}),
     ]);
     await initializeStage2();
     ready.value = true;
-  };
-  onBeforeMount(async () => {
-    await initialize();
-  });
+    };
+    onBeforeMount(async () => {
+      await initialize();
+      });
 </script>
 
 <style lang="scss">

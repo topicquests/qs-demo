@@ -97,7 +97,7 @@ import memberHandle from "../components/member-handle.vue";
 import scoreboard from "../components/score-board.vue";
 import roleTable from "../components/role-table.vue";
 import serverDataCard from "../components/server-data-card.vue";
-import type { Member } from "../types";
+import type { Member, PublicMember } from "../types";
 import { userLoaded } from "../boot/userLoaded";
 import { ref, computed, watch } from "vue";
 import { permission_enum } from "../enums";
@@ -119,8 +119,7 @@ const ready = ref(false);
   const $q = useQuasar();
   const member_id = ref<number|undefined>(undefined);
 const members = membersStore.getMembers;
-
-const member = ref<Member>( membersStore.getMemberById(member_id.value));
+const member = ref<PublicMember|undefined>( membersStore.getMemberById(member_id.value!));
     
 
 function ensure(array: string[], value: permission_enum, present: boolean) {
@@ -175,9 +174,9 @@ async function ensureData() {
 
   async function updatePermissions() {
     try {
-      await membersStore.updateMember({      
-        data: { id: member.value.id, permissions: member.value.permissions } ,
-      });
+      await membersStore.updateMember(     
+        { id: member.value?.id, permissions: member.value?.permissions } ,
+      );
       $q.notify({
         message: "Permissions were updated successfully",
         color: "positive",

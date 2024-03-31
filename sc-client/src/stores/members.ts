@@ -123,7 +123,7 @@ export const useMembersStore = defineStore('members', {
       guildId,
       full = true,
     }: {
-      guildId: number;
+      guildId: number|null;
       full?: boolean;
     }) {
       const guildStore = useGuildStore();
@@ -196,9 +196,10 @@ export const useMembersStore = defineStore('members', {
     async fetchMemberById(
       id: undefined | number | Array<number>,
       full: boolean = true,
-    ): Promise<AxiosResponse<PublicMember[]>> {
+    ) {
       const memberStore = useMemberStore();
       const params = Object();
+      params.id = id;
       if (id !== undefined) {
         if (Array.isArray(id)) {
           params.id = `in.(${params.id.join(',')})`;
@@ -233,7 +234,6 @@ export const useMembersStore = defineStore('members', {
           };
         }        
       }
-      return res;
     },
     async updateMember(
       data: Partial<Member>,

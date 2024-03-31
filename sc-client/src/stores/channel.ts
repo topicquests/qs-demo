@@ -111,7 +111,7 @@ export const useChannelStore = defineStore('channel', {
       guild != guildStore.currentGuild ||
       channelData[channel_id] === undefined
     ) {
-      await fetchChannelConversation({params: { node_id: channel_id }})
+      await this.fetchChannelConversation({params: { node_id: channel_id }})
     }
   },
   resetChannel: (state: ChannelState) => {
@@ -137,15 +137,18 @@ export const useChannelStore = defineStore('channel', {
     const params = {
       guild_id: `eq.${guild_id}`
     };
-    const res:AxiosResponse<ConversationNode> = await api.get('/conversation_node', {params})
+    const res:AxiosResponse<ConversationNode[]> = await api.get('/conversation_node', {params})
     if(res.status == 200) {
-      if (this.currentGuild !== params.guild_id) {
-        this.currentGuild = params.guild_id;
-        this.channelData = {};
+      const guildStore = useGuildStore();
+      if (res.data.length > 0) {
+          if (res.data[0].guild_id && guildStore.currentGuild !== res.data[0].guild_id) {
+          guildStore.currentGuild = res.data[0].guild_id;
+          this.channelData = {};
+        }
+        this.channels = Object.fromEntries(
+          res.data.map((node: ConversationNode) => [node.id, node]),
+        );
       }
-      this.channels = Object.fromEntries(
-        res.data.map((node: ConversationNode) => [node.id, node]),
-      );
     }
   },
   
@@ -175,7 +178,7 @@ export const useChannelStore = defineStore('channel', {
      if(res.status==200)
      {
       const node = res.data[0];
-      addToState(node);
+      this.addToState(node);
      }
     },
     async updateChannelNode(params: Partial<conversationNode>) {
@@ -185,7 +188,7 @@ export const useChannelStore = defineStore('channel', {
       })
       if (res.status == 200) {
         const node = res.data[0];
-        addToState(node);
+        this.addToState(node);
       }
     }
   }

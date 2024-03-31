@@ -29,7 +29,7 @@ export interface QuestMembership {
 export interface Casting {
   guild_id: number;
   quest_id: number;
-  member_id: number;
+  member_id?: number;
   permissions: permission_type[];
   status: registration_status_type;
   created_at: string;
@@ -270,7 +270,7 @@ export interface GuildMemberAvailableRole {
 
 export interface CastingRole {
   guild_id: number;
-  member_id: number;
+  member_id?: number;
   role_id: number;
   quest_id: number;
 }

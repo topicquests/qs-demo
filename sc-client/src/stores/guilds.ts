@@ -97,7 +97,7 @@ getters: {
       }
       return this.guilds;
     },
-    setCurrentGuild(guild_id: number) {
+    setCurrentGuild(guild_id: number|boolean) {
       this.currentGuild = guild_id;
       //getWSClient().setDefaultGuild(guild_id);
     },
@@ -439,7 +439,7 @@ getters: {
       params.member_id = data.member_id;
       params.guild_id = data.guild_id;
       params.role_id = data.role_id;
-      const res: AxiosResponse<GuildMemberAvailableRole> = await api.delete(
+      const res: AxiosResponse<GuildMemberAvailableRole[]> = await api.delete(
         '/guild_member_available_role',
         {
           params,

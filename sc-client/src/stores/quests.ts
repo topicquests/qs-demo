@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 //import { filterKeys} from './base';
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { useMemberStore } from './member';
 import { useMembersStore } from './members';
 import { useGuildStore } from './guilds';
@@ -20,6 +20,7 @@ import {
   PublicMember,
   questPatchKeys,
   GuildData,
+  Member,
 } from '../types';
 import {
   quest_status_enum,
@@ -53,10 +54,12 @@ const baseState: QuestsState = {
 export const useQuestStore = defineStore('quest', {
   state: () => baseState,
   getters: {
-    getCurrentQuest: (state: QuestsState): QuestData => {
-    if(state.currentQuest) 
-    return state.quests[state.currentQuest]
-  },
+    getCurrentQuest: (state: QuestsState): QuestData|undefined => {
+    if(state.currentQuest) { 
+      return state.quests[state.currentQuest]  
+    }
+      return undefined
+    },
     getQuests(): QuestData[] {
       return Object.values(this.quests);
     },
@@ -141,8 +144,8 @@ export const useQuestStore = defineStore('quest', {
       const currentGuildId = useGuildStore().currentGuild;
       if (!currentGuildId) return [];
       if (quest.casting) {
-      return quest.casting
-        .filter((c: Casting) => c.guild_id == currentGuildId)
+      return (quest.casting || [])
+        .filter((c: Casting) => c.guild_id == currentGuildId && c.member_id !== undefined)
         .map((c: Casting) => membersStore.members[c.member_id])
         .filter((member: PublicMember) => member);
       }
@@ -203,7 +206,7 @@ export const useQuestStore = defineStore('quest', {
       const membersStore = useMembersStore()
      if(quest.casting)
       return quest?.casting
-        .map((c: Casting) => membersStore.members[c.member_id])
+        .map((c: Casting) => membersStore.members[c.member_id!])
         .filter((member: PublicMember) => member);
     },
     getGamePlayForGuild: (state: QuestsState) =>
@@ -247,8 +250,8 @@ export const useQuestStore = defineStore('quest', {
           // maximum for all roles
           maxPubStates.sort(
             (a, b) =>
-              publication_state_list.indexOf(b) -
-              publication_state_list.indexOf(a),
+              publication_state_list.indexOf(b!) -
+              publication_state_list.indexOf(a!),
           );          
         }         
       }
@@ -391,39 +394,43 @@ export const useQuestStore = defineStore('quest', {
         const casting = res.data[0];
         let quest = this.quests[casting.quest_id];
         if (quest) {
-          const castings = quest.casting || [];
+          const castings = quest.casting || [] || undefined;
           castings.push(casting);
           quest = { ...quest, casting: castings };
           this.quests = { ...this.quests, [quest.id]: quest };
-        }
+        }        
         if ((casting.member_id = memberStore.getUserId) && memberStore.member) {
           const castings = (memberStore.member.casting || []).filter(
-            (c: Casting) => c.quest_id != casting.quest_id,
-          );
-          castings.push(casting);
-          memberStore.member.casting = castings;
+          (c: Casting) => c.quest_id != casting.quest_id,
+        );
+        castings.push(casting);
+        memberStore.member.casting = castings;
         }
       }
     },
-    async addCastingRole(castingRole: Partial<CastingRole>) {
+    async addCastingRole() {
       const memberStore = useMemberStore();
       const membersStore = useMembersStore();
-      const res: AxiosResponse<CastingRole> =
-        await axios.api.patch(castingRole);
+      const res: AxiosResponse<CastingRole[]> =
+        await api.post('/casting_role');
       if (res.status == 200) {
         const castingRole = res.data[0];
         if ((castingRole.member_id = memberStore.getUserId)) {
           if (memberStore.member) {
-            const castingRoles =
+            if(memberStore.member.casting_role) {
+            const castingRoles:CastingRole[] =
               memberStore.member.casting_role.filter(
-                (cr: CastingRole) => cr.role_id != casting_role.role_id,
+                (cr: CastingRole) => cr.role_id != castingRole.role_id,
               ) || [];
-            castingRoles.push(casting_role);
+            castingRoles.push(castingRole);
             memberStore.member.casting_role = castingRoles;
+            }
           }
         }
         const member_id = castingRole.member_id;
-        let member = memberStore.members[member_id];
+        if(memberStore.member && member_id !== undefined) {
+          let member  = membersStore.members[member_id];  
+        
         if (member) {
           const casting_role =
             member.casting_role?.filter(
@@ -436,6 +443,7 @@ export const useQuestStore = defineStore('quest', {
             [member_id]: member,
           };
         }
+      }
       }
     },
 
@@ -464,9 +472,10 @@ export const useQuestStore = defineStore('quest', {
         membersStore.removeCastingRole(res.data[0]);
       }
     },
-    async updateCasting(data) {
+    async updateCasting(data:Casting) {
       const memberStore = useMemberStore();
-      params.id = data.id;
+      const params=Object();
+      params.id = data.member_id;
       const res: AxiosResponse<Casting[]> = await api.patch('/casting', params);
       if (res.status == 200) {
         const casting = res.data[0];
@@ -479,20 +488,20 @@ export const useQuestStore = defineStore('quest', {
           castings.push(casting);
           quest.casting = castings;
         }
-        if ((casting.member_id = memberStore.getUserId())) {
-          if (this.member) {
+        if ((casting.member_id = memberStore.getUserId)) {
+          if (memberStore.member) {
             const castings =
-              this.member.casting.filter(
+              memberStore.member.casting!.filter(
                 (c: Casting) => c.quest_id != casting.quest_id,
               ) || [];
             castings.push(casting);
-            this.member.casting = castings;
+            memberStore.member.casting = castings;
           }
         }
       }
     },
     async createQuestBase(data: Partial<QuestData>): Promise<Partial<QuestData>> {
-      const res: AxiosResponse<QuestData> = await api.post('/quests', data);
+      const res: AxiosResponse<QuestData[]> = await api.post('/quests', data);
       if (res.status == 201) {
         const questData: QuestData = Object.assign(res.data[0], {
           last_node_published_at: null,
@@ -530,7 +539,7 @@ export const useQuestStore = defineStore('quest', {
         this.fullQuests = { ...this.fullQuests, [quest.id]: undefined };
       }
     },
-    async addQuestMembership() {
+    async addQuestMembership(params:Partial<QuestMembership>) {
       const memberStore = useMemberStore();
       const res: AxiosResponse<QuestMembership[]> = await api.post(
         '/quest_membership',
@@ -546,7 +555,7 @@ export const useQuestStore = defineStore('quest', {
         }
         if (memberStore.member) {
           const memberships =
-            memberStore.member.quest_membership.filter(
+            memberStore.member.quest_membership!.filter(
               (m: QuestMembership) => m.quest_id != membership.quest_id,
             ) || [];
           memberships.push(membership);
@@ -554,16 +563,17 @@ export const useQuestStore = defineStore('quest', {
         }
       }
     },
-    async updateQuestMembership(data) {
+    async updateQuestMembership(data:Partial<QuestMembership>) {
       const memberStore = useMemberStore();
-      params.id = data.id;
+      const params = Object();
+      params.id = data.member_id;
       const res: AxiosResponse<QuestMembership[]> = await api.patch(
         '/quest_membership',
         params,
       );
       if (res.status == 200) {
         const membership = res.data[0];
-        const quest = state.quests[membership.quest_id];
+        const quest = this.quests[membership.quest_id];
         if (quest) {
           const memberships =
             quest.quest_membership?.filter(
@@ -574,7 +584,7 @@ export const useQuestStore = defineStore('quest', {
         }
         if (memberStore.member) {
           const memberships =
-            memberStore.member.quest_membership.filter(
+            memberStore.member.quest_membership!.filter(
               (m: QuestMembership) => m.quest_id != membership.quest_id,
             ) || [];
           memberships.push(membership);
@@ -582,14 +592,14 @@ export const useQuestStore = defineStore('quest', {
         }
       }
     },
-    async addGamePlay() {
+    async addGamePlay(params:GamePlay) {
       const guildStore = useGuildStore();
       const res: AxiosResponse<GamePlay[]> = await api.post(
         '/game_play',
         params,
       );
       if (res.status == 200) {
-        const game_play = res.data[0];
+        const game_play:GamePlay = res.data[0];
         const quest = this.quests[game_play.quest_id];
         if (quest) {
           const game_plays = quest.game_play || [];
@@ -610,29 +620,33 @@ export const useQuestStore = defineStore('quest', {
       }
     },
     async updateGamePlay(data: { id: number }) {
+      const guildStore = useGuildStore();
+      const params = Object();
       params.id = data.id;
       const res: AxiosResponse<GamePlay[]> = await api.patch(
         '/game_play',
         params,
       );
       if (res.status == 200) {
-        const game_play = res.data[0];
-        const quest = this.quests[game_play.quest_id];
+        const game_play:Partial<GamePlay> = res.data[0];
+        const quest = this.quests[game_play.quest_id!];
         if (quest) {
-          const game_plays =
+          const game_plays:Partial<GamePlay[]> =
             quest.game_play?.filter(
-              (gp: GamePlay) => gp.quest_id !== game_play.quest_id,
-            ) || [];
-          game_plays.push(game_play);
+              (gp: GamePlay) => gp.quest_id !== game_play.quest_id
+            );
+          game_plays.push(game_plays);
           quest.game_play = game_plays;
         }
+        const guild_id = game_play.guild_id;
+        const guild = guildStore.guilds[guild_id]
         if (guild) {
           const game_plays =
             guild.game_play?.filter(
               (gp: GamePlay) => gp.quest_id !== game_play.quest_id,
             ) || [];
           game_plays.push(game_play);
-          guildStore.guild.game_play = game_plays;
+          guild.game_play = game_plays;
         }
       }
     },

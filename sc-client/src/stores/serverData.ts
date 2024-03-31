@@ -41,11 +41,11 @@ export const useServerDataStore = defineStore('serverData', {
         '/server_data',
         serverData,
       );
-      if (res == 200) {
+      if (res.status == 200) {
         this.serverData = Object.assign({}, this.serverData, res.data[0]);
       }
     },
-    async resetDefaultSingle(): string {
+    async resetDefaultSingle(): Promise<string> {
       const res: AxiosResponse<Member[]> = await api.get(
         '/server_data',
         serverData,

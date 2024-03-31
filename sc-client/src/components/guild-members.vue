@@ -4,7 +4,7 @@
       <h3 class="text-center">Team</h3>
     </div>
     <ul class="q-ml-md">
-      <li v-for="member in membersStore.members" :key="member.id" class="q-ml-lg q-mr-md">
+      <li v-for="member in members" :key="member.id" class="q-ml-lg q-mr-md">
         <div class="row">
           <div class="col-4">
             <span class="q-pr-md q-ml-md"> {{ member.handle }} </span>
@@ -44,7 +44,7 @@ import { useRoleStore } from 'src/stores/role';
 
 const GuildMembersProps = defineProps<{
     guild: Guild;
-    quest: Quest;
+    quest?: Quest;
     members: PublicMember[] | undefined,
     playersOnly?: boolean,
 }>();
@@ -62,7 +62,7 @@ function playingAsGuild(member_id: number): Guild {
     return guildStore.getGuildById(guild_id);
 }
 function getCastingRoleNamesForQuest(memberId: number) {
-  const castingRoles = membersStore.castingRolesPerQuest(memberId, GuildMembersProps.quest.id);
+  const castingRoles = membersStore.castingRolesPerQuest(memberId, GuildMembersProps.quest!.id);
   const roles = castingRoles.map((cr) => roleStore.role[cr.role_id]);
   return roles;
 }

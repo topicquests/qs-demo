@@ -244,7 +244,7 @@ export const useConversationStore = defineStore('conversation', {
         node_id != this.neighbourhoodRoot ||
         Object.keys(this.neighbourhood).length == 0
       ) {
-        await fetchConversationNeighbourhood({
+        await this.fetchConversationNeighbourhood({
           params: { node_id, guild },
         });
       }
