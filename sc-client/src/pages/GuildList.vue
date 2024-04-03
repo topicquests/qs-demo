@@ -43,7 +43,7 @@ const roleStore = useRoleStore();
 const questStore = useQuestStore();
 
 onBeforeMount(async() => {
-  await userLoaded;
+  //await userLoaded;
   await Promise.all([
       guildStore.ensureAllGuilds(),
       await roleStore.ensureAllRoles(),

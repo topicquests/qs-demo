@@ -98,7 +98,10 @@ getters: {
       return this.guilds;
     },
     setCurrentGuild(guild_id: number|boolean) {
-      this.currentGuild = guild_id;
+      if (typeof guild_id === 'number') {
+        this.currentGuild = guild_id;
+      }
+     
       //getWSClient().setDefaultGuild(guild_id);
     },
     async ensureGuild(

@@ -114,7 +114,7 @@
 
 <script setup lang="ts">
 import IbisButton from "./ibis-btn.vue";
-import { ConversationNode, Role } from "../types";
+import { ConversationNode, Role, defaultNodeType } from "../types";
 import {
   ibis_node_type_list,
   ibis_node_type_type,
@@ -125,7 +125,7 @@ import { computed } from "vue";
 import { QInput } from "quasar";
 
 const NodeFormProps = defineProps<{
-    nodeInput: Partial<ConversationNode>;
+    nodeInput?: Partial<ConversationNode>|defaultNodeType;
     editing: boolean;
     ibisTypes: ibis_node_type_type[];
     allowChangeMeta: boolean;

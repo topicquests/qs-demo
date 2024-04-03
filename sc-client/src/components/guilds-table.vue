@@ -53,11 +53,7 @@
               </router-link>
               <router-link
                 v-if="
-                  baseStore.hasPermission(
-                    permission_enum.guildAdmin,
-                    props.row.id,
-                  )
-                "
+                hasGuildAdminPermission(props.row.id)"
                 :to="{
                   name: 'guild_admin',
                   params: { guild_id: props.row.id },
@@ -100,7 +96,7 @@ import GuildsPlayingIndicator from './guilds-playing-indicator.vue';
 import { useQuestStore } from 'src/stores/quests';
 import { useGuildStore } from 'src/stores/guilds';
 import { useBaseStore } from 'src/stores/baseStore';
-import { onBeforeMount } from 'vue';
+import { computed, onBeforeMount } from 'vue';
 import { permission_enum } from 'src/enums';
 import { useMemberStore } from 'src/stores/member';
 
@@ -195,6 +191,13 @@ const columns: QTableProps['columns']=[
   },
   ...extra,
 ];
+
+const hasGuildAdminPermission = computed(() => (id:number) => {
+  return baseStore.hasPermission(
+    permission_enum.guildAdmin,
+    id        
+  );
+})
 
 function guildData(): Partial<GuildData[]> {
   return GuildsTableProp.guilds.map((guild: GuildData) => guildRow(guild));

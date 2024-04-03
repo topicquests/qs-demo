@@ -141,7 +141,7 @@
                   v-if="availableRoles.length"
                   :availableRoles="availableRoles"
                   :castingRoles="castingRoles"
-                  :guildId="guildId"
+                  :guildId!="guildId"
                   :questId="questStore.currentQuest"
                   :memberId="memberId"
                   v-on:castingRoleAdd="castingRoleAdded"

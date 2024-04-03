@@ -93,8 +93,8 @@ function getOpenGuilds(): GuildData[] {
 onBeforeMount(async () => {
   //await userLoaded;
   // all guilds and quests
-  //await guildsStore.setCurrentGuild(true);
-  //await questsStore.setCurrentQuest(true);
+  await guildsStore.setCurrentGuild(true);
+  await questsStore.setCurrentQuest(true);
   await Promise.all([
     questsStore.ensureAllQuests(),
     guildsStore.ensureAllGuilds(),

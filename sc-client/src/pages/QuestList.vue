@@ -3,7 +3,7 @@
     <div class="row justify-center">
       <q-card class="q-mt-md quest-card">
         <div>
-          <!-- member></member -->
+          <member-handle></member-handle>
         </div>
         <div class="column items-center">
           <div class="col-12 q-mb-md">
@@ -17,7 +17,7 @@
               v-if="memberStore.member"
               label="New Quest"
               @click="
-                $router.push({
+                  router.push({
                   name: 'create_quest',
                 })
               "
@@ -32,8 +32,8 @@
               style="width: 100%"
             >
               <quest-table
-                v-bind:quests="questStore.getQuests"
-                title="Quests"
+                :quests="questStore.getQuests"
+                :title="'Quests'"
               />
             </div>
             <div v-else class="column items-center q-mt-md">
@@ -55,23 +55,26 @@ import { userLoaded } from '../boot/userLoaded';
 import { useMemberStore } from 'src/stores/member';
 import { useQuestStore } from 'src/stores/quests';
 import { useGuildStore } from 'src/stores/guilds';
-import { onBeforeMount } from 'vue';
+import { onBeforeMount, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { memberHandle } from '../components/member-handle.vue'
 
 const memberStore = useMemberStore();
 const questStore = useQuestStore();
 const guildStore = useGuildStore();
+const router = useRouter()
 
-let ready = false;
+let ready = ref(false);
 
 onBeforeMount(async () => {
-  await userLoaded;
+  //await userLoaded;
   // not using those yet?
   await Promise.all([
     questStore.ensureAllQuests(),
     guildStore.setCurrentGuild(false),
     questStore.setCurrentQuest(true),
   ]);
-  ready = true;
+  ready.value = true;
 });
 </script>
 

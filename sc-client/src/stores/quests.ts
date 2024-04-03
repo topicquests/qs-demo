@@ -267,9 +267,11 @@ export const useQuestStore = defineStore('quest', {
         await this.fetchQuests(undefined);
       }
     },
-    setCurrentQuest(quest_id: number) {
-      this.currentQuest = quest_id;
-      getWSClient().setDefaultQuest(quest_id);
+    setCurrentQuest(quest_id: number|boolean) {
+      if (typeof quest_id === 'number') {
+        this.currentQuest = quest_id;
+      }
+     // getWSClient().setDefaultQuest(quest_id);
     },
     async fetchQuests(
       id: undefined | number | Array<number>,
