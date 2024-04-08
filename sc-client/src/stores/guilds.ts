@@ -22,7 +22,7 @@ interface GuildMap {
 };
 export interface GuildsState {
   guilds: GuildMap;
-  currentGuild: number;
+  currentGuild: number|boolean;
   fullFetch: boolean;
   fullGuilds: { [key: number]: boolean };
 };
@@ -37,8 +37,13 @@ export const useGuildStore = defineStore('guild', {
   state: () => baseState,
 
 getters: {
-  getCurrentGuild: (state: GuildsState): GuildData => 
-      state.guilds[state.currentGuild],
+  getCurrentGuild: (state: GuildsState): GuildData|undefined => {
+    if (typeof state.currentGuild === 'number') { 
+      return state.guilds[state.currentGuild]
+    } else {
+      return undefined
+    }
+  },
   getGuilds: (state: GuildsState) => Object.values(state.guilds),
   getGuildById: (state: GuildsState) => (id: number) => state.guilds[id],
   getMyGuilds: (state: GuildsState): GuildData[] => {

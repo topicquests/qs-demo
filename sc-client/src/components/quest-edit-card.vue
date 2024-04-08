@@ -326,7 +326,7 @@ const emit = defineEmits(['doUpdateQuest']);
 
 async function doEndTurn() {
   try {
-    await questStore.endTurn({ data: { quest_id: quest.value.id } });
+    await questStore.endTurn({  quest_id: quest.value.id! });
     $q.notify({
       type: "positive",
       message: "Turn ended",

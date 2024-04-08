@@ -95,7 +95,7 @@ import { ConversationNode, Quest, QuestData, defaultNodeType } from "src/types";
 const $q = useQuasar();
 const questStore = useQuestStore();
 const conversationStore = useConversationStore();
-let quest_id = ref<number>()
+let quest_id = ref<number|null>(null)
 const base_ibis_types = [ibis_node_type_enum.question];
 const ready = ref(false);
 const isAdmin = true;
@@ -122,11 +122,9 @@ async function editNode(node:ConversationNode) {
 }
 async function addNode(node:ConversationNode) {
   try {
-    const data: { node: ConversationNode | defaultNodeType } = { 
-    node: { ...node, ...node } };
-      
-    data.node.quest_id = quest_id.value;  
-    await conversationStore.createConversationNode(data);
+    const data:ConversationNode|defaultNodeType = { ...node, ...node };
+    data.quest_id = quest_id.value!;  
+    await conversationStore.createConversationNode(data );
     $q.notify({
       message: `Added node to conversation`,
       color: "positive",
@@ -185,16 +183,17 @@ async function doSubmitQuest(quest: Partial<Quest>) {
 onBeforeMount(async() =>{
   if (typeof route.params.quest_id === 'string') {
     quest_id.value = Number.parseInt(route.params.quest_id);
-  }  
-  //await userLoaded;
-  if(quest_id.value) {
-  await questStore.setCurrentQuest(quest_id.value);
-  await questStore.ensureQuest({ quest_id: quest_id.value });
-  await conversationStore.ensureConversation(quest_id.value);
-  if (conversationStore.getConversation.length > 0) {
-    await conversationStore.fetchRootNode( { quest_id: quest_id.value } );
   }
-}
+  const questId = quest_id.value;
+    //await userLoaded;
+  if (typeof questId === 'number') {
+    await questStore.setCurrentQuest(questId);
+    await questStore.ensureQuest({ quest_id: questId });
+    await conversationStore.ensureConversation(questId);
+    if (conversationStore.getConversation.length > 0) {
+      await conversationStore.fetchRootNode( { quest_id: questId } );
+    }
+  }
   ready.value = true;
 })
 

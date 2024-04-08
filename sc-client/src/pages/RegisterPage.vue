@@ -113,7 +113,6 @@
 
 <script setup lang="ts">
 import { useQuasar, Notify } from 'quasar';
-import { Member } from 'src/types';
 import { useRouter } from 'vue-router';
 import { useMemberStore } from 'src/stores/member';
 import axios from 'axios';
@@ -135,7 +134,7 @@ const formdata = ref<FormData>({
   password: undefined,
 });
 const $q = useQuasar();
-let isPwd = true;
+let isPwd = ref(true);
 
 function doRegister() {
   try {
