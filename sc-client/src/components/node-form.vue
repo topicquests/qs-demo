@@ -63,7 +63,7 @@
       <q-select
         v-if="node.status == 'role_draft'"
         v-model="node.draft_for_role_id"
-        :options="roles"
+        :options="NodeFormProps.roles"
         option-label="name"
         option-value="id"
         :emit-value="true"
@@ -128,16 +128,16 @@ const NodeFormProps = defineProps<{
     nodeInput?: Partial<ConversationNode>|defaultNodeType;
     editing: boolean;
     ibisTypes: ibis_node_type_type[];
-    allowChangeMeta: boolean;
-    roles: Role[];
-    pubFn: (node: Partial<ConversationNode>) => publication_state_type[];
+    allowChangeMeta?: boolean;
+    roles?: Role[];
+    pubFn?: (node: Partial<ConversationNode>) => publication_state_type[],
 }>();
 const emit = defineEmits(['action', 'cancel']);
 let node: Partial<ConversationNode> = {};
 let pub_state_list: publication_state_type[] = publication_state_list
 const description = computed( {
   get() {
-    return NodeFormProps.nodeInput.description || "";
+    return NodeFormProps.nodeInput!.description || "";
   },
   set(value) {
     node.description = value;

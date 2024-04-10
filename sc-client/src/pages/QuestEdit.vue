@@ -107,9 +107,12 @@ const defaultNode:defaultNodeType = {
     status: "private_draft",
     node_type: "question",
 };
-function node(): Partial<ConversationNode>|undefined|defaultNodeType {
-      return conversationStore.getRootNode || defaultNode;
+let node = node1();
+function node1(): Partial<ConversationNode> | defaultNodeType {  
+  const rootNode = conversationStore.getRootNode;
+    return rootNode || defaultNode;
 }
+
 function quest(): QuestData|undefined {
       return questStore.getCurrentQuest;
 }
