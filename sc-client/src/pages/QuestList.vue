@@ -57,7 +57,7 @@ import { useQuestStore } from 'src/stores/quests';
 import { useGuildStore } from 'src/stores/guilds';
 import { onBeforeMount, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { memberHandle } from '../components/member-handle.vue'
+import memberHandle  from '../components/member-handle.vue'
 
 const memberStore = useMemberStore();
 const questStore = useQuestStore();

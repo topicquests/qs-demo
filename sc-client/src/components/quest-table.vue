@@ -136,19 +136,19 @@ import {
   quest_status_enum,
   quest_status_type,
 } from '../enums';
-import { GuildMembership, QuestData, Member } from '../types';
+import { GuildMembership, Quest, Member, QuestData } from '../types';
 import QuestDateTimeInterval from './quest-date-time-interval.vue';
 import { onBeforeMount, ref } from 'vue';
 
 const QuestTableProps = defineProps<{
-  quests: QuestData[];
+  quests: Quest;
   title: string;
 }>();
 
 const questStore = useQuestStore();
 const memberStore = useMemberStore();
 const baseStore = useBaseStore();
-let questStatus = ref<quest_status_type>('All');
+let questStatus = ref<quest_status_type|string>('All');
 let questStatusOptions: quest_status_type[];
 
 const columns: QTableProps['columns'] = [
@@ -236,7 +236,7 @@ function refInterval(row: QuestData) {
   const refTime = start > now ? start : end;
   return Math.abs(refTime - now);
 }
-function getFilteredQuests(): Partial<QuestData[]> {
+function getFilteredQuests(): Partial<Quest>|any[] {
   if (questStatus.value && questStatus.value != 'All') {
     return questStore.getQuestsByStatus(questStatus.value);
   } else {
@@ -245,7 +245,7 @@ function getFilteredQuests(): Partial<QuestData[]> {
       questStore.getQuestsByStatus(quest_status_enum.finished),
     );
     questStatus.value = 'All';
-    return questStore.getQuestsByStatus(quest_status_enum.finished);
+    return QuestTableProps.quests;
   }
 }
 

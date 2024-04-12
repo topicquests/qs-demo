@@ -41,11 +41,11 @@ export interface QuestsState {
   quests: QuestMap;
   fullQuests: { [key: number]: boolean };
   fullFetch: boolean;
-  currentQuest: number;
+  currentQuest?: number;
 }
 
 const baseState: QuestsState = {
-  currentQuest: 0,
+  currentQuest: undefined,
   fullFetch: false,
   quests: {},
   fullQuests: {},
@@ -72,7 +72,7 @@ export const useQuestStore = defineStore('quest', {
         ),
       );
     },
-    getActiveQuests: (state: QuestsState) =>
+    getActiveQuests: (state: QuestsState): Quest[] =>
       Object.values(state.quests).filter(
         (quest) =>
           ['ongoing', 'paused', 'registration'].indexOf(quest.status) >= 0,
@@ -222,7 +222,7 @@ export const useQuestStore = defineStore('quest', {
           );
         }
       },
-    getQuestsByStatus: (state: QuestsState) => (status: quest_status_enum) =>
+    getQuestsByStatus: (state: QuestsState) => (status: quest_status_enum|string) =>
       Object.values(state.quests).filter(
         (quest: QuestData) => quest.status == status,
       ),
@@ -525,11 +525,11 @@ export const useQuestStore = defineStore('quest', {
       return res.data[0];
     },
     async updateQuest(data: Partial<Quest>) {
-      const params = Object.assign(data);
+     const params = Object()
       params.id = data.id;
       data = filterKeys(data, questPatchKeys);
       const res: AxiosResponse<QuestData[]> = await api.patch(
-        `/quests/${params}`,
+        `/quests/${params.id}`,
         data,
       );
       if (res.status == 200) {

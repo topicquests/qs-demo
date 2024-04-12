@@ -11,12 +11,12 @@ const QuestDateTimeIntervalProps = defineProps<{
   quest: QuestData;
 }>();
 
-let now = DateTime.now();
-let start: DateTime = DateTime.fromISO(QuestDateTimeIntervalProps.quest.start);
-let end: DateTime = DateTime.fromISO(QuestDateTimeIntervalProps.quest.end);
+const now = DateTime.now();
+const start: DateTime = DateTime.fromISO(QuestDateTimeIntervalProps.quest.start);
+const end: DateTime = DateTime.fromISO(QuestDateTimeIntervalProps.quest.end);
 
 function display(): string {
-  let prefix: string;
+  let prefix: string='';
   if (now < start) prefix = 'starting ';
   else if (now > end) prefix = 'ended ';
   else prefix = 'ending ';
