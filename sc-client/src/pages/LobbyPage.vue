@@ -76,6 +76,7 @@ import { Guild, GuildData } from '../types';
 import { onBeforeMount, ref } from 'vue';
 import member from '../components/member-handle.vue';
 import { useMembersStore } from 'src/stores/members';
+import { waitUserLoaded } from '../app-access';
 
 const memberStore = useMemberStore();
 const guildsStore = useGuildStore();
@@ -91,7 +92,7 @@ function getOpenGuilds(): GuildData[] {
 }
 
 onBeforeMount(async () => {
-  //await userLoaded;
+  await waitUserLoaded();
   // all guilds and quests
   await guildsStore.setCurrentGuild(true);
   await questsStore.setCurrentQuest(true);
