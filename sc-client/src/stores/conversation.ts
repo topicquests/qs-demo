@@ -90,11 +90,11 @@ export const useConversationStore = defineStore('conversation', {
       Object.values(state.conversation),
     getConversationNodeById: (state: ConversationState) => (id: number) =>
       state.conversation[id],
-    getRootNode: (state: ConversationState): ConversationNode|undefined => {
+    getRootNode: (state: ConversationState): ConversationNode | undefined => {
       if (state.conversationRoot) {
-        return state.conversationRoot
+        return state.conversationRoot;
       }
-      return undefined
+      return undefined;
     },
     getNeighbourhood: (state: ConversationState): ConversationNode[] =>
       Object.values(state.neighbourhood),
@@ -225,12 +225,12 @@ export const useConversationStore = defineStore('conversation', {
     async ensureConversation(quest_id: number) {
       // maybe allow guildId, min status.
       if (quest_id != this.currentQuest || !this.full) {
-        await this.fetchConversation( { quest_id } );
+        await this.fetchConversation({ quest_id });
       }
     },
     async ensureRootNode(quest_id: number | undefined) {
       if (quest_id != this.currentQuest || !this.conversationRoot) {
-        await this.fetchRootNode( { quest_id } );
+        await this.fetchRootNode({ quest_id });
       }
     },
     async ensureConversationNeighbourhood({
@@ -259,8 +259,8 @@ export const useConversationStore = defineStore('conversation', {
         });
       }
     },
-    resetConversation: () => {
-      Object.assign(baseState);
+    resetConversation() {
+      Object.assign(this, baseState);
     },
     async fetchConversationNode(params: { id: number }) {
       const res: AxiosResponse<ConversationNode[]> = await api.get(
@@ -312,7 +312,7 @@ export const useConversationStore = defineStore('conversation', {
         );
       }
     },
-    async fetchRootNode(params: { quest_id:number|undefined }) {
+    async fetchRootNode(params: { quest_id: number | undefined }) {
       const res: AxiosResponse<ConversationNode[]> = await api.get(
         `/conversation_node?quest_id=eq.${params.quest_id}&parent_id=is.null&meta=eq.conversation`,
       );
@@ -378,7 +378,9 @@ export const useConversationStore = defineStore('conversation', {
         }
       }
     },
-    async createConversationNode(data: { node: ConversationNode|defaultNodeType}) {
+    async createConversationNode(data: {
+      node: ConversationNode | defaultNodeType;
+    }) {
       const res: AxiosResponse<ConversationNode[]> = await api.post(
         '/conversation_node',
         data,
@@ -388,7 +390,9 @@ export const useConversationStore = defineStore('conversation', {
         this.addToState(node);
       }
     },
-    async updateConversationNode(data: Partial<ConversationNode>|defaultNodeType) {
+    async updateConversationNode(
+      data: Partial<ConversationNode> | defaultNodeType,
+    ) {
       const params = Object();
       params.id = data.id;
       data = filterKeys(data, conversationNodePatchKeys);

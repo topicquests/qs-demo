@@ -54,11 +54,11 @@ const baseState: QuestsState = {
 export const useQuestStore = defineStore('quest', {
   state: () => baseState,
   getters: {
-    getCurrentQuest: (state: QuestsState): QuestData|undefined => {
-    if(state.currentQuest) { 
-      return state.quests[state.currentQuest]  
-    }
-      return undefined
+    getCurrentQuest: (state: QuestsState): QuestData | undefined => {
+      if (state.currentQuest) {
+        return state.quests[state.currentQuest];
+      }
+      return undefined;
     },
     getQuests(): QuestData[] {
       return Object.values(this.quests);
@@ -76,7 +76,7 @@ export const useQuestStore = defineStore('quest', {
       Object.values(state.quests).filter(
         (quest) =>
           ['ongoing', 'paused', 'registration'].indexOf(quest.status) >= 0,
-    ),
+      ),
     getPlayingQuests: (state: QuestsState) => {
       const member_id = useMemberStore().getUserId;
       return Object.values(state.quests).filter((quest: QuestData) =>
@@ -111,32 +111,32 @@ export const useQuestStore = defineStore('quest', {
     },
     getCastingRoles:
       () =>
-      (member_id: number): Role[]|undefined => {
+      (member_id: number): Role[] | undefined => {
         const castingRoles = useMembersStore().getPlayersRoles(member_id);
-        if(castingRoles) {
-        const roles = castingRoles.map((pr) =>
-          useRoleStore().getRoleById(pr.role_id),
-        );
-        return roles;
+        if (castingRoles) {
+          const roles = castingRoles.map((pr) =>
+            useRoleStore().getRoleById(pr.role_id),
+          );
+          return roles;
         }
-        return undefined 
+        return undefined;
       },
     getCastingRolesForQuest:
       () =>
-      (member_id: number, quest_id: number): Role[]|undefined => {
+      (member_id: number, quest_id: number): Role[] | undefined => {
         const castingRoles = useMembersStore().getPlayersRoles(member_id);
-        if(castingRoles) {
-        const playerRoles = castingRoles.filter(
-          (role) => role.quest_id == quest_id,
-        );
-        
-        const roles = playerRoles.map((pr) =>
-          useRoleStore().getRoleById(pr.role_id),
-        );
-        
-        return roles;
+        if (castingRoles) {
+          const playerRoles = castingRoles.filter(
+            (role) => role.quest_id == quest_id,
+          );
+
+          const roles = playerRoles.map((pr) =>
+            useRoleStore().getRoleById(pr.role_id),
+          );
+
+          return roles;
         }
-        return undefined
+        return undefined;
       },
     getPlayersOfCurrentQuestGuild: (state: QuestsState) => {
       const quest = state.quests[state.currentQuest];
@@ -144,10 +144,13 @@ export const useQuestStore = defineStore('quest', {
       const currentGuildId = useGuildStore().currentGuild;
       if (!currentGuildId) return [];
       if (quest.casting) {
-      return (quest.casting || [])
-        .filter((c: Casting) => c.guild_id == currentGuildId && c.member_id !== undefined)
-        .map((c: Casting) => membersStore.members[c.member_id])
-        .filter((member: PublicMember) => member);
+        return (quest.casting || [])
+          .filter(
+            (c: Casting) =>
+              c.guild_id == currentGuildId && c.member_id !== undefined,
+          )
+          .map((c: Casting) => membersStore.members[c.member_id])
+          .filter((member: PublicMember) => member);
       }
     },
 
@@ -180,7 +183,7 @@ export const useQuestStore = defineStore('quest', {
       },
     getCastingRolesById:
       () =>
-      (member_id: number, quest_id: number): CastingRole[]|undefined => {
+      (member_id: number, quest_id: number): CastingRole[] | undefined => {
         const castingRoles = useMembersStore().getPlayersRoles(member_id);
         const playerRoles = castingRoles?.filter(
           (role) => role.quest_id == quest_id,
@@ -189,7 +192,7 @@ export const useQuestStore = defineStore('quest', {
       },
     getMembersOfCurrentQuest: (state: QuestsState) => {
       const quest = state.quests[state.currentQuest];
-      const membersStore = useMembersStore()
+      const membersStore = useMembersStore();
       return quest?.quest_membership
         ?.map((qm: QuestMembership) => membersStore.members[qm.member_id])
         .filter((member: PublicMember) => member);
@@ -203,14 +206,15 @@ export const useQuestStore = defineStore('quest', {
       },
     getPlayersOfCurrentQuest: (state: QuestsState) => {
       const quest = state.quests[state.currentQuest];
-      const membersStore = useMembersStore()
-     if(quest.casting)
-      return quest?.casting
-        .map((c: Casting) => membersStore.members[c.member_id!])
-        .filter((member: PublicMember) => member);
+      const membersStore = useMembersStore();
+      if (quest.casting)
+        return quest?.casting
+          .map((c: Casting) => membersStore.members[c.member_id!])
+          .filter((member: PublicMember) => member);
     },
-    getGamePlayForGuild: (state: QuestsState) =>
-      (guild_id: number): GamePlay|undefined => {
+    getGamePlayForGuild:
+      (state: QuestsState) =>
+      (guild_id: number): GamePlay | undefined => {
         if (state.currentQuest) {
           const quest = state.quests[state.currentQuest];
           return quest?.game_play?.find(
@@ -228,46 +232,45 @@ export const useQuestStore = defineStore('quest', {
         quest_id: number,
         node_type: ibis_node_type_type,
       ): publication_state_type => {
-        const roleCastings: CastingRole[]|undefined =
+        const roleCastings: CastingRole[] | undefined =
           useMemberStore().castingRolesForQuest(quest_id);
-        if(roleCastings) {
+        if (roleCastings) {
           const roles: Role[] = roleCastings.map((rc) =>
-          useRoleStore().getRoleById(rc.role_id),
-        );
-        if(roles){
-        
-        let maxPubStates = roles.map((role) => role.max_pub_state);
-        maxPubStates = maxPubStates.concat(
-          roles.map((role) =>
-          role.role_node_constraint
-            ? role.role_node_constraint.find((x) => x.node_type == node_type)?.max_pub_state
-            : undefined
-        )
-        
-        );
-        maxPubStates = maxPubStates.filter((x) => x != undefined);
-        if (maxPubStates.length > 0) {
-          // maximum for all roles
-          maxPubStates.sort(
-            (a, b) =>
-              publication_state_list.indexOf(b!) -
-              publication_state_list.indexOf(a!),
-          );          
-        }         
-      }
-       
+            useRoleStore().getRoleById(rc.role_id),
+          );
+          if (roles) {
+            let maxPubStates = roles.map((role) => role.max_pub_state);
+            maxPubStates = maxPubStates.concat(
+              roles.map((role) =>
+                role.role_node_constraint
+                  ? role.role_node_constraint.find(
+                      (x) => x.node_type == node_type,
+                    )?.max_pub_state
+                  : undefined,
+              ),
+            );
+            maxPubStates = maxPubStates.filter((x) => x != undefined);
+            if (maxPubStates.length > 0) {
+              // maximum for all roles
+              maxPubStates.sort(
+                (a, b) =>
+                  publication_state_list.indexOf(b!) -
+                  publication_state_list.indexOf(a!),
+              );
+            }
+          }
         }
         // no constraint
         return publication_state_enum.submitted;
       },
   },
   actions: {
-    async ensureAllQuests(){
+    async ensureAllQuests() {
       if (Object.keys(this.quests).length === 0 || !this.fullFetch) {
         await this.fetchQuests(undefined);
       }
     },
-    setCurrentQuest(quest_id: number|boolean) {
+    setCurrentQuest(quest_id: number | boolean) {
       if (typeof quest_id === 'number') {
         this.currentQuest = quest_id;
       }
@@ -316,7 +319,7 @@ export const useQuestStore = defineStore('quest', {
         this.fullFetch = true;
         return res.data;
       }
-      return undefined
+      return undefined;
     },
     async ensureQuest({
       quest_id,
@@ -336,22 +339,22 @@ export const useQuestStore = defineStore('quest', {
       const res: Partial<QuestData> = await this.createQuestBase(data);
       // Refetch to get memberships.
       // TODO: maybe add representation to creation instead?
-      await this.fetchQuestById( res.id );
+      await this.fetchQuestById(res.id);
       // TODO: Get the membership from the quest
       await useMemberStore().fetchLoginUser();
       await useConversationStore().resetConversation();
       return res;
     },
 
-    async ensureCurrentQuest ( quest_id: number, full = true ){
+    async ensureCurrentQuest(quest_id: number, full = true) {
       await this.ensureQuest({ quest_id, full });
       await this.setCurrentQuest(quest_id);
     },
-    resetQuests: () => {
-      Object.assign(baseState);
+    resetQuests() {
+      Object.assign(this, baseState);
     },
 
-    async fetchQuestById(id: number | number[]| undefined, full?: boolean) {
+    async fetchQuestById(id: number | number[] | undefined, full?: boolean) {
       const params = Object();
       if (Array.isArray(id)) {
         params.id = `in.(${id.join(',')})`;
@@ -400,52 +403,51 @@ export const useQuestStore = defineStore('quest', {
           castings.push(casting);
           quest = { ...quest, casting: castings };
           this.quests = { ...this.quests, [quest.id]: quest };
-        }        
+        }
         if ((casting.member_id = memberStore.getUserId) && memberStore.member) {
           const castings = (memberStore.member.casting || []).filter(
-          (c: Casting) => c.quest_id != casting.quest_id,
-        );
-        castings.push(casting);
-        memberStore.member.casting = castings;
+            (c: Casting) => c.quest_id != casting.quest_id,
+          );
+          castings.push(casting);
+          memberStore.member.casting = castings;
         }
       }
     },
     async addCastingRole() {
       const memberStore = useMemberStore();
       const membersStore = useMembersStore();
-      const res: AxiosResponse<CastingRole[]> =
-        await api.post('/casting_role');
+      const res: AxiosResponse<CastingRole[]> = await api.post('/casting_role');
       if (res.status == 200) {
         const castingRole = res.data[0];
         if ((castingRole.member_id = memberStore.getUserId)) {
           if (memberStore.member) {
-            if(memberStore.member.casting_role) {
-            const castingRoles:CastingRole[] =
-              memberStore.member.casting_role.filter(
-                (cr: CastingRole) => cr.role_id != castingRole.role_id,
-              ) || [];
-            castingRoles.push(castingRole);
-            memberStore.member.casting_role = castingRoles;
+            if (memberStore.member.casting_role) {
+              const castingRoles: CastingRole[] =
+                memberStore.member.casting_role.filter(
+                  (cr: CastingRole) => cr.role_id != castingRole.role_id,
+                ) || [];
+              castingRoles.push(castingRole);
+              memberStore.member.casting_role = castingRoles;
             }
           }
         }
         const member_id = castingRole.member_id;
-        if(memberStore.member && member_id !== undefined) {
-          let member  = membersStore.members[member_id];  
-        
-        if (member) {
-          const casting_role =
-            member.casting_role?.filter(
-              (cr: CastingRole) => cr.role_id != castingRole.role_id,
-            ) || [];
-          casting_role.push(castingRole);
-          member = { ...member, casting_role };
-          membersStore.members = {
-            ...membersStore.members,
-            [member_id]: member,
-          };
+        if (memberStore.member && member_id !== undefined) {
+          let member = membersStore.members[member_id];
+
+          if (member) {
+            const casting_role =
+              member.casting_role?.filter(
+                (cr: CastingRole) => cr.role_id != castingRole.role_id,
+              ) || [];
+            casting_role.push(castingRole);
+            member = { ...member, casting_role };
+            membersStore.members = {
+              ...membersStore.members,
+              [member_id]: member,
+            };
+          }
         }
-      }
       }
     },
 
@@ -474,9 +476,9 @@ export const useQuestStore = defineStore('quest', {
         membersStore.removeCastingRole(res.data[0]);
       }
     },
-    async updateCasting(data:Casting) {
+    async updateCasting(data: Casting) {
       const memberStore = useMemberStore();
-      const params=Object();
+      const params = Object();
       params.id = data.member_id;
       const res: AxiosResponse<Casting[]> = await api.patch('/casting', params);
       if (res.status == 200) {
@@ -502,7 +504,9 @@ export const useQuestStore = defineStore('quest', {
         }
       }
     },
-    async createQuestBase(data: Partial<QuestData>): Promise<Partial<QuestData>> {
+    async createQuestBase(
+      data: Partial<QuestData>,
+    ): Promise<Partial<QuestData>> {
       const res: AxiosResponse<QuestData[]> = await api.post('/quests', data);
       if (res.status == 201) {
         const questData: QuestData = Object.assign(res.data[0], {
@@ -521,7 +525,7 @@ export const useQuestStore = defineStore('quest', {
       return res.data[0];
     },
     async updateQuest(data: Partial<Quest>) {
-     const params = Object.assign(data)
+      const params = Object.assign(data);
       params.id = data.id;
       data = filterKeys(data, questPatchKeys);
       const res: AxiosResponse<QuestData[]> = await api.patch(
@@ -541,7 +545,7 @@ export const useQuestStore = defineStore('quest', {
         this.fullQuests = { ...this.fullQuests, [quest.id]: undefined };
       }
     },
-    async addQuestMembership(params:Partial<QuestMembership>) {
+    async addQuestMembership(params: Partial<QuestMembership>) {
       const memberStore = useMemberStore();
       const res: AxiosResponse<QuestMembership[]> = await api.post(
         '/quest_membership',
@@ -565,7 +569,7 @@ export const useQuestStore = defineStore('quest', {
         }
       }
     },
-    async updateQuestMembership(data:Partial<QuestMembership>) {
+    async updateQuestMembership(data: Partial<QuestMembership>) {
       const memberStore = useMemberStore();
       const params = Object();
       params.id = data.member_id;
@@ -594,14 +598,14 @@ export const useQuestStore = defineStore('quest', {
         }
       }
     },
-    async addGamePlay(params:GamePlay) {
+    async addGamePlay(params: GamePlay) {
       const guildStore = useGuildStore();
       const res: AxiosResponse<GamePlay[]> = await api.post(
         '/game_play',
         params,
       );
       if (res.status == 200) {
-        const game_play:GamePlay = res.data[0];
+        const game_play: GamePlay = res.data[0];
         const quest = this.quests[game_play.quest_id];
         if (quest) {
           const game_plays = quest.game_play || [];
@@ -630,18 +634,17 @@ export const useQuestStore = defineStore('quest', {
         params,
       );
       if (res.status == 200) {
-        const game_play:Partial<GamePlay> = res.data[0];
+        const game_play: Partial<GamePlay> = res.data[0];
         const quest = this.quests[game_play.quest_id!];
         if (quest) {
-          const game_plays:Partial<GamePlay[]> =
-            quest.game_play?.filter(
-              (gp: GamePlay) => gp.quest_id !== game_play.quest_id
-            );
+          const game_plays: Partial<GamePlay[]> = quest.game_play?.filter(
+            (gp: GamePlay) => gp.quest_id !== game_play.quest_id,
+          );
           game_plays.push(game_plays);
           quest.game_play = game_plays;
         }
         const guild_id = game_play.guild_id;
-        const guild = guildStore.guilds[guild_id]
+        const guild = guildStore.guilds[guild_id];
         if (guild) {
           const game_plays =
             guild.game_play?.filter(
@@ -652,7 +655,7 @@ export const useQuestStore = defineStore('quest', {
         }
       }
     },
-    async endTurn(data: {quest_id: number}) {
+    async endTurn(data: { quest_id: number }) {
       await api.post('/rpc/end_turn', data);
     },
   },
