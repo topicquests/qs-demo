@@ -1,4 +1,4 @@
-import RobustWebSocket from "robust-websocket";
+import RobustWebSocket from 'robust-websocket';
 import { useMemberStore } from './stores/member';
 import { useMembersStore } from './stores/members';
 import { useConversationStore } from './stores/conversation';
@@ -6,54 +6,58 @@ import { useQuestStore } from './stores/quests';
 import { useGuildStore } from './stores/guilds';
 
 export class WSClient {
-  
   ws: RobustWebSocket;
   connected = false;
-  login_message: string|null = null;
-  store: Store<any>;
+  login_message: string | null = null;
   guild_id: number | boolean = false;
   quest_id: number | boolean = false;
-  constructor(store, url) {
-  const memberStore = useMemberStore();
- 
-    this.store = store;
+  memberStore: any;
+  membersStore: any;
+  questStore: any;
+  guildStore: any;
+  conversationStore: any;
+  constructor(url) {
+    const memberStore = useMemberStore();
+    this.memberStore = memberStore;
+    this.membersStore = useMembersStore();
+    this.conversationStore = useConversationStore();
+    this.questStore = useQuestStore();
+    this.guildStore = useGuildStore();
+
     function shouldReconnect(event, ws) {
-      if (event.type === "online") return 0;
+      if (event.type === 'online') return 0;
       return Math.pow(1.5, ws.attempts) * 500;
     }
 
     shouldReconnect.handle1000 = true;
     this.ws = new RobustWebSocket(url, null, { shouldReconnect });
-    this.ws.addEventListener("open", (event) => {
-      console.log("Connected to server");
+    this.ws.addEventListener('open', (event) => {
+      console.log('Connected to server');
       this.connected = true;
       if (
         !this.login_message &&
         memberStore.member &&
-       memberStore.tokenIsValid()
+        memberStore.tokenIsValid()
       ) {
-        this.login(
-          memberStore.member.id,
-          memberStore.member.token
-        );
+        this.login(memberStore.member.id, memberStore.member.token);
       } else if (this.login_message) {
         this.ws.send(this.login_message);
       }
       this.setDefaultQuest(this.quest_id);
       this.setDefaultGuild(this.guild_id);
     });
-    this.ws.addEventListener("message", (event: Event) => {
+    this.ws.addEventListener('message', (event: Event) => {
       this.onMessage(event);
     });
-    this.ws.addEventListener("close", (event) => {
-      console.log("Disconnected from server");
+    this.ws.addEventListener('close', (event) => {
+      console.log('Disconnected from server');
       this.connected = false;
     });
   }
   login(id: number, token: string) {
     this.login_message = `LOGIN ${id} ${token}`;
     if (this.connected) {
-      console.log("sending");
+      console.log('sending');
       this.ws.send(this.login_message);
     }
   }
@@ -65,22 +69,18 @@ export class WSClient {
   setDefaultGuild(id: number | boolean) {
     this.guild_id = id;
     if (!this.connected) return;
-    if (id === true) this.ws.send("GUILD *");
-    else if (id === false) this.ws.send("GUILD");
+    if (id === true) this.ws.send('GUILD *');
+    else if (id === false) this.ws.send('GUILD');
     else this.ws.send(`GUILD ${id}`);
   }
   setDefaultQuest(id: number | boolean) {
     this.quest_id = id;
     if (!this.connected) return;
-    if (id === true) this.ws.send("QUEST *");
-    else if (id === false) this.ws.send("QUEST");
+    if (id === true) this.ws.send('QUEST *');
+    else if (id === false) this.ws.send('QUEST');
     else this.ws.send(`QUEST ${id}`);
   }
   async onMessage(event) {
-    const membersStore = useMembersStore();
-    const conversationStore = useConversationStore();
-    const questStore = useQuestStore();
-    const guildStore = useGuildStore();
     const parts = /^([CUD]) (\w+) (\d+)$/.exec(event.data);
     if (!parts) {
       console.error(`Unknown ws event: ${event}`);
@@ -90,43 +90,43 @@ export class WSClient {
     const id = parseInt(id_s);
     // note we will not await the dispatch, as we don't want to block the websocket
     switch (otype) {
-      case "conversation_node":
-        if (crud == "D") {
+      case 'conversation_node':
+        if (crud == 'D') {
           // TODO
         } else {
-          await conversationStore.fetchConversationNode({
+          await this.conversationStore.fetchConversationNode({
             params: { id },
           });
         }
         break;
-      case "quests":
-        if (crud == "D") {
+      case 'quests':
+        if (crud == 'D') {
           // TODO
         } else {
-          await questStore.fetchQuestById({
+          await this.questStore.fetchQuestById({
             full: true,
             params: { id },
           });
         }
         break;
-      case "guilds":
-      case "guild_membership":
-        if (crud == "D") {
+      case 'guilds':
+      case 'guild_membership':
+        if (crud == 'D') {
           // TODO
         } else {
-          await guildStore.fetchGuildById({
+          await this.guildStore.fetchGuildById({
             full: true,
             params: { id },
           });
         }
         break;
-      case "members":
-        await membersStore.fetchMemberById({
+      case 'members':
+        await this.membersStore.fetchMemberById({
           full: true,
           params: { id },
         });
-        if (memberStore.member.id == id)
-          await memberStore.fetchLoginUser();
+        if (this.memberStore.member.id == id)
+          await this.memberStore.fetchLoginUser();
         break;
       default:
         console.warn(`Unhandled ws event: ${event}`);
@@ -136,10 +136,10 @@ export class WSClient {
 
 let ws_client: WSClient;
 
-export function initWSClient(store: Store<any>, url: string) {
+export function initWSClient(url: string) {
   // dynamic because of circular dependency in store
   if (!ws_client) {
-    ws_client = new WSClient(store, url);
+    ws_client = new WSClient(url);
   }
   return ws_client;
 }

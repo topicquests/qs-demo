@@ -49,36 +49,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { ConversationNode } from "../types";
-import { userLoaded } from "../boot/userLoaded";
-import { useChannelStore } from "src/stores/channel";
-import { onBeforeUpdate } from "vue";
-import { onBeforeMount } from "vue";
+import { ref } from 'vue';
+import { ConversationNode } from '../types';
+import { useChannelStore } from 'src/stores/channel';
+import { waitUserLoaded } from '../app-access';
+import { onBeforeUpdate } from 'vue';
+import { onBeforeMount } from 'vue';
 
 const ChannelListProps = defineProps<{
-    guild_id?: number;
-    quest_id?: number;
-    inPage: boolean;
-    title: string;
+  guild_id?: number;
+  quest_id?: number;
+  inPage: boolean;
+  title: string;
 }>();
 const channelStore = useChannelStore();
-const  ready = ref(false);
+const ready = ref(false);
 
-function getChannels():ConversationNode[] {
+function getChannels(): ConversationNode[] {
   return ChannelListProps.quest_id
     ? channelStore.getGameChannelsOfQuest(ChannelListProps.quest_id)
     : channelStore.getGuildChannels;
-};
+}
 async function ensureData() {
   await channelStore.ensureChannels(ChannelListProps.guild_id);
-};
-onBeforeUpdate(async () =>{
-    await ensureData();
+}
+onBeforeUpdate(async () => {
+  await ensureData();
 });
 
 onBeforeMount(async () => {
-  await userLoaded;
+  await waitUserLoaded();
   ensureData();
   ready.value = true;
 });
