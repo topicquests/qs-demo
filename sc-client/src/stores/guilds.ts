@@ -182,15 +182,16 @@ getters: {
         membership.guild_id
       ].guild_membership.find(
         (c: GuildMembership) => c.member_id == membership.member_id,
-      );
-      
-      if (gMembership.status == 'confirmed') {
+      );      
+      if (gMembership?.status == 'confirmed') {
         await membersStore.fetchMemberById({
           full: true,
           params: { id: membership.member_id },
         });
-        if (membership.member_id == memberStore.getUserId()) {
-          await memberStore.fetchLoginUser();
+        if(memberStore.getUserId) {
+          if (membership.member_id == memberStore.getUserId) {
+            await memberStore.fetchLoginUser();
+          }
         }
       }
     }
