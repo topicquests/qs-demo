@@ -11,7 +11,7 @@ const QuestDateTimeIntervalProps = defineProps<{
   quest: QuestData;
 }>();
 
-const now = DateTime.now();
+let now = DateTime.now();
 const start: DateTime = DateTime.fromISO(QuestDateTimeIntervalProps.quest.start);
 const end: DateTime = DateTime.fromISO(QuestDateTimeIntervalProps.quest.end);
 

@@ -80,7 +80,7 @@ import scoreboard from "../components/score-board.vue";
 import memberHandle from "../components/member-handle.vue";
 import nodeForm from "../components/node-form.vue";
 import questCard from "../components/quest-edit-card.vue";
-import { userLoaded } from "../boot/userLoaded";
+import { waitUserLoaded } from '../app-access';
 import { ref } from "vue";
 import { useQuestStore } from "src/stores/quests";
 import { useConversationStore } from "src/stores/conversation";
@@ -125,9 +125,9 @@ async function editNode(node:ConversationNode) {
 }
 async function addNode(node:ConversationNode) {
   try {
-    const data:ConversationNode|defaultNodeType = { ...node, ...node };
+    const data:Partial<ConversationNode>|Partial<defaultNodeType> = { ...node, ...node };
     data.quest_id = quest_id.value!;  
-    await conversationStore.createConversationNode(data );
+    await conversationStore.createConversationNode({ node: data as ConversationNode | defaultNodeType } );
     $q.notify({
       message: `Added node to conversation`,
       color: "positive",
@@ -188,7 +188,7 @@ onBeforeMount(async() =>{
     quest_id.value = Number.parseInt(route.params.quest_id);
   }
   const questId = quest_id.value;
-    //await userLoaded;
+  await waitUserLoaded();
   if (typeof questId === 'number') {
     await questStore.setCurrentQuest(questId);
     await questStore.ensureQuest({ quest_id: questId });

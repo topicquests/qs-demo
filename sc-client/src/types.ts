@@ -276,6 +276,7 @@ export interface CastingRole {
 }
 
 export interface defaultNodeType {
+  id?:number;
   quest_id?: number;
   title?: string;
   description?: string;

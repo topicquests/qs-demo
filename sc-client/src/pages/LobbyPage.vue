@@ -72,7 +72,6 @@ import { useMemberStore } from '../stores/member';
 import { useGuildStore } from '../stores/guilds';
 import { useQuestStore } from '../stores/quests';
 import { Guild, GuildData } from '../types';
-//import { userLoaded } from '../boot/userLoaded';
 import { onBeforeMount, ref } from 'vue';
 import member from '../components/member-handle.vue';
 import { useMembersStore } from 'src/stores/members';

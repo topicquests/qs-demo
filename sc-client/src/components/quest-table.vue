@@ -37,7 +37,7 @@
 
       <template v-slot:body-cell-time="props">
         <td>
-          <quest-date-time-interval v-bind:quest="props.row" />
+          <quest-date-time-interval :quest="props.row" />
         </td>
       </template>
       <template v-slot:body-cell-lastMove="props">
@@ -49,7 +49,7 @@
       </template>
       <template v-slot:body-cell-view="props">
         <td>
-          <slot v-bind:quest="props.row">
+          <slot :quest="props.row">
             <span v-if="props.row.is_quest_member">
               <router-link
                 :to="{
@@ -141,7 +141,7 @@ import QuestDateTimeInterval from './quest-date-time-interval.vue';
 import { onBeforeMount, ref } from 'vue';
 
 const QuestTableProps = defineProps<{
-  quests: Quest;
+  quests: Quest[];
   title: string;
 }>();
 
@@ -236,7 +236,7 @@ function refInterval(row: QuestData) {
   const refTime = start > now ? start : end;
   return Math.abs(refTime - now);
 }
-function getFilteredQuests(): Partial<Quest>|any[] {
+function getFilteredQuests(): any[] {
   if (questStatus.value && questStatus.value != 'All') {
     return questStore.getQuestsByStatus(questStatus.value);
   } else {
@@ -279,7 +279,7 @@ function canAdminGuilds(): boolean {
 }
 onBeforeMount(() => {
   questStatusOptions = QuestTableProps.quests.map(
-    (quest: QuestData) => quest.status,
+    (quest: Quest) => quest.status,
   );
   questStatusOptions = questStatusOptions.filter(
     (item, index) => questStatusOptions.indexOf(item) === index,
