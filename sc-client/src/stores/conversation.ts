@@ -270,10 +270,10 @@ export const useConversationStore = defineStore('conversation', {
         const node = res.data[0];
         if (node.meta == 'channel') {
           // maybe we came here through the websocket
-          addToState(this.node);
+          this.addToState(node);
         } else {
           this.node = res.data[0];
-          addToState(this.node);
+          this.addToState(node);
         }
       }
     },
@@ -323,7 +323,7 @@ export const useConversationStore = defineStore('conversation', {
           this.neighbourhood = {};
           this.neighbourhoodRoot = null;
         }
-        if (res.data.length) addToState(state, res.data[0]);
+        if (res.data.length) this.addToState(res.data[0]);
       }
     },
     async fetchConversationNeighbourhood(params: {
@@ -378,9 +378,7 @@ export const useConversationStore = defineStore('conversation', {
         }
       }
     },
-    async createConversationNode(data: {
-      node: ConversationNode | defaultNodeType;
-    }) {
+    async createConversationNode(data:Partial<ConversationNode>|defaultNodeType) {
       const res: AxiosResponse<ConversationNode[]> = await api.post(
         '/conversation_node',
         data,
@@ -401,7 +399,7 @@ export const useConversationStore = defineStore('conversation', {
         data,
       );
       const node = res.data[0];
-      addToState(node);
+      this.addToState(node);
     },
   },
 });

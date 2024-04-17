@@ -280,7 +280,7 @@ export interface defaultNodeType {
   quest_id?: number;
   title?: string;
   description?: string;
-  status: string;
+  status: ibis_node_type_type;
   node_type: string;
 }
 

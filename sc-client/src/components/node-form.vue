@@ -3,7 +3,7 @@
     <section class="node-card-title">
       <q-input v-model="node.title" label="Node title" ref="title" />
       <h3 class="q-ma-md">
-        <IbisButton v-bind:node_type="node.node_type"></IbisButton>
+        <IbisButton :node_type="node.node_type"></IbisButton>
         {{ node.title }}
       </h3>
     </section>
@@ -42,7 +42,7 @@
         <ibis-button
           :node_type="node.node_type"
           :small="true"
-          style="valign: center; margin-top: 3ex; margin-right: 1ex"
+          style="box-align: center; margin-top: 3ex; margin-right: 1ex"
         />
         <q-select
           v-model="node.node_type"
@@ -121,7 +121,7 @@ import {
   publication_state_list,
   publication_state_type,
 } from "../enums";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { QInput } from "quasar";
 
 const NodeFormProps = defineProps<{
@@ -133,18 +133,19 @@ const NodeFormProps = defineProps<{
     pubFn?: (node: Partial<ConversationNode>) => publication_state_type[],
 }>();
 const emit = defineEmits(['action', 'cancel']);
-let node: Partial<ConversationNode> = {};
+let node=ref<Partial<ConversationNode>>({});
 let pub_state_list: publication_state_type[] = publication_state_list
 const description = computed( {
   get() {
     return NodeFormProps.nodeInput!.description || "";
   },
   set(value) {
-    node.description = value;
+    node.value.description = value;
   },
 })
- node = { ...NodeFormProps.nodeInput };
-  if (NodeFormProps.pubFn) pub_state_list = NodeFormProps.pubFn(node);
+
+node.value = { ...NodeFormProps.nodeInput };
+  if (NodeFormProps.pubFn) pub_state_list = NodeFormProps.pubFn(node.value);
   else pub_state_list = publication_state_list;
 /*
 
@@ -159,13 +160,13 @@ function descriptionChange(value: string) {
 }
 */
 function action() {
-    emit("action", node);
+    emit("action", node.value);
   }
 function cancel() {
     emit("cancel");
 }
 function statusChanged() {
-  if (NodeFormProps.pubFn) pub_state_list = NodeFormProps.pubFn(node);
+  if (NodeFormProps.pubFn) pub_state_list = NodeFormProps.pubFn(node.value);
   }
  /* 
 function setFocus() {

@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { useQuasar } from "quasar";
-import { userLoaded } from "../boot/userLoaded";
+import { waitUserLoaded } from '../app-access';
 import { public_private_bool } from "../enums";
 import { Guild } from "../types";
 import { useGuildStore } from "src/stores/guilds";
@@ -100,6 +100,6 @@ async function doSubmit() {
     }
   }
 onBeforeMount(async () =>{
-  await userLoaded;
+  await waitUserLoaded();
 })
 </script>

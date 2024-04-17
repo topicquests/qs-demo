@@ -107,8 +107,8 @@ const defaultNode:defaultNodeType = {
     status: "private_draft",
     node_type: "question",
 };
-let node = node1();
-function node1(): Partial<ConversationNode> | defaultNodeType {  
+let node = getNode();
+function getNode(): Partial<ConversationNode> | defaultNodeType {  
   const rootNode = conversationStore.getRootNode;
     return rootNode || defaultNode;
 }
@@ -127,7 +127,7 @@ async function addNode(node:ConversationNode) {
   try {
     const data:Partial<ConversationNode>|Partial<defaultNodeType> = { ...node, ...node };
     data.quest_id = quest_id.value!;  
-    await conversationStore.createConversationNode({ node: data as ConversationNode | defaultNodeType } );
+    await conversationStore.createConversationNode(data);
     $q.notify({
       message: `Added node to conversation`,
       color: "positive",
