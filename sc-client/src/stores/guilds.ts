@@ -335,11 +335,11 @@ getters: {
       });
     },
     //updateGuild: RestDataActionType<Partial<Guild>, Guild[]>;
-    async updateGuild(data: Partial<Guild>) {
+    async updateGuild(data: Partial<Guild>|undefined) {
       const params = Object();
-      params.id = data.id;
+      params.id = data!.id;
       //actionParams.data = filterKeys(data, guildPatchKeys);
-      const res: AxiosResponse<Guild> = await api.patch('/guilds', {
+      const res: AxiosResponse<Guild[]> = await api.patch('/guilds', {
         params,
       });
       if (res.status == 200) {

@@ -96,7 +96,7 @@ import GuildsPlayingIndicator from './guilds-playing-indicator.vue';
 import { useQuestStore } from 'src/stores/quests';
 import { useGuildStore } from 'src/stores/guilds';
 import { useBaseStore } from 'src/stores/baseStore';
-import { computed, onBeforeMount } from 'vue';
+import { computed, onBeforeMount, ref } from 'vue';
 import { permission_enum } from 'src/enums';
 import { useMemberStore } from 'src/stores/member';
 
@@ -122,6 +122,7 @@ const guildStore = useGuildStore();
 const baseStore = useBaseStore();
 const memberStore = useMemberStore();
 const extra = GuildsTableProp.extra_columns || [];
+const guildPermission = ref(false)
 let selectedGuild: GuildRow[] = [];
 const columns: QTableProps['columns']=[
   {
@@ -192,12 +193,13 @@ const columns: QTableProps['columns']=[
   ...extra,
 ];
 
-const hasGuildAdminPermission = computed(() => (id:number) => {
-  return baseStore.hasPermission(
+function hasGuildAdminPermission (id:number) {
+  guildPermission.value = baseStore.hasPermission(
     permission_enum.guildAdmin,
     id        
   );
-})
+  return guildPermission;
+}
 
 function guildData(): Partial<GuildData[]> {
   return GuildsTableProp.guilds.map((guild: GuildData) => guildRow(guild));

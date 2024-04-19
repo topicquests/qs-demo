@@ -56,12 +56,12 @@
 import { useQuasar } from "quasar";
 import { waitUserLoaded } from '../app-access';
 import { public_private_bool } from "../enums";
-import { Guild } from "../types";
+import { Guild, GuildData } from "../types";
 import { useGuildStore } from "src/stores/guilds";
 import { onBeforeMount, ref, watch } from "vue";
 
 const GuildCardProps = defineProps<{
-    currentGuild: Guild,
+    currentGuild?: Partial<Guild>,
     showDescription: boolean,
 }>();
 const $q = useQuasar()
@@ -71,21 +71,17 @@ const invitation: { label: string; value: boolean }[] = [
     { label: "close", value: false },
 ];
 
-let guild: Partial<Guild> = {};
+let guild = ref<Partial<Guild>>({});
 const description = ref<string>('');
 
-watch(guildStore.getCurrentGuild, (newGuild, oldGuild) => {
-  description.value = newGuild.description || ''; 
-});
-watch(description, (newDescription) => {
-  guildStore.getCurrentGuild.description = newDescription;
-});
 
-guild.id = guildStore.currentGuild;
+
+if (typeof guildStore.currentGuild === 'number')
+guild.value.id = guildStore.currentGuild;
 
 async function doSubmit() {
     try {
-      await guildStore.updateGuild(guild);
+      await guildStore.updateGuild(guild.value);
       $q.notify({
         message: "Guild was updated successfully",
         color: "positive",

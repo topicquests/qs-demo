@@ -78,10 +78,10 @@ export const useMembersStore = defineStore('members', {
         return roles.filter((cr) => cr.guild_id == guild_id);
       },
     castingRolesPerQuest:
-      (state: MembersState) => (member_id: number, quest_id: number) => {
+      (state: MembersState) => (member_id?: number, quest_id?: number) => {
         const castingRole: CastingRole[] = [];
         const rolesPerQuest: CastingRole[]|undefined =
-          state.members[member_id].casting_role;
+          state.members[member_id!].casting_role;
         if (rolesPerQuest !== undefined && rolesPerQuest.length > 0) {
           rolesPerQuest.forEach((cr) => {
             if (cr.quest_id == quest_id) {
