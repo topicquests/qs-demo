@@ -74,13 +74,16 @@ getters: {
     }
   },
   getMembersOfCurrentGuild: (state: GuildsState) => {
-    const guild = state.currentGuild
+    if(typeof state.currentGuild === 'number') {
+    const guild:GuildData|undefined = state.currentGuild!
       ? state.guilds[state.currentGuild]
       : undefined;
+    
     const members = useMembersStore().members;
     return guild?.guild_membership
       ?.map((gm: GuildMembership) => members[gm.member_id])
       .filter((member: PublicMember) => member);
+    }
   },
   getGuildsPlayingCurrentQuest: (state: GuildsState) => {
     
