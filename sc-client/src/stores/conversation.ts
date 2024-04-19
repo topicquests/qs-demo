@@ -245,7 +245,8 @@ export const useConversationStore = defineStore('conversation', {
         Object.keys(this.neighbourhood).length == 0
       ) {
         await this.fetchConversationNeighbourhood({
-          params: { node_id, guild },
+          node_id,
+          guild,
         });
       }
     },
@@ -330,8 +331,8 @@ export const useConversationStore = defineStore('conversation', {
       node_id: number;
       guild: number;
     }) {
-      const res: AxiosResponse<ConversationNode[]> = await api.post(
-        `rpc/node_neighbourhood/${params}`,
+      const res: AxiosResponse<ConversationNode[]> = await api.get(
+        `rpc/node_neighbourhood?node_id=${params.node_id}&guild=${params.guild}`,
       );
       const firstNode = res.data[0];
       if (this.currentQuest !== firstNode.quest_id) {
@@ -378,7 +379,9 @@ export const useConversationStore = defineStore('conversation', {
         }
       }
     },
-    async createConversationNode(data:Partial<ConversationNode>|defaultNodeType) {
+    async createConversationNode(
+      data: Partial<ConversationNode> | defaultNodeType,
+    ) {
       const res: AxiosResponse<ConversationNode[]> = await api.post(
         '/conversation_node',
         data,
