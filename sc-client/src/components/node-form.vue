@@ -113,40 +113,40 @@
 </template>
 
 <script setup lang="ts">
-import IbisButton from "./ibis-btn.vue";
-import { ConversationNode, Role, defaultNodeType } from "../types";
+import IbisButton from './ibis-btn.vue';
+import { ConversationNode, Role, defaultNodeType } from '../types';
 import {
   ibis_node_type_list,
   ibis_node_type_type,
   publication_state_list,
   publication_state_type,
-} from "../enums";
-import { computed, ref } from "vue";
-import { QInput } from "quasar";
+} from '../enums';
+import { computed, ref } from 'vue';
+import { QInput } from 'quasar';
 
 const NodeFormProps = defineProps<{
-    nodeInput?: Partial<ConversationNode>|defaultNodeType;
-    editing: boolean;
-    ibisTypes: ibis_node_type_type[];
-    allowChangeMeta?: boolean;
-    roles?: Role[];
-    pubFn?: (node: Partial<ConversationNode>) => publication_state_type[],
+  nodeInput?: Partial<ConversationNode> | defaultNodeType;
+  editing: boolean;
+  ibisTypes: ibis_node_type_type[];
+  allowChangeMeta?: boolean;
+  roles?: Role[];
+  pubFn?: (node: Partial<ConversationNode>) => publication_state_type[];
 }>();
 const emit = defineEmits(['action', 'cancel']);
-let node=ref<Partial<ConversationNode>>({});
-let pub_state_list: publication_state_type[] = publication_state_list
-const description = computed( {
+let node = ref<Partial<ConversationNode>>({});
+let pub_state_list: publication_state_type[] = publication_state_list;
+const description = computed<string>({
   get() {
-    return NodeFormProps.nodeInput!.description || "";
+    return NodeFormProps.nodeInput!.description || '';
   },
   set(value) {
     node.value.description = value;
   },
-})
+});
 
 node.value = { ...NodeFormProps.nodeInput };
-  if (NodeFormProps.pubFn) pub_state_list = NodeFormProps.pubFn(node.value);
-  else pub_state_list = publication_state_list;
+if (NodeFormProps.pubFn) pub_state_list = NodeFormProps.pubFn(node.value);
+else pub_state_list = publication_state_list;
 /*
 
 function getDescription() {
@@ -160,15 +160,15 @@ function descriptionChange(value: string) {
 }
 */
 function action() {
-    emit("action", node.value);
-  }
+  emit('action', node.value);
+}
 function cancel() {
-    emit("cancel");
+  emit('cancel');
 }
 function statusChanged() {
   if (NodeFormProps.pubFn) pub_state_list = NodeFormProps.pubFn(node.value);
-  }
- /* 
+}
+/*
 function setFocus() {
   const titleEl = this.$refs.title as QInput;
     titleEl.focus();
