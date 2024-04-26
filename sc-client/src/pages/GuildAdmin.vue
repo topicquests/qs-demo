@@ -27,8 +27,9 @@
             <q-card>
               <div class="admin-content-container">
                 <q-editor
+                  v-model="description"
                   class="admin-content guild-description-col"
-                  v-model="guild!.description!"
+                  
                 >
                 </q-editor>
               </div>
@@ -42,6 +43,7 @@
             </q-card>
           </div>
         </div>
+      
         <div class="col-3"></div>
         <section class="quest-section">
           <div
@@ -223,7 +225,7 @@
                       "
                       @remove="
                         (details) => {
-                          roleRemoved(member.id, details);
+                          roleRemoved(member.id, details.value);
                         }
                       "
                       :options="roleStore.getRoles"
@@ -292,7 +294,7 @@ import {
 PublicMember,
 GuildData,
 } from "../types";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import roleTable from "../components/role-table.vue";
 import guildCard from "../components/guild-card.vue";
 import QuestTable from "../components/quest-table.vue";
@@ -324,6 +326,14 @@ let availableRolesByMember = ref<{ [key: number]: number[] | undefined }> ( {});
 const isAdmin = ref(false);
 let guildId: number|null = null;
 let confirmedPlayQuestId:number[]|GamePlay[] = [];
+
+const description = computed({
+  get: () => guild.value?.description,
+  set: (value) => {
+    if(guild.value)
+      guild.value.description = value;
+  },
+});
 
 function activeQuests():Partial<QuestData[]> {
   confirmedPlayQuestId = confirmedPlayQuestIds();

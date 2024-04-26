@@ -33,7 +33,7 @@
             <div class="row justify-start q-pb-xs">Details<br /></div>
             <div class="row justify-start q-pb-lg">
               <q-editor
-                v-model="guild.description"
+                v-model="description"
                 style="width: 85%"
               ></q-editor>
             </div>
@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import scoreboard from '../components/score-board.vue';
 import member_handle from '../components/member-handle.vue';
 //import { userLoaded } from '../boot/userLoaded';
@@ -110,6 +110,14 @@ const guild = ref<guildType>({
 });
 
 const role = ref<Partial<Role>>({name: ''});
+
+  const description = computed({
+  get: () => guild.value?.description,
+  set: (value) => {
+    if(guild.value)
+      guild.value.description = value;
+  },
+});
 
 async function doSubmit(guild:guildType) {
   try {

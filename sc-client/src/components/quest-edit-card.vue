@@ -125,7 +125,7 @@
     <div class="row justify-start q-pb-xs q-ml-lg">Description<br /></div>
     <div class="row justify-start q-pb-lg q-ml-lg">
       <q-editor
-        v-model="quest.description"
+        v-model="description"
         name="description"
         id="q-editor"
         style="background-color: lightgrey"
@@ -300,7 +300,7 @@ import { public_private_bool, quest_status_type } from "../enums";
 import { DateTime } from "luxon";
 import { useQuestStore } from "src/stores/quests";
 import { useQuasar } from "quasar";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 const turn_based_bool = [
   {
@@ -323,6 +323,14 @@ const questStore = useQuestStore();
 const quest = ref<Partial<Quest>>(QuestCardProps.thisQuest) ;
 const $q = useQuasar();
 const emit = defineEmits(['doUpdateQuest']);
+
+const description = computed({
+  get: () => quest.value?.description,
+  set: (value) => {
+    if(quest.value)
+      quest.value.description = value;
+  },
+});
 
 async function doEndTurn() {
   try {
