@@ -7,6 +7,7 @@ import {
   Quest,
   QuestData,
   GuildMemberAvailableRole,
+  guildPatchKeys,
 } from '../types';
 import { registration_status_enum, game_play_status_enum } from '../enums';
 import { defineStore } from 'pinia';
@@ -16,6 +17,7 @@ import { useQuestStore } from './quests';
 import { api } from '../boot/axios';
 import { AxiosResponse } from 'axios';
 import { getWSClient } from '../wsclient';
+import { filterKeys } from './base';
 
 interface GuildMap {
   [key: number]: GuildData;
@@ -337,17 +339,18 @@ getters: {
         guildId,
       });
     },
-    //updateGuild: RestDataActionType<Partial<Guild>, Guild[]>;
-    async updateGuild(data: Partial<Guild>|undefined) {
+    async updateGuild(data: Partial<Guild>) {
       const params = Object();
       params.id = data!.id;
-      //actionParams.data = filterKeys(data, guildPatchKeys);
-      const res: AxiosResponse<Guild[]> = await api.patch('/guilds', {
-        params,
-      });
+      data = filterKeys(data, guildPatchKeys);
+      const res: AxiosResponse<GuildData[]> = await api.patch(
+        `/guilds?id=eq.${params.id}`, 
+        data,
+      );
       if (res.status == 200) {
         const guild = res.data[0];
         const guildData: GuildData = Object.assign(
+          {},
           this.guilds[guild.id],
           guild,
         );
@@ -463,7 +466,7 @@ getters: {
           if (memberStore.member) {
             const guild_member_available_role =
               memberStore.member.guild_member_available_role;
-            const pos = guild_member_available_role.findIndex(
+            const pos = guild_member_available_role!.findIndex(
               (a: GuildMemberAvailableRole) =>
                 a.role_id == guild_Member_Available_Role.role_id &&
                 a.member_id == guild_Member_Available_Role.member_id &&

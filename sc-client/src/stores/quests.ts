@@ -542,7 +542,7 @@ export const useQuestStore = defineStore('quest', {
           quest,
         );
         this.quests = { ...this.quests, [quest.id]: questData };
-        this.fullQuests = { ...this.fullQuests!, [quest.id]: undefined };
+        this.fullQuests = { ...this.fullQuests!, [quest.id]: questData };
       }
     },
     async addQuestMembership(params: Partial<QuestMembership>) {

@@ -186,7 +186,7 @@
 
             <guild-card
               class="guilds-card"
-              :currentGuild!="{ ...guild }"
+              :currentGuild="{ ...guild }"
               :showDescription="false"
             ></guild-card>
           </div>
@@ -218,7 +218,7 @@
                       v-model="availableRolesByMember[member.id]"
                       @add="
                         (details) => {
-                          roleAdded(member.id, details);
+                          roleAdded(member.id, details.value);
                         }
                       "
                       @remove="
@@ -320,7 +320,7 @@ const route = useRoute();
 const guild = ref<GuildData>()
 const ready = ref(false);
 const currentGuildId:number|undefined = undefined
-let availableRolesByMember: { [key: number]: number[] | undefined } = {};
+let availableRolesByMember = ref<{ [key: number]: number[] | undefined }> ( {});
 const isAdmin = ref(false);
 let guildId: number|null = null;
 let confirmedPlayQuestId:number[]|GamePlay[] = [];
@@ -502,6 +502,7 @@ async function removeGuildAdmin(id:number) {
 
   async function roleAdded(member_id:number, role_id:number) {
     const guild_id = guildId;
+    if(guild_id)
     await guildStore.addGuildMemberAvailableRole({ member_id, guild_id, role_id },
     );
   }
@@ -563,7 +564,7 @@ async function removeGuildAdmin(id:number) {
     await guildStore.setCurrentGuild(guildId!); 
     guild.value = await guildStore.getGuildById(guildId!)
     const guildMembers=getGuildMembers();  
-    availableRolesByMember = Object.fromEntries(
+    availableRolesByMember.value = Object.fromEntries(
       guildMembers.map((m: PublicMember ) => [
         m.id,
         m.guild_member_available_role
