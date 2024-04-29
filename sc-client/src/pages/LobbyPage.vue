@@ -31,7 +31,7 @@
         </div>
         <div class="column items-center">
           <div class="col-4" style="width: 100%">
-            <div v-if="guildsStore.getMyGuilds.length">
+            <div v-if="quests.length">
               <guilds-table
                 :guilds="guildsStore.getMyGuilds"
                 :title="'My Guilds'"
@@ -72,7 +72,7 @@ import { useMemberStore } from '../stores/member';
 import { useGuildStore } from '../stores/guilds';
 import { useQuestStore } from '../stores/quests';
 import { Guild, GuildData } from '../types';
-import { onBeforeMount, ref } from 'vue';
+import { computed, onBeforeMount, ref } from 'vue';
 import member from '../components/member-handle.vue';
 import { useMembersStore } from 'src/stores/members';
 import { waitUserLoaded } from '../app-access';
@@ -82,6 +82,11 @@ const guildsStore = useGuildStore();
 const questsStore = useQuestStore();
 const membersStore = useMembersStore();
 let ready = ref(false);
+
+const quests = computed({
+  get: () => questsStore.getQuests,
+  set: () => {}
+});
 
 function getOpenGuilds(): GuildData[] {
   return guildsStore.getGuilds.filter(

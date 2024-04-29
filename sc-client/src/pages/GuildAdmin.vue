@@ -27,7 +27,7 @@
             <q-card>
               <div class="admin-content-container">
                 <q-editor
-                  v-model="description"
+                  v-model="description!"
                   class="admin-content guild-description-col"
                   
                 >

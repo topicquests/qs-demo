@@ -16,7 +16,7 @@
     <q-table
       class="quest-table"
       :title="title"
-      :rows="getFilteredQuests()"
+      :rows="getFilteredQuests"
       :columns="columns"
       row-key="id"
     >
@@ -136,9 +136,9 @@ import {
   quest_status_enum,
   quest_status_type,
 } from '../enums';
-import { GuildMembership, Quest, Member, QuestData } from '../types';
+import { GuildMembership, Quest, QuestData } from '../types';
 import QuestDateTimeInterval from './quest-date-time-interval.vue';
-import { onBeforeMount, ref } from 'vue';
+import { computed, onBeforeMount, ref } from 'vue';
 
 const QuestTableProps = defineProps<{
   quests: Quest[];
@@ -229,6 +229,22 @@ const columns: QTableProps['columns'] = [
   },
 ];
 
+const getFilteredQuests = computed({
+  get: () => {
+    if (questStatus.value && questStatus.value != 'All') {
+      return questStore.getQuestsByStatus(questStatus.value);
+    } else {
+      console.log(
+        'Filtered quests',
+        questStore.getQuestsByStatus(quest_status_enum.finished),
+      );
+      //questStatus.value = 'All';
+      return QuestTableProps.quests;
+    }
+  },
+  set: () => {}
+});
+
 function refInterval(row: QuestData) {
   const start: number = DateTime.fromISO(row.start).millisecond;
   const end: number = DateTime.fromISO(row.end).millisecond;
@@ -236,18 +252,7 @@ function refInterval(row: QuestData) {
   const refTime = start > now ? start : end;
   return Math.abs(refTime - now);
 }
-function getFilteredQuests(): any[] {
-  if (questStatus.value && questStatus.value != 'All') {
-    return questStore.getQuestsByStatus(questStatus.value);
-  } else {
-    console.log(
-      'Filtered quests',
-      questStore.getQuestsByStatus(quest_status_enum.finished),
-    );
-    questStatus.value = 'All';
-    return QuestTableProps.quests;
-  }
-}
+
 
 function lastMoveRel(row: QuestData) {
   return row.last_node_published_at
