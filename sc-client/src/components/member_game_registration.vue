@@ -4,12 +4,12 @@
       <q-card-section>
         <div class="text-h6">Available Roles</div>
       </q-card-section>
-      <div v-for="role in availableRoles()" :key="role.id">
+      <div v-for="role in availableRoles" :key="role.id!">
         <q-radio
           v-model="roleId"
           :label="role.name"
           :val="role.id"
-          @input="updateRole()"
+          @update:model-value="updateRole()"          
           v-close-popup="true"
         >
         </q-radio>
@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { Role, GuildMemberAvailableRole } from '../types';
-import { onBeforeMount, onBeforeUpdate, ref } from 'vue';
+import { computed, onBeforeMount, onBeforeUpdate, ref } from 'vue';
 import { useMemberStore } from 'src/stores/member';
 import { useMembersStore } from 'src/stores/members';
 import { useRoleStore } from 'src/stores/role';
@@ -45,18 +45,18 @@ const questStore = useQuestStore();
 const ready = ref(false);
 const roleId = ref<number | undefined>(undefined);
 
-function availableRoles(): Role[] {
+const availableRoles =computed((): Role[] => {
   const memberId = memberStore.member?.id;
   return membersStore
     .getAvailableRolesForMemberAndGuild(
-      memberId,
+      memberId!,
       MemberGameRegistrationProp.guildId,
     )
     .map((cr: GuildMemberAvailableRole) => roleStore.getRoleById(cr.role_id));
-}
+})
 async function doAddCasting(quest_id: number) {
   const guild_id = MemberGameRegistrationProp.guildId;
-  const member_id = memberStore.member.id;
+  const member_id = memberStore.member!.id;
   await questStore.addCasting({
     quest_id,
     guild_id: guild_id,
@@ -67,22 +67,22 @@ async function doAddCasting(quest_id: number) {
 async function updateRole() {
   const guild_id = MemberGameRegistrationProp.guildId;
   const role_id: number | undefined = roleId.value;
-  const member_id = memberStore.member.id;
+  const member_id = memberStore.member!.id;
   const quest_id = MemberGameRegistrationProp.questId;
-  await doAddCasting(quest_id);
+  await doAddCasting(quest_id!);
   await questStore.addCastingRole({
-    member_id, 
-    guild_id, 
-    role_id, 
-    quest_id ,
-  })
+    quest_id,
+    guild_id,
+    member_id,
+    role_id
+  }) 
 }
 
 async function ensureData() {
   await Promise.all([
     roleStore.ensureAllRoles(),
     membersStore.ensureMembersOfGuild({
-      guildId: MemberGameRegistrationProp.guildId,
+      guildId: MemberGameRegistrationProp.guildId!,
     }),
   ]);
 }

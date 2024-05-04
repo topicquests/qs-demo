@@ -77,8 +77,8 @@ import { useConversationStore, ibis_node_icon } from "src/stores/conversation";
 
 const QuestCardProps = defineProps<{
     currentQuest: QuestData;
-    creator: object;
-    showQuestInfo:  {
+    creator?: object;
+    showQuestInfo?:  {
       type: boolean,
       default: true,
     },

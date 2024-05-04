@@ -6,9 +6,9 @@
       <q-btn
         round
         v-if="
-          getChannelUnreadCount(node_id) > 0 &&
-          channelStore.getChannelChildrenOf(node_id) &&
-          channelStore.getChannelChildrenOf(node_id).length > 0 &&
+          getChannelUnreadCount(readStatusProps.node_id)! > 0 &&
+          channelStore.getChannelChildrenOf(readStatusProps.node_id) &&
+          channelStore.getChannelChildrenOf(readStatusProps.node_id)!.length > 0 &&
           !isExpanded
         "
         size="9px"
@@ -16,7 +16,7 @@
         text-color="black"
         @click="toggleReadStatus()"
       >
-        <strong>{{ getChannelUnreadCount(node_id) }}</strong> /
+        <strong>{{ getChannelUnreadCount(readStatusProps.node_id) }}</strong> /
         {{ getNodeCount(node_id) }}
       </q-btn>
       <!--Node is read has children and unfolded then transparent-->
@@ -24,8 +24,8 @@
       <q-btn
         round
         v-else-if="
-          channelStore.getChannelChildrenOf(node_id) &&
-          channelStore.getChannelChildrenOf(node_id).length > 0 &&
+          channelStore.getChannelChildrenOf(readStatusProps.node_id) &&
+          channelStore.getChannelChildrenOf(readStatusProps.node_id)!.length > 0 &&
           isExpanded
         "
         size="9px"
@@ -50,8 +50,8 @@
       <q-btn
         round
         v-if="
-          getUnreadCount(node_id) > 0 &&
-          conversationStore.getChildrenOf(node_id).length > 0 &&
+          getUnreadCount(readStatusProps.node_id)! > 0 &&
+          conversationStore.getChildrenOf(readStatusProps.node_id).length > 0 &&
           !isExpanded
         "
         size="9px"
@@ -59,14 +59,14 @@
         text-color="black"
         @click="toggleReadStatus()"
       >
-        <strong>{{ getUnreadCount(node_id) }}</strong> /
-        {{ getNodeCount(node_id) }}
+        <strong>{{ getUnreadCount(readStatusProps.node_id) }}</strong> /
+        {{ getNodeCount(readStatusProps.node_id) }}
       </q-btn>
       <!--Node is read has children and unfolded then transparent-->
       <!--Node is not read has children and unfolded then blue-->
       <q-btn
         round
-        v-else-if="conversationStore.getChildrenOf(node_id).length > 0 && isExpanded"
+        v-else-if="conversationStore.getChildrenOf(readStatusProps.node_id).length > 0 && isExpanded"
         size="9px"
         :color="localRead ? 'transparent' : 'blue'"
         text-color="black"
@@ -90,18 +90,14 @@
 import { useChannelStore } from 'src/stores/channel';
 import { useConversationStore } from 'src/stores/conversation';
 import { useReadStatusStore } from 'src/stores/readStatus';
+import { computed } from 'vue';
 
 const readStatusStore = useReadStatusStore();
 const channelStore = useChannelStore()
 const conversationStore = useConversationStore()
 const readStatusProps = defineProps<{
-  node_id: {
-    type: number,
-    required: true,
-  },
-  isRead: { 
-    type: boolean 
-  },
+  node_id: number,
+  isRead: boolean,
   isChannel: {
     type: boolean,
     default: false,
@@ -109,15 +105,15 @@ const readStatusProps = defineProps<{
   isExpanded: boolean,
 }>();
 let localRead= readStatusProps.isRead;
-function getChannelUnreadCount(nodeId: number) {
+const getChannelUnreadCount = computed(() => (nodeId: number) => {
   if (
     channelStore.getChannelById(nodeId) &&
-      channelStore.getChannelChildrenOf(nodeId).length > 0
+      channelStore.getChannelChildrenOf(nodeId)!.length > 0
     ) {
       return readStatusStore.getUnreadStatusCount(nodeId);
     }
     return 0;
-  }
+  })
 
 function getUnreadCount(nodeId: number) {
     if (
@@ -133,7 +129,7 @@ function getNodeCount(nodeId: number) {
   if (readStatusProps.isChannel) {
     if (
       channelStore.getChannelById(nodeId) &&
-      channelStore.getChannelChildrenOf(nodeId).length > 0
+      channelStore.getChannelChildrenOf(nodeId)!.length > 0
     ) {
       return readStatusStore.getNodeStatusCount(nodeId);
     }
@@ -149,13 +145,13 @@ function getNodeCount(nodeId: number) {
   }
   async function toggleReadStatus() {
     localRead = !localRead;
-    await readStatusStore.CreateOrUpdateReadStatus({
-      data: {
+    await readStatusStore.CreateOrUpdateReadStatus(
+      {
         nodeid: readStatusProps.node_id,
         new_status: localRead,
         override: true,
       },
-    });
+    );
     if (readStatusProps.isChannel) {
       await readStatusStore.ensureAllChannelReadStatus();
     } else {

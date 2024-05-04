@@ -7,23 +7,23 @@
         </div>
         <div class="row justify-center q-mt-lg">
           <h3 class="q-mt-md">
-            {{ questStore.getCurrentQuest.name }}
+            {{ questStore.getCurrentQuest!.name }}
             <q-btn
-              v-if="questStore.getCurrentQuest.description"
+              v-if="questStore.getCurrentQuest!.description"
               class="q-ml-xs q-mt-md"
               size="md"
               :flat="true"
               icon="info"
             >
               <q-tooltip self="bottom middle" max-width="25rem">
-                <div v-html="questStore.getCurrentQuest.description"></div>
+                <div v-html="questStore.getCurrentQuest!.description"></div>
               </q-tooltip>
             </q-btn>
           </h3>
           <router-link
             :to="{
               name: 'quest_teams',
-              params: { quest_id: questStore.getCurrentQuest.id },
+              params: { quest_id: questStore.getCurrentQuest!.id },
             }"
             class="q-ml-sm q-mt-md"
             >Teams</router-link
@@ -45,10 +45,10 @@
             You're playing in guild
             <router-link
               :to="{ name: 'guild', params: { guild_id: guildId} }"
-              >{{ guildStore.getCurrentGuild.name }}</router-link
+              >{{ guildStore.getCurrentGuild!.name }}</router-link
             >
           </span>
-          <span v-else-if="questStore.getCurrentQuest.status != 'registration'">
+          <span v-else-if="questStore.getCurrentQuest!.status != 'registration'">
             The game has started
           </span>
           <span v-else-if="myPlayingGuilds.length == 1">
@@ -156,10 +156,10 @@
           </div>
         </div>
         <q-dialog v-model="registerMemberDialog" persistent>
-          <member-game-registration>
+          <member-game-registration
             guildId="mySelectedPlayingGuildId"
             questId="questId"
-          </member-game-registration>
+          />
         </q-dialog>
       </q-card>
     </div>
@@ -168,25 +168,18 @@
 
 <script setup lang="ts">
 import member from "../components/member-handle.vue";
-import questCard from "../components/quest-card.vue";
 import nodeTree from "../components/node-tree.vue";
 import {
-  ibis_node_type_type,
-  ibis_node_type_list,
-  publication_state_list,
-  public_private_bool,
   permission_enum,
 } from "../enums";
-import { userLoaded } from "../boot/userLoaded";
-import { RoleState } from "../stores/role";
+import { waitUserLoaded } from '../app-access';
 import { useRoute, useRouter } from 'vue-router';
-import { Casting, ConversationNode, Member, Guild, GuildData } from "../types";
-import { ref } from "vue";
+import { Casting, Guild, GuildData } from "../types";
+import { computed, ref } from "vue";
 import { useQuestStore } from "src/stores/quests";
 import { useGuildStore } from "src/stores/guilds";
 import { useMemberStore } from "src/stores/member";
 import { useBaseStore } from "../stores/baseStore"
-import CastingRoleEdit from "../components/casting_role_edit.vue";
 import memberGameRegistration from "../components/member_game_registration.vue";
 import { onBeforeMount } from "vue";
 
@@ -196,28 +189,35 @@ const memberStore = useMemberStore();
 const baseStore = useBaseStore();
 const router = useRouter();
 const route = useRoute();
-const memberId = ref(memberStore.member.id);
+const memberId = ref(memberStore.member!.id);
 const ready = ref(false);
 const registerMemberDialog = ref(false);
-let   questId:number;
+const questId = ref<number|null>(null);
 let myPlayingGuilds: Guild[];
-let  selectedNodeId: number | null = null;
-let mySelectedPlayingGuildId: number | null = null;
+const  selectedNodeId = ref<number | undefined>(undefined);
+const mySelectedPlayingGuildId = ref<number | null>(null);
 
-/*
+const guildId = computed(():number|undefined => {
+  const quest_id = questStore.getCurrentQuest?.id;
+  const casting: Casting = memberStore.castingPerQuest[quest_id!];
+  if (casting) {
+    return casting.guild_id;
+  } else {
+    return undefined
+  }
+})
+
+
 //data
-ibis_node_type_list = ibis_node_type_list;
-  publication_state_list = publication_state_list;
-  public_private_bool = public_private_bool;
-  newNode: Partial<ConversationNode> = {};
+  //const newNode: Partial<ConversationNode> = {};
  
-  newNodeParent: number = null;
-  selectedIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
-  childIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
-  allRoles!: RoleState["role"];
-  */
+  //newNodeParent: number = null;
+  //const selectedIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
+  //const childIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
+  //allRoles!: RoleState["role"];
+  
   function myGuilds(only_as_leader = false):GuildData[] {
-    let memberships = memberStore.member.guild_membership || [];
+    let memberships = memberStore.member!.guild_membership || [];
     memberships = memberships.filter((gm) => gm.status == "confirmed");
     let guild_ids = memberships.map((gm) => gm.guild_id);
     if (only_as_leader) {
@@ -230,10 +230,10 @@ ibis_node_type_list = ibis_node_type_list;
 
   function guildsPlayingGame(only_mine = false, recruiting = false) {
     let guild_ids =
-      questStore.getCurrentQuest.game_play?.map((gp:GuildData) => gp.guild_id) || [];
+      questStore.getCurrentQuest!.game_play?.map((gp:GuildData) => gp.guild_id) || [];
     if (only_mine) {
       guild_ids = guild_ids.filter((g) =>
-        (memberStore.member.guild_membership || []).some(
+        (memberStore.member!.guild_membership || []).some(
           (gm) => gm.guild_id === g && gm.status == "confirmed",
         ),
       );
@@ -245,13 +245,7 @@ ibis_node_type_list = ibis_node_type_list;
     return guilds;
   }
 
-function guildId():number|undefined {
-  const quest_id = questStore.getCurrentQuest?.id;
-  const casting: Casting = memberStore.castingPerQuest[quest_id];
-  if (casting) {
-    return casting.guild_id;
-  }
-}
+
 /*
 function route(to, from) {
   if (from.params.quest_id != to.params.quest_id) {
@@ -260,9 +254,7 @@ function route(to, from) {
   }
  */ 
 
-  function getQuestCreator() {
-    return memberStore.getUserById(questStore.getCurrentQuest.creator);
-  }
+ 
 
   function selectionChanged(id: number) {
     router.push({
@@ -275,37 +267,36 @@ function route(to, from) {
   }
 
   async function initialize() {
-    questId = Number.parseInt(route.params.quest_id);
-    if (route.params.node_id) {
-      selectedNodeId = Number.parseInt(route.params.node_id);
+    if (typeof route.params.quest_id === 'string') {
+      questId.value = Number.parseInt(route.params.quest_id);
     }
-    await userLoaded;
-    questStore.setCurrentQuest(questId);
+    if (typeof route.params.node_id === 'string') {
+      selectedNodeId.value = Number.parseInt(route.params.node_id);
+    }
+    await waitUserLoaded();
+    questStore.setCurrentQuest(questId.value!);
     const promises: Promise<any>[] = [
-      questStore.ensureQuest({ quest_id: questId }),
-      guildStore.ensureGuildsPlayingQuest({ quest_id: questId }),
+      questStore.ensureQuest({ quest_id: questId.value! }),
+      guildStore.ensureGuildsPlayingQuest({ quest_id: questId.value! }),
     ];
     await Promise.all(promises);
     // after so we have game_play ready
     await initializeGuildInner();
     ready.value = true;
   }
-  async function  initializeGuild() {
-    await initializeGuildInner();
-    ready.value = true;
-  }
   async function initializeGuildInner() {
-    if (guildId) {
+    if (guildId.value) {
       ready.value = false;
-      guildStore.setCurrentGuild(guildId);
-      await guildStore.ensureGuild({ guild_id: guildId });
-      if (!selectedNodeId) {
-        selectedNodeId = this.getCurrentGamePlay?.focus_node_id;
+      guildStore.setCurrentGuild(guildId.value);
+      if(guildId.value)
+      await guildStore.ensureGuild(guildId.value );
+      if (!selectedNodeId.value) {
+        selectedNodeId.value = questStore.getCurrentGamePlay!.focus_node_id;
       }
     } else if (member) {
       myPlayingGuilds = guildsPlayingGame(true);
       if (myPlayingGuilds.length) {
-        mySelectedPlayingGuildId = myPlayingGuilds[0].id;
+        mySelectedPlayingGuildId.value = myPlayingGuilds[0].id;
       }
     }
   }

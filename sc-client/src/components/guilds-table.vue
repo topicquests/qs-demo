@@ -4,7 +4,7 @@
       <q-table
         class="guilds-table"
         :title="title"
-        :rows="guildData()"
+        :rows="guildData"
         :columns="columns"
         style="text-align: left"
         row-key="id"
@@ -108,7 +108,7 @@ interface GuildRow extends GuildData {
 }
 
 const GuildsTableProp = defineProps<{
-  title: string;
+  title?: string;
   guilds: GuildData[];
   scores?: object;
   quest?: object;
@@ -123,7 +123,7 @@ const baseStore = useBaseStore();
 const memberStore = useMemberStore();
 const extra = GuildsTableProp.extra_columns || [];
 const guildPermission = ref(false)
-let selectedGuild: GuildRow[] = [];
+const selectedGuild = ref<GuildRow[]>([]);
 const columns: QTableProps['columns']=[
   {
     name: 'info',
@@ -193,17 +193,17 @@ const columns: QTableProps['columns']=[
   ...extra,
 ];
 
-function hasGuildAdminPermission (id:number) {
+const hasGuildAdminPermission = computed(() => (id:number) => {
   guildPermission.value = baseStore.hasPermission(
     permission_enum.guildAdmin,
     id        
   );
   return guildPermission;
-}
+})
 
-function guildData(): Partial<GuildData[]> {
+const guildData = computed((): Partial<GuildData[]> => {
   return GuildsTableProp.guilds.map((guild: GuildData) => guildRow(guild));
-}
+})
 
 function numPlayers(guild: Guild) {
   if (GuildsTableProp.showPlayers) {
@@ -221,18 +221,18 @@ function guildIfPlaying(quest_id: number) {
   }
 }
 
-function selectionChanged(rowEvent: {
+const selectionChanged = computed(() => (rowEvent: {
   rows: readonly any[];
   keys: readonly any[];
   added: boolean;
   evt: Event;
-}) {
+}) => {
   if (rowEvent.added) {
     guildStore.setCurrentGuild(rowEvent.rows[0].id);
   } else {
     guildStore.setCurrentGuild(null);
-  }
-}
+  } 
+})
 
 function guildRow(guild: GuildData): GuildRow {
   return {
@@ -270,7 +270,7 @@ onBeforeMount(async () => {
       }
     }
     if (guild) {
-      selectedGuild = [guildRow(guild)];
+      selectedGuild.value = [guildRow(guild)];
       // does this mean we won't get update on other rows?
       await guildStore.setCurrentGuild(guild.id);
     } 

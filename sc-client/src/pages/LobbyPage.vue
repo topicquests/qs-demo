@@ -31,9 +31,9 @@
         </div>
         <div class="column items-center">
           <div class="col-4" style="width: 100%">
-            <div v-if="quests.length">
+            <div v-if="myGuilds.length">
               <guilds-table
-                :guilds="guildsStore.getMyGuilds"
+                :guilds="myGuilds"
                 :title="'My Guilds'"
               />
               <q-btn :to="{ name: 'guild_list' }">All Guilds</q-btn>
@@ -72,7 +72,7 @@ import { useMemberStore } from '../stores/member';
 import { useGuildStore } from '../stores/guilds';
 import { useQuestStore } from '../stores/quests';
 import { Guild, GuildData } from '../types';
-import { computed, onBeforeMount, ref } from 'vue';
+import { computed, onBeforeMount, onMounted, ref } from 'vue';
 import member from '../components/member-handle.vue';
 import { useMembersStore } from 'src/stores/members';
 import { waitUserLoaded } from '../app-access';
@@ -88,12 +88,14 @@ const quests = computed({
   set: () => {}
 });
 
-function getOpenGuilds(): GuildData[] {
-  return guildsStore.getGuilds.filter(
+const getOpenGuilds = computed(
+  (): GuildData[] => guildsStore.getGuilds.filter(
     (guild: Guild) =>
       guild.open_for_applications && !guildsStore.isGuildMember(guild.id),
-  );
-}
+  )
+);
+const myGuilds = computed((): GuildData[] => guildsStore.getMyGuilds
+)
 
 onBeforeMount(async () => {
   await waitUserLoaded();
@@ -107,6 +109,10 @@ onBeforeMount(async () => {
   ]);
   ready.value = true;
 });
+
+onMounted(() => {
+
+})
 </script>
 
 <style>

@@ -46,7 +46,7 @@ getters: {
       return undefined
     }
   },
-  getGuilds: (state: GuildsState) => Object.values(state.guilds),
+  getGuilds: (state: GuildsState):GuildData[] => Object.values(state.guilds),
   getGuildById: (state: GuildsState) => (id: number) => state.guilds[id],
   getMyGuilds: (state: GuildsState): GuildData[] => {
     const memberId = useMemberStore().getUserId;

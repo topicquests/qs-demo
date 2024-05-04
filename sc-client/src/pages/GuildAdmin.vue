@@ -20,8 +20,8 @@
               >{{ guild.name }}
             </router-link>
           </h4>
-        </div>
-        <q-tooltip>Click on guild name to goto guild</q-tooltip>
+          <q-tooltip>Click on guild name to goto guild</q-tooltip>
+        </div>       
         <div class="row justify-center">
           <div class="column">
             <q-card>
@@ -166,14 +166,14 @@
                   }
                 "
                 label="Member"
-                :options="getGuildMembers()"
+                :options="getGuildMembers"
                 option-label="handle"
                 option-value="id"
                 emit-value
                 map-options
               >
               </q-select>
-              <div v-for="member in getGuildMembers()" :key="member.id">
+              <div v-for="member in getGuildMembers" :key="member.id">
                 <div class="row">
                   <span
                     v-if="isGuildAdmin(member.id)"
@@ -208,7 +208,7 @@
                 </span>
               </div>
               <div>
-                <div v-for="member in getGuildMembers()" :key="member.id">
+                <div v-for="member in getGuildMembers" :key="member.id">
                   <div class="row" id="members-handle">
                     <span class="q-pl-md q-pt-md">
                       {{ member.handle }}
@@ -321,7 +321,7 @@ const router = useRouter();
 const route = useRoute();
 const guild = ref<GuildData>()
 const ready = ref(false);
-const currentGuildId:number|undefined = undefined
+let currentGuildId:number|undefined = undefined
 let availableRolesByMember = ref<{ [key: number]: number[] | undefined }> ( {});
 const isAdmin = ref(false);
 let guildId: number|null = null;
@@ -374,20 +374,20 @@ function guildGamePlays() {
     return [];
   }
 }
-function potentialQuests():QuestData[] {
+const potentialQuests = computed(():QuestData[] => {
   return questStore.getQuests.filter(
     (q: Quest) =>
     (q.status == quest_status_enum.registration ||
      q.status == quest_status_enum.ongoing) &&
-    !confirmedPlayQuestIds()
+    confirmedPlayQuestIds().length == 0
   );
-}
+})
 function confirmedPlayQuestIds():GamePlay[]|number[]{
     return (guildGamePlays() || []).map((gp: GamePlay) => gp.quest_id);
 }
-function getGuildMembers():PublicMember[] {  
+const getGuildMembers = computed(():PublicMember[] => {  
     return guildStore.getMembersOfCurrentGuild!;
-} 
+}) 
 /*
 function getCastingRole() {
   const roles: CastingRole[] = membersStore.castingRolesPerQuest(quest);
@@ -572,8 +572,9 @@ async function removeGuildAdmin(id:number) {
       membersStore.ensureMembersOfGuild({guildId}),
     ]);
     await guildStore.setCurrentGuild(guildId!); 
+    currentGuildId = guildId!;
     guild.value = await guildStore.getGuildById(guildId!)
-    const guildMembers=getGuildMembers();  
+    const guildMembers=getGuildMembers.value;  
     availableRolesByMember.value = Object.fromEntries(
       guildMembers.map((m: PublicMember ) => [
         m.id,

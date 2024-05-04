@@ -114,12 +114,16 @@ export const useReadStatusStore = defineStore('readStatus', {
         );
       }
     },
-    async CreateOrUpdateReadStatus() {
+    async CreateOrUpdateReadStatus(data: {
+      nodeid: number,
+      new_status: boolean,
+      override: boolean,
+    },) {
       const res:AxiosResponse<{
         new_node_id: number;
         new_member_id: number;
         status_new: boolean;
-      }> = await api.post('node_set_read_status')
+      }> = await api.post('node_set_read_status', data)
       if(res.status==200){
        const memberStore=useMemberStore();
         const memberId = memberStore.getUserId;

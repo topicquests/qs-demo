@@ -33,7 +33,7 @@
 <script setup lang="ts">
 import scoreboard from "../components/score-board.vue";
 import member_handle from "../components/member-handle.vue";
-import { userLoaded } from "../boot/userLoaded";
+import { waitUserLoaded } from '../app-access';
 import QuestCard from "../components/quest-edit-card.vue";
 import { useQuestStore } from "src/stores/quests";
 import { onBeforeMount } from "vue";
@@ -82,7 +82,7 @@ function validateStartEnd(quest: Partial<QuestData>) {
     }
   }
   onBeforeMount(async () => {
-    await userLoaded;
+    await waitUserLoaded();
   })
 </script>
 

@@ -179,7 +179,7 @@ import { useConversationStore } from '../stores/conversation';
 import { useGuildStore } from 'src/stores/guilds';
 import { useMembersStore } from 'src/stores/members';
 import { useQuestStore } from 'src/stores/quests';
-import { onBeforeMount, ref } from 'vue';
+import { computed, onBeforeMount, ref } from 'vue';
 import MemberHandle from './member-handle.vue';
 import { useReadStatusStore } from 'src/stores/readStatus';
 import { useRoleStore } from 'src/stores/role';
@@ -190,8 +190,8 @@ const NodeTreeProps = defineProps<{
   channelId: number | null;
   isChannel: boolean;
   editable: boolean;
-  hideDescription: boolean;
-  initialSelectedNodeId: number | null;
+  hideDescription?: boolean;
+  initialSelectedNodeId: number | undefined;
 }>();
 
 const channelStore = useChannelStore();
@@ -255,18 +255,18 @@ function nodesTree(): QTreeNode[] {
     return conversationStore.getPrivateConversationTree;
   return conversationStore.getConversationTree;
 }
-function threats(): ThreatMap {
-  if (NodeTreeProps.channelId) return null;
+const threats = computed((): ThreatMap|undefined => {
+  if (NodeTreeProps.channelId) return undefined;
   if (NodeTreeProps.currentGuildId && showDraft)
     return conversationStore.getPrivateThreatMap;
   return conversationStore.getThreatMap;
-}
-function scores(): ScoreMap {
-  if (NodeTreeProps.channelId) return null;
+})
+const scores = computed((): ScoreMap|undefined => {
+  if (NodeTreeProps.channelId) return undefined;
   if (NodeTreeProps.currentGuildId && showDraft)
     return conversationStore.getPrivateScoreMap;
   return conversationStore.getScoreMap;
-}
+})
 //currentGuildId: "guildChanged",
 //conversation: "conversationChanged",
 
