@@ -185,7 +185,7 @@ import { useReadStatusStore } from 'src/stores/readStatus';
 import { useRoleStore } from 'src/stores/role';
 
 const NodeTreeProps = defineProps<{
-  currentQuestId: number | null;
+  currentQuestId: number | undefined;
   currentGuildId: number | undefined;
   channelId: number | null;
   isChannel: boolean;

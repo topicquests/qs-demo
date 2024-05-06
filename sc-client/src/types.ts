@@ -97,7 +97,7 @@ export interface Quest {
   updated_at: string;
   quest_membership?: QuestMembership[];
   casting?: Casting[];
-  game_play: [];
+  game_play?: GamePlay[];
 }
 
 export const questPatchKeys: KeyArray<Quest> = [

@@ -103,7 +103,7 @@ export const useQuestStore = defineStore('quest', {
         const quest = state.quests[state.currentQuest];
         const currentGuild: GuildData = useGuildStore().getCurrentGuild!;
         if (currentGuild) {
-          return currentGuild?.game_play?.find(
+          return quest?.game_play?.find(
             (gp: GamePlay) => gp.guild_id == currentGuild.id,
           );
         }
@@ -265,10 +265,14 @@ export const useQuestStore = defineStore('quest', {
       },
   },
   actions: {
-    async ensureAllQuests() {
+    async ensureAllQuests(): Promise<QuestData[] | undefined> {
       if (Object.keys(this.quests).length === 0 || !this.fullFetch) {
-        await this.fetchQuests(undefined);
-      }
+        const quest: QuestData[]|undefined = await this.fetchQuests(undefined);
+        if (quest!.length > 0)
+          return quest
+      } else 
+      return undefined    
+     
     },
     setCurrentQuest(quest_id: number | boolean) {
       if (typeof quest_id === 'number') {
@@ -395,7 +399,7 @@ export const useQuestStore = defineStore('quest', {
     async addCasting(casting: Partial<Casting>) {
       const memberStore = useMemberStore();
       const res: AxiosResponse<Casting[]> = await api.post('/casting', casting);
-      if (res.status == 200) {
+      if (res.status == 201) {
         const casting = res.data[0];
         let quest = this.quests[casting.quest_id];
         if (quest) {
@@ -598,22 +602,23 @@ export const useQuestStore = defineStore('quest', {
         }
       }
     },
-    async addGamePlay(params: GamePlay) {
+    async addGamePlay(params: Partial<GamePlay>) {
       const guildStore = useGuildStore();
       const res: AxiosResponse<GamePlay[]> = await api.post(
         '/game_play',
         params,
       );
-      if (res.status == 200) {
-        const game_play: GamePlay = res.data[0];
-        const quest = this.quests[game_play.quest_id];
+      if (res.status == 201) {
+        const game_play: Partial<GamePlay> = res.data[0];
+        let quest = this.quests[game_play.quest_id!];
         if (quest) {
-          const game_plays = quest.game_play || [];
+          const game_plays = quest.game_play || [] || undefined;
           game_plays.push(game_play);
-          quest.game_play = game_plays;
+          quest = { ...quest, game_play: game_plays };
+          this.quests = { ...this.quests, [quest.id]: quest };
         }
         const guild_id = game_play.guild_id;
-        const guild = guildStore.guilds[guild_id];
+        const guild = guildStore.guilds[guild_id!];
         // Assuming it is definitely not there
         if (guild) {
           const game_plays =

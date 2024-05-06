@@ -462,7 +462,7 @@ async function removeGuildAdmin(id:number) {
     }
     return false;
   }
-  async function doRegister(quest_Id: number) {
+  const doRegister = async(quest_Id: number) =>{
     try {
       const questId = quest_Id;
       const regQuest = questStore.getQuestById(questId);
@@ -493,8 +493,7 @@ async function removeGuildAdmin(id:number) {
         message: `${err}`,
       });
       console.log("error registering to quest: ", err);
-    }
-  
+    }  
   }
   function findPlayOfGuild(gamePlays):GamePlay | undefined {
     if (gamePlays) {

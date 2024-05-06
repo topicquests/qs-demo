@@ -33,7 +33,7 @@
           <span v-if="!memberId">
             <router-link :to="{ name: 'signin' }">Login to play</router-link>
           </span>
-          <span v-else-if="questStore.isQuestMember(questId)">
+          <span v-else-if="questStore.isQuestMember(questId!)">
             You can
             <router-link
               :to="{ name: 'quest_edit', params: { quest_id: questId } }"
@@ -157,8 +157,8 @@
         </div>
         <q-dialog v-model="registerMemberDialog" persistent>
           <member-game-registration
-            guildId="mySelectedPlayingGuildId"
-            questId="questId"
+            :guildId="mySelectedPlayingGuildId"
+            :questId="questId"
           />
         </q-dialog>
       </q-card>
@@ -192,10 +192,10 @@ const route = useRoute();
 const memberId = ref(memberStore.member!.id);
 const ready = ref(false);
 const registerMemberDialog = ref(false);
-const questId = ref<number|null>(null);
+const questId = ref<number|undefined>(undefined);
 let myPlayingGuilds: Guild[];
 const  selectedNodeId = ref<number | undefined>(undefined);
-const mySelectedPlayingGuildId = ref<number | null>(null);
+const mySelectedPlayingGuildId = ref<number | undefined>(undefined);
 
 const guildId = computed(():number|undefined => {
   const quest_id = questStore.getCurrentQuest?.id;
