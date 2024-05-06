@@ -124,10 +124,10 @@ import { useRouter } from 'vue-router';
 import { useMemberStore } from '../stores/member';
 import { useGuildStore } from '../stores/guilds';
 import { useQuestStore } from '../stores/quests';
-import channelList  from '../components/ChannelListComponent.vue'
+import channelList from '../components/ChannelListComponent.vue';
 import { GuildData } from '../types';
 import { useQuasar } from 'quasar';
-import drawer_menu  from '../components/drawer_menu.vue'
+import drawer_menu from '../components/drawer_menu.vue';
 
 const router = useRouter();
 const memberStore = useMemberStore();
@@ -138,7 +138,7 @@ const leftDrawer = ref(false);
 const isAuthenticated = ref(false);
 const rightDrawer = ref(false);
 const showTree = true;
-const currentGuild  = ref<GuildData|undefined>(guildStore.getCurrentGuild);
+const currentGuild = ref<GuildData | undefined>(guildStore.getCurrentGuild);
 
 function checkIfAuthenticated(): boolean {
   isAuthenticated.value = memberStore.isAuthenticated;
@@ -146,10 +146,10 @@ function checkIfAuthenticated(): boolean {
     return true;
   }
   return false;
-};
+}
 function goTo(route: string): void {
   router.push(route);
-};
+}
 async function onLogout() {
   rightDrawer.value = false;
   leftDrawer.value = false;
@@ -159,17 +159,17 @@ async function onLogout() {
     type: 'positive',
     message: 'You are now logged out',
   });
-};
+}
 function toggleNav() {
   if (rightDrawer.value) {
     closeNav();
   } else {
     rightDrawer.value = true;
   }
-};
+}
 function closeNav() {
   rightDrawer.value = false;
-};
+}
 onBeforeMount(async () => {
   await guildStore.ensureAllGuilds();
   await questStore.ensureAllQuests();

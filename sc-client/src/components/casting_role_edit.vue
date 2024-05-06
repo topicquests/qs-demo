@@ -40,32 +40,32 @@
 </template>
 
 <script setup lang="ts">
-import { useMemberStore } from "src/stores/member";
-import { Role } from "../types";
-import { watchEffect } from "vue";
+import { useMemberStore } from 'src/stores/member';
+import { Role } from '../types';
+import { watchEffect } from 'vue';
 
 const CastingRoleEditProps = defineProps<{
-    availableRoles: Role[];
-    castingRoles: Role[];
-    questId: number | undefined;
-    guildId: number | undefined;
+  availableRoles: Role[];
+  castingRoles: Role[];
+  questId: number | undefined;
+  guildId: number | undefined;
 }>();
 
 const memberStore = useMemberStore();
 let cr: Role[] = [];
-const emit = defineEmits(['castingRoleAdd','castingRoleRemove']);
+const emit = defineEmits(['castingRoleAdd', 'castingRoleRemove']);
 
 watchEffect(() => {
   cr = [...CastingRoleEditProps.castingRoles];
-})
+});
 
 function castingRoleAdd(role_id: number) {
-  emit("castingRoleAdd", role_id);
+  emit('castingRoleAdd', role_id);
 }
 
 function castingRoleRemove(role: Role) {
-  emit("castingRoleRemove", role.id);
-};
+  emit('castingRoleRemove', role.id);
+}
 </script>
 <style>
 H5 {

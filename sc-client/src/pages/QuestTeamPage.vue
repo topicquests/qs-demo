@@ -15,9 +15,8 @@
         <div class="row justify-center">
           <div class="column quest-card-col">
             <div class="col-12 q-mb-md">
-              <questCard 
-                :currentQuest="questStore.getCurrentQuest!"> 
-            </questCard>
+              <questCard :currentQuest="questStore.getCurrentQuest!">
+              </questCard>
             </div>
           </div>
         </div>
@@ -46,7 +45,11 @@
                 <span v-if="questStore.getCurrentQuest!.is_playing">
                   <!-- already playing -->
                 </span>
-                <span v-else-if="questStore.getCurrentQuest!.status != 'registration'">
+                <span
+                  v-else-if="
+                    questStore.getCurrentQuest!.status != 'registration'
+                  "
+                >
                   <!-- not in registration phase -->
                 </span>
                 <span v-else-if="slotProps.guild.is_member">
@@ -56,7 +59,7 @@
                 <span
                   v-else-if="
                     questStore.getCurrentQuest!.my_confirmed_guild_count +
-                    questStore.getCurrentQuest!.my_recruiting_guild_count >
+                      questStore.getCurrentQuest!.my_recruiting_guild_count >
                     0
                   "
                 >
@@ -91,19 +94,19 @@
 </template>
 
 <script setup lang="ts">
-import Vue, { onBeforeMount, ref } from "vue";
-import questCard from "../components/quest-card.vue";
-import scoreboard from "../components/score-board.vue";
-import member from "../components/member-handle.vue";
-import GuildsTable from "../components/guilds-table.vue";
-import GuildsPlayingIndicator from "../components/guilds-playing-indicator.vue";
-import GuildMembers from "../components/guild-members.vue";
-import { useGuildStore } from "src/stores/guilds";
-import { useQuestStore } from "src/stores/quests";
-import { useConversationStore } from "src/stores/conversation";
-import { useMembersStore } from "src/stores/members";
-import { useRoleStore } from "src/stores/role";
-import { useRoute } from "vue-router";
+import Vue, { onBeforeMount, ref } from 'vue';
+import questCard from '../components/quest-card.vue';
+import scoreboard from '../components/score-board.vue';
+import member from '../components/member-handle.vue';
+import GuildsTable from '../components/guilds-table.vue';
+import GuildsPlayingIndicator from '../components/guilds-playing-indicator.vue';
+import GuildMembers from '../components/guild-members.vue';
+import { useGuildStore } from 'src/stores/guilds';
+import { useQuestStore } from 'src/stores/quests';
+import { useConversationStore } from 'src/stores/conversation';
+import { useMembersStore } from 'src/stores/members';
+import { useRoleStore } from 'src/stores/role';
+import { useRoute } from 'vue-router';
 
 const guildStore = useGuildStore();
 const questStore = useQuestStore();
@@ -114,23 +117,23 @@ const ready = ref(false);
 let questId: number;
 const route = useRoute();
 
-  async function initialize() {
-    if (typeof route.params.quest_id === 'string') {
-      const quest_id = Number.parseInt(route.params.quest_id);
-      questId = quest_id;
-    }
-    await Promise.all([
-      membersStore.ensurePlayersOfQuest( questId ),
-      roleStore.ensureAllRoles(),
-      questStore.ensureCurrentQuest(questId),
-      conversationStore.ensureConversation(questId),
-    ]);
-    await guildStore.ensureGuildsPlayingQuest(questId);
-    ready.value = true;
+async function initialize() {
+  if (typeof route.params.quest_id === 'string') {
+    const quest_id = Number.parseInt(route.params.quest_id);
+    questId = quest_id;
   }
-  onBeforeMount(async() => {
-    await initialize();
-  })
+  await Promise.all([
+    membersStore.ensurePlayersOfQuest(questId),
+    roleStore.ensureAllRoles(),
+    questStore.ensureCurrentQuest(questId),
+    conversationStore.ensureConversation(questId),
+  ]);
+  await guildStore.ensureGuildsPlayingQuest(questId);
+  ready.value = true;
+}
+onBeforeMount(async () => {
+  await initialize();
+});
 </script>
 <style>
 .guild-member-col {

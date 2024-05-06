@@ -236,7 +236,7 @@ function beforeRouterUpdate() {
       });
     }, 500);
   }
- 
+
 function isRelation() {
       return q.type === "relation";
 }

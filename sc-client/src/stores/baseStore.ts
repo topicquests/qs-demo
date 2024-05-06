@@ -18,7 +18,7 @@ import { useGuildStore } from './guilds';
 import { useQuestStore } from './quests';
 import { useRoleStore } from './role';
 import { useServerDataStore } from './serverData';
-import { useReadStatusStore } from './readStatus'
+import { useReadStatusStore } from './readStatus';
 
 export function filterKeys<T>(data: Partial<T>, keys: KeyArray<T>): Partial<T> {
   return Object.fromEntries(
@@ -49,8 +49,8 @@ export const useBaseStore = defineStore('base', {
         questN?: number | Quest,
         nodeType?: ibis_node_type_enum,
       ) => {
-        const memberStore = useMemberStore()
-        const guildStore = useGuildStore()
+        const memberStore = useMemberStore();
+        const guildStore = useGuildStore();
         const member = memberStore.getUser;
         if (!member) return false;
         if (member.permissions.indexOf(permission) >= 0) return true;
@@ -115,4 +115,3 @@ export const useBaseStore = defineStore('base', {
       },
   },
 });
-

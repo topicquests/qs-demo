@@ -148,7 +148,7 @@ const QuestTableProps = defineProps<{
 const questStore = useQuestStore();
 const memberStore = useMemberStore();
 const baseStore = useBaseStore();
-let questStatus = ref<quest_status_type|string>('All');
+let questStatus = ref<quest_status_type | string>('All');
 let questStatusOptions: quest_status_type[];
 
 const columns: QTableProps['columns'] = [
@@ -242,7 +242,7 @@ const getFilteredQuests = computed({
       return QuestTableProps.quests;
     }
   },
-  set: () => {}
+  set: () => {},
 });
 
 function refInterval(row: QuestData) {
@@ -252,7 +252,6 @@ function refInterval(row: QuestData) {
   const refTime = start > now ? start : end;
   return Math.abs(refTime - now);
 }
-
 
 function lastMoveRel(row: QuestData) {
   return row.last_node_published_at

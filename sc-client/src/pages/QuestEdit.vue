@@ -76,91 +76,92 @@
 </template>
 
 <script setup lang="ts">
-import scoreboard from "../components/score-board.vue";
-import memberHandle from "../components/member-handle.vue";
-import nodeForm from "../components/node-form.vue";
-import questCard from "../components/quest-edit-card.vue";
+import scoreboard from '../components/score-board.vue';
+import memberHandle from '../components/member-handle.vue';
+import nodeForm from '../components/node-form.vue';
+import questCard from '../components/quest-edit-card.vue';
 import { waitUserLoaded } from '../app-access';
-import { ref } from "vue";
-import { useQuestStore } from "src/stores/quests";
-import { useConversationStore } from "src/stores/conversation";
-import { useQuasar } from "quasar";
-import {
-  ibis_node_type_enum,
-} from "../enums";
-import { onBeforeMount } from "vue";
-import {  useRoute } from "vue-router"
-import { ConversationNode, Quest, QuestData, defaultNodeType } from "src/types";
+import { ref } from 'vue';
+import { useQuestStore } from 'src/stores/quests';
+import { useConversationStore } from 'src/stores/conversation';
+import { useQuasar } from 'quasar';
+import { ibis_node_type_enum } from '../enums';
+import { onBeforeMount } from 'vue';
+import { useRoute } from 'vue-router';
+import { ConversationNode, Quest, QuestData, defaultNodeType } from 'src/types';
 
 const $q = useQuasar();
 const questStore = useQuestStore();
 const conversationStore = useConversationStore();
-let quest_id = ref<number|null>(null)
+let quest_id = ref<number | null>(null);
 const base_ibis_types = [ibis_node_type_enum.question];
 const ready = ref(false);
 const isAdmin = true;
 const route = useRoute();
-const defaultNode:defaultNodeType = {
-    quest_id: undefined,
-    title: "",
-    description: "",
-    status: "private_draft",
-    node_type: "question",
+const defaultNode: defaultNodeType = {
+  quest_id: undefined,
+  title: '',
+  description: '',
+  status: 'private_draft',
+  node_type: 'question',
 };
 let node = getNode();
-function getNode(): Partial<ConversationNode> | defaultNodeType {  
+function getNode(): Partial<ConversationNode> | defaultNodeType {
   const rootNode = conversationStore.getRootNode;
-    return rootNode || defaultNode;
+  return rootNode || defaultNode;
 }
 
-function quest(): QuestData|undefined {
-      return questStore.getCurrentQuest;
+function quest(): QuestData | undefined {
+  return questStore.getCurrentQuest;
 }
-async function editNode(node:ConversationNode) {
+async function editNode(node: ConversationNode) {
   if (node.id) {
     await updateNode(node);
   } else {
     await addNode(node);
   }
 }
-async function addNode(node:ConversationNode) {
+async function addNode(node: ConversationNode) {
   try {
-    const data:Partial<ConversationNode>|Partial<defaultNodeType> = { ...node, ...node };
-    data.quest_id = quest_id.value!;  
+    const data: Partial<ConversationNode> | Partial<defaultNodeType> = {
+      ...node,
+      ...node,
+    };
+    data.quest_id = quest_id.value!;
     await conversationStore.createConversationNode(data);
     $q.notify({
       message: `Added node to conversation`,
-      color: "positive",
+      color: 'positive',
     });
-    if(quest_id.value) {
-      await conversationStore.fetchRootNode({ quest_id: quest_id.value } );
+    if (quest_id.value) {
+      await conversationStore.fetchRootNode({ quest_id: quest_id.value });
     }
   } catch (err) {
-    console.log("there was an error in adding node ", err);
+    console.log('there was an error in adding node ', err);
     $q.notify({
       message: `There was an error adding new node.`,
-      color: "negative",
+      color: 'negative',
     });
   }
 }
-async function updateNode(node:ConversationNode) {
+async function updateNode(node: ConversationNode) {
   try {
     const data = { ...node, ...node };
-    await conversationStore.updateConversationNode(data );
+    await conversationStore.updateConversationNode(data);
     $q.notify({
       message: `Root node updated`,
-      color: "positive",
+      color: 'positive',
     });
   } catch (err) {
-    console.log("there was an error in adding node ", err);
+    console.log('there was an error in adding node ', err);
     $q.notify({
       message: `There was an error adding root node.`,
-      color: "negative",
+      color: 'negative',
     });
   }
 }
 function validateStartEnd(quest: Partial<QuestData>) {
-  if (quest.start && quest.end && (quest.start < quest.end)) {
+  if (quest.start && quest.end && quest.start < quest.end) {
     return true;
   }
   return false;
@@ -168,22 +169,22 @@ function validateStartEnd(quest: Partial<QuestData>) {
 async function doSubmitQuest(quest: Partial<Quest>) {
   try {
     if (!validateStartEnd(quest)) {
-      throw "End date is before start date";
+      throw 'End date is before start date';
     }
     await questStore.updateQuest(quest);
     $q.notify({
-      message: "Quest was updated successfully",
-      color: "positive",
+      message: 'Quest was updated successfully',
+      color: 'positive',
     });
   } catch (err) {
-    console.log("there was an error in updating quest ", err);
+    console.log('there was an error in updating quest ', err);
     $q.notify({
       message: `There was an error updating quest. If this issue persists, contact support.`,
-      color: "negative",
+      color: 'negative',
     });
   }
 }
-onBeforeMount(async() =>{
+onBeforeMount(async () => {
   if (typeof route.params.quest_id === 'string') {
     quest_id.value = Number.parseInt(route.params.quest_id);
   }
@@ -194,12 +195,11 @@ onBeforeMount(async() =>{
     await questStore.ensureQuest({ quest_id: questId });
     await conversationStore.ensureConversation(questId);
     if (conversationStore.getConversation.length > 0) {
-      await conversationStore.fetchRootNode( { quest_id: questId } );
+      await conversationStore.fetchRootNode({ quest_id: questId });
     }
   }
   ready.value = true;
-})
-
+});
 </script>
 
 <style>

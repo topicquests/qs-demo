@@ -164,7 +164,7 @@
 import { ConversationNode, QTreeNode } from '../types';
 import NodeForm from './node-form.vue';
 import ReadStatusCounterButton from './read-status-counter-button.vue';
-import { ConversationMap, ibis_child_types } from '../stores/conversation'
+import { ConversationMap, ibis_child_types } from '../stores/conversation';
 import { QTree } from 'quasar';
 import {
   ibis_node_type_type,
@@ -255,18 +255,18 @@ function nodesTree(): QTreeNode[] {
     return conversationStore.getPrivateConversationTree;
   return conversationStore.getConversationTree;
 }
-const threats = computed((): ThreatMap|undefined => {
+const threats = computed((): ThreatMap | undefined => {
   if (NodeTreeProps.channelId) return undefined;
   if (NodeTreeProps.currentGuildId && showDraft)
     return conversationStore.getPrivateThreatMap;
   return conversationStore.getThreatMap;
-})
-const scores = computed((): ScoreMap|undefined => {
+});
+const scores = computed((): ScoreMap | undefined => {
   if (NodeTreeProps.channelId) return undefined;
   if (NodeTreeProps.currentGuildId && showDraft)
     return conversationStore.getPrivateScoreMap;
   return conversationStore.getScoreMap;
-})
+});
 //currentGuildId: "guildChanged",
 //conversation: "conversationChanged",
 
@@ -477,7 +477,7 @@ async function confirmAddChild(node) {
     });
   }
 }
-async function confirmEdit(node:Partial<ConversationNode> ) {
+async function confirmEdit(node: Partial<ConversationNode>) {
   try {
     if (NodeTreeProps.channelId) {
       await channelStore.updateChannelNode({ data: node });

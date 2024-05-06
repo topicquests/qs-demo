@@ -93,34 +93,35 @@
 </template>
 
 <script setup lang="ts">
-import memberHandle from "../components/member-handle.vue";
-import scoreboard from "../components/score-board.vue";
-import roleTable from "../components/role-table.vue";
-import serverDataCard from "../components/server-data-card.vue";
-import type { Member, PublicMember } from "../types";
-import { userLoaded } from "../boot/userLoaded";
-import { ref, computed, watch } from "vue";
-import { permission_enum } from "../enums";
-import { useMembersStore } from "../stores/members"; 
-import { useMemberStore } from "../stores/member";
-import { useBaseStore } from "../stores/baseStore"
-import { useRoleStore } from "../stores/role";
-import { useServerDataStore } from '../stores/serverData'
-import { onBeforeMount } from "vue";
+import memberHandle from '../components/member-handle.vue';
+import scoreboard from '../components/score-board.vue';
+import roleTable from '../components/role-table.vue';
+import serverDataCard from '../components/server-data-card.vue';
+import type { Member, PublicMember } from '../types';
+import { userLoaded } from '../boot/userLoaded';
+import { ref, computed, watch } from 'vue';
+import { permission_enum } from '../enums';
+import { useMembersStore } from '../stores/members';
+import { useMemberStore } from '../stores/member';
+import { useBaseStore } from '../stores/baseStore';
+import { useRoleStore } from '../stores/role';
+import { useServerDataStore } from '../stores/serverData';
+import { onBeforeMount } from 'vue';
 import { useQuasar } from 'quasar';
 
 const ready = ref(false);
-  const userIsSuperAdmin = ref(false); 
-  const membersStore = useMembersStore();
-  const memberStore = useMemberStore();
-  const baseStore = useBaseStore();
-  const roleStore = useRoleStore();
-  const serverDataStore = useServerDataStore();
-  const $q = useQuasar();
-  const member_id = ref<number|undefined>(undefined);
+const userIsSuperAdmin = ref(false);
+const membersStore = useMembersStore();
+const memberStore = useMemberStore();
+const baseStore = useBaseStore();
+const roleStore = useRoleStore();
+const serverDataStore = useServerDataStore();
+const $q = useQuasar();
+const member_id = ref<number | undefined>(undefined);
 const members = membersStore.getMembers;
-const member = ref<PublicMember|undefined>( membersStore.getMemberById(member_id.value!));
-    
+const member = ref<PublicMember | undefined>(
+  membersStore.getMemberById(member_id.value!),
+);
 
 function ensure(array: string[], value: permission_enum, present: boolean) {
   if (!array) return;
@@ -136,15 +137,15 @@ function ensure(array: string[], value: permission_enum, present: boolean) {
 }
 const superAdmin = computed({
   get() {
-        return member.value?.permissions.includes("superadmin");
-      },
-      set(value) {
-        ensure(member.value?.permissions, permission_enum.superadmin, value);
-      }
+    return member.value?.permissions.includes('superadmin');
+  },
+  set(value) {
+    ensure(member.value?.permissions, permission_enum.superadmin, value);
+  },
 });
 const createQuest = computed({
   get() {
-    return member.value?.permissions.includes("createQuest");
+    return member.value?.permissions.includes('createQuest');
   },
   set(val) {
     ensure(member.value?.permissions, permission_enum.createQuest, val);
@@ -152,50 +153,54 @@ const createQuest = computed({
 });
 const createGuild = computed({
   get() {
-    return member.value?.permissions.includes("createGuild");
+    return member.value?.permissions.includes('createGuild');
   },
   set(val) {
     ensure(member.value?.permissions, permission_enum.createGuild, val);
   },
-})
+});
 watch(member_id, (newVal, oldVal) => {
   // Handle member selection change here
-  member.value = membersStore.getMemberById(member_id.value)
+  member.value = membersStore.getMemberById(member_id.value);
   console.log('Selected member ID:', newVal);
 });
- 
-async function ensureData() {
-  const promises = [membersStore.ensureAllMembers(), roleStore.ensureAllRoles()];
-    if (baseStore.hasPermission(permission_enum.superadmin)) {
-      promises.push(serverDataStore.ensureServerData());
-    }
-    await Promise.all(promises);
-  }
 
-  async function updatePermissions() {
-    try {
-      await membersStore.updateMember(     
-        { id: member.value?.id, permissions: member.value?.permissions } ,
-      );
-      $q.notify({
-        message: "Permissions were updated successfully",
-        color: "positive",
-      });
-    } catch (err) {
-      console.log("there was an error in updating permissions ", err);
-      $q.notify({
-        message: "There was an error updating permissions.",
-        color: "negative",
-      });
-    }
+async function ensureData() {
+  const promises = [
+    membersStore.ensureAllMembers(),
+    roleStore.ensureAllRoles(),
+  ];
+  if (baseStore.hasPermission(permission_enum.superadmin)) {
+    promises.push(serverDataStore.ensureServerData());
   }
-  onBeforeMount(async () => {
-    //await userLoaded;
-    member_id.value = await memberStore.getUserId;
-    userIsSuperAdmin.value = baseStore.hasPermission(permission_enum.superadmin);
-    await ensureData();
-    ready.value = true;
-  })
+  await Promise.all(promises);
+}
+
+async function updatePermissions() {
+  try {
+    await membersStore.updateMember({
+      id: member.value?.id,
+      permissions: member.value?.permissions,
+    });
+    $q.notify({
+      message: 'Permissions were updated successfully',
+      color: 'positive',
+    });
+  } catch (err) {
+    console.log('there was an error in updating permissions ', err);
+    $q.notify({
+      message: 'There was an error updating permissions.',
+      color: 'negative',
+    });
+  }
+}
+onBeforeMount(async () => {
+  //await userLoaded;
+  member_id.value = await memberStore.getUserId;
+  userIsSuperAdmin.value = baseStore.hasPermission(permission_enum.superadmin);
+  await ensureData();
+  ready.value = true;
+});
 </script>
 <style>
 .admin-card {

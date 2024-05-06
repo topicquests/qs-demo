@@ -3,9 +3,7 @@
     <q-card id="node-card">
       <section id="node-card-title">
         <h3 class="q-ma-md">
-          <IbisButton 
-          :node_type="node.node_type">
-        </IbisButton>
+          <IbisButton :node_type="node.node_type"> </IbisButton>
           {{ node.title }}
         </h3>
       </section>
@@ -25,15 +23,15 @@
 </template>
 
 <script setup lang="ts">
-import IbisButton from "./ibis-btn.vue";
-import { ConversationNode } from "../types";
+import IbisButton from './ibis-btn.vue';
+import { ConversationNode } from '../types';
 
 const NodeCardProps = defineProps<{
-    node: ConversationNode;
+  node: ConversationNode;
 }>();
 
 function description() {
-  return NodeCardProps.node.description || "";
+  return NodeCardProps.node.description || '';
 }
 </script>
 <style>

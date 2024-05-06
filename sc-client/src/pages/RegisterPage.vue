@@ -166,18 +166,18 @@ function doRegister() {
       color: 'positive',
     });
     router.push({ name: 'confirm_registration' });
-  } catch (error:unknown) {
-    if(axios.isAxiosError(error)){
-      console.log(error.status)
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.log(error.status);
       $q.notify({
-      message: 'There was an error creating new member.',
-      color: 'negative',
-    })
+        message: 'There was an error creating new member.',
+        color: 'negative',
+      });
     } else {
       console.log('there was an error in creating member ', error);
       $q.notify({
         message:
-        'There was an error creating your account. If this issue persists, contact support.',
+          'There was an error creating your account. If this issue persists, contact support.',
         color: 'negative',
       });
     }

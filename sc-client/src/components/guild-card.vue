@@ -53,49 +53,47 @@
 </template>
 
 <script setup lang="ts">
-import { useQuasar } from "quasar";
+import { useQuasar } from 'quasar';
 import { waitUserLoaded } from '../app-access';
-import { public_private_bool } from "../enums";
-import { Guild, GuildData } from "../types";
-import { useGuildStore } from "src/stores/guilds";
-import { onBeforeMount, ref, watch } from "vue";
+import { public_private_bool } from '../enums';
+import { Guild, GuildData } from '../types';
+import { useGuildStore } from 'src/stores/guilds';
+import { onBeforeMount, ref, watch } from 'vue';
 
 const GuildCardProps = defineProps<{
-    currentGuild?: Partial<Guild>,
-    showDescription: boolean,
+  currentGuild?: Partial<Guild>;
+  showDescription: boolean;
 }>();
-const $q = useQuasar()
+const $q = useQuasar();
 const guildStore = useGuildStore();
 const invitation: { label: string; value: boolean }[] = [
-    { label: "open", value: true },
-    { label: "close", value: false },
+  { label: 'open', value: true },
+  { label: 'close', value: false },
 ];
 
 let guild = ref<Partial<Guild>>({});
 const description = ref<string>('');
 
-
-
 if (typeof guildStore.currentGuild === 'number')
-guild.value.id = guildStore.currentGuild;
+  guild.value.id = guildStore.currentGuild;
 
 async function doSubmit() {
-    try {
-      await guildStore.updateGuild(guild.value);
-      $q.notify({
-        message: "Guild was updated successfully",
-        color: "positive",
-      });
-    } catch (err) {
-      console.log("there was an error in updating guild ", err);
-      $q.notify({
-        message:
-          "There was an error updating guild. If this issue persists, contact support.",
-        color: "negative",
-      });
-    }
+  try {
+    await guildStore.updateGuild(guild.value);
+    $q.notify({
+      message: 'Guild was updated successfully',
+      color: 'positive',
+    });
+  } catch (err) {
+    console.log('there was an error in updating guild ', err);
+    $q.notify({
+      message:
+        'There was an error updating guild. If this issue persists, contact support.',
+      color: 'negative',
+    });
   }
-onBeforeMount(async () =>{
+}
+onBeforeMount(async () => {
   await waitUserLoaded();
-})
+});
 </script>

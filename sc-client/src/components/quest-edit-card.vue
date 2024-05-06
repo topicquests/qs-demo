@@ -139,111 +139,84 @@
         <span>End</span>
       </div>
     </div>
-    <div class="row">      
-        <div class="col-6">
-          <div class="q-pa-md" style="max-width: 400px">
-            <q-input 
-              filled 
-              v-model="quest.start" 
-              name="startDate">
-              <template v-slot:prepend>
-                <q-icon name="event" class="cursor-pointer">
-                  <q-popup-proxy
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale"
-                  >
-                    <q-date 
-                      v-model="quest.start" 
-                      mask="YYYY-MM-DD HH:mm">
-                      <div class="row items-center justify-end">
-                        <q-btn
-                          v-close-popup
-                          label="Close"
-                          color="primary"
-                          flat
-                        />
-                      </div>
-                    </q-date>
-                  </q-popup-proxy>
-                </q-icon>
-              </template>
-
-              <template v-slot:append>
-                <q-icon name="access_time" class="cursor-pointer">
-                  <q-popup-proxy
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale"
-                  >
-                    <q-time v-model="quest.start" mask="YYYY-MM-DD HH:mm">
-                      format24h >
-                      <div class="row items-center justify-end">
-                        <q-btn
-                          v-close-popup
-                          label="Close"
-                          color="primary"
-                          flat
-                        />
-                      </div>
-                    </q-time>
-                  </q-popup-proxy>
-                </q-icon>
-              </template>
-            </q-input>
-          </div>
-        </div>
-      
+    <div class="row">
       <div class="col-6">
-        
-          <div class="q-pa-md" style="max-width: 400px">
-            <q-input filled v-model="quest.end" name="endDate">
-              <template v-slot:prepend>
-                <q-icon name="event" class="cursor-pointer">
-                  <q-popup-proxy
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale"
-                  >
-                    <q-date v-model="quest.end" mask="YYYY-MM-DD HH:mm"
-                      >>
-                      <div class="row items-center justify-end">
-                        <q-btn
-                          v-close-popup
-                          label="Close"
-                          color="primary"
-                          flat
-                        />
-                      </div>
-                    </q-date>
-                  </q-popup-proxy>
-                </q-icon>
-              </template>
+        <div class="q-pa-md" style="max-width: 400px">
+          <q-input filled v-model="quest.start" name="startDate">
+            <template v-slot:prepend>
+              <q-icon name="event" class="cursor-pointer">
+                <q-popup-proxy
+                  cover
+                  transition-show="scale"
+                  transition-hide="scale"
+                >
+                  <q-date v-model="quest.start" mask="YYYY-MM-DD HH:mm">
+                    <div class="row items-center justify-end">
+                      <q-btn v-close-popup label="Close" color="primary" flat />
+                    </div>
+                  </q-date>
+                </q-popup-proxy>
+              </q-icon>
+            </template>
 
-              <template v-slot:append>
-                <q-icon name="access_time" class="cursor-pointer">
-                  <q-popup-proxy
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale"
-                  >
-                    <q-time v-model="quest.end" mask="YYYY-MM-DD HH:mm">
-                      format24h >
-                      <div class="row items-center justify-end">
-                        <q-btn
-                          v-close-popup
-                          label="Close"
-                          color="primary"
-                          flat
-                        />
-                      </div>
-                    </q-time>
-                  </q-popup-proxy>
-                </q-icon>
-              </template>
-            </q-input>
-          </div>
-       
+            <template v-slot:append>
+              <q-icon name="access_time" class="cursor-pointer">
+                <q-popup-proxy
+                  cover
+                  transition-show="scale"
+                  transition-hide="scale"
+                >
+                  <q-time v-model="quest.start" mask="YYYY-MM-DD HH:mm">
+                    format24h >
+                    <div class="row items-center justify-end">
+                      <q-btn v-close-popup label="Close" color="primary" flat />
+                    </div>
+                  </q-time>
+                </q-popup-proxy>
+              </q-icon>
+            </template>
+          </q-input>
+        </div>
+      </div>
+
+      <div class="col-6">
+        <div class="q-pa-md" style="max-width: 400px">
+          <q-input filled v-model="quest.end" name="endDate">
+            <template v-slot:prepend>
+              <q-icon name="event" class="cursor-pointer">
+                <q-popup-proxy
+                  cover
+                  transition-show="scale"
+                  transition-hide="scale"
+                >
+                  <q-date v-model="quest.end" mask="YYYY-MM-DD HH:mm"
+                    >>
+                    <div class="row items-center justify-end">
+                      <q-btn v-close-popup label="Close" color="primary" flat />
+                    </div>
+                  </q-date>
+                </q-popup-proxy>
+              </q-icon>
+            </template>
+
+            <template v-slot:append>
+              <q-icon name="access_time" class="cursor-pointer">
+                <q-popup-proxy
+                  cover
+                  transition-show="scale"
+                  transition-hide="scale"
+                >
+                  <q-time v-model="quest.end" mask="YYYY-MM-DD HH:mm">
+                    format24h >
+                    <div class="row items-center justify-end">
+                      <q-btn v-close-popup label="Close" color="primary" flat />
+                    </div>
+                  </q-time>
+                </q-popup-proxy>
+              </q-icon>
+            </template>
+          </q-input>
+        </div>
       </div>
     </div>
     <div class="row justify-start q-pa-lg q-ml-lg q-gutter-sm">
@@ -295,77 +268,75 @@
 </template>
 
 <script setup lang="ts">
-import { Quest, QuestData } from "../types";
-import { public_private_bool, quest_status_type } from "../enums";
-import { DateTime } from "luxon";
-import { useQuestStore } from "src/stores/quests";
-import { useQuasar } from "quasar";
-import { computed, ref } from "vue";
+import { Quest, QuestData } from '../types';
+import { public_private_bool, quest_status_type } from '../enums';
+import { DateTime } from 'luxon';
+import { useQuestStore } from 'src/stores/quests';
+import { useQuasar } from 'quasar';
+import { computed, ref } from 'vue';
 
 const turn_based_bool = [
   {
-    label: "Continuous",
+    label: 'Continuous',
     value: true,
   },
   {
-    label: "Turn-based",
+    label: 'Turn-based',
     value: false,
   },
 ];
 
 const QuestCardProps = defineProps<{
-    thisQuest: Partial<QuestData>;
-    edit: boolean,
-    create: boolean,
-   
+  thisQuest: Partial<QuestData>;
+  edit: boolean;
+  create: boolean;
 }>();
 const questStore = useQuestStore();
-const quest = ref<Partial<Quest>>(QuestCardProps.thisQuest) ;
+const quest = ref<Partial<Quest>>(QuestCardProps.thisQuest);
 const $q = useQuasar();
 const emit = defineEmits(['doUpdateQuest']);
 
 const description = computed({
   get: () => quest.value?.description,
   set: (value) => {
-    if(quest.value)
-      quest.value.description = value;
+    if (quest.value) quest.value.description = value;
   },
 });
 
 async function doEndTurn() {
   try {
-    await questStore.endTurn({  quest_id: quest.value.id! });
+    await questStore.endTurn({ quest_id: quest.value.id! });
     $q.notify({
-      type: "positive",
-      message: "Turn ended",
+      type: 'positive',
+      message: 'Turn ended',
     });
   } catch (e) {
     $q.notify({
-      type: "negative",
-      message: "Could not end turn",
+      type: 'negative',
+      message: 'Could not end turn',
     });
   }
 }
 function updateStatus(value: quest_status_type) {
   const dt = DateTime.now();
-  if (value == "registration") {
+  if (value == 'registration') {
     $q.notify({
       message: "Don't forget to create first conversation node",
-      color: "positive",
+      color: 'positive',
     });
   }
-  if (value == "ongoing") {
+  if (value == 'ongoing') {
     quest.value.start = dt.toString();
   }
-  if (value == "finished") {
+  if (value == 'finished') {
     quest.value.end = dt.toString();
   }
   quest.value.status = value;
 }
 function doUpdateQuest() {
-  console.log("Quest ", quest.value);
-  const createdQuest:Partial<QuestData> = Object.assign(quest.value)
-  emit("doUpdateQuest", createdQuest);
+  console.log('Quest ', quest.value);
+  const createdQuest: Partial<QuestData> = Object.assign(quest.value);
+  emit('doUpdateQuest', createdQuest);
 }
 </script>
 <style>

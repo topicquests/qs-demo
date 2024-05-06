@@ -1,13 +1,13 @@
-import { ibis_node_type_enum, meta_state_enum } from "../enums";
-import { MaybeRealNode, generic_id } from "../types";
+import { ibis_node_type_enum, meta_state_enum } from '../enums';
+import { MaybeRealNode, generic_id } from '../types';
 
 export enum ThreatStatus {
-  "answered" = "answered",
-  "threat" = "threat",
-  "threatened" = "threatened",
-  "support" = "support",
-  "unsupported" = "unsupported",
-  "unanswered" = "unanswered",
+  'answered' = 'answered',
+  'threat' = 'threat',
+  'threatened' = 'threatened',
+  'support' = 'support',
+  'unsupported' = 'unsupported',
+  'unanswered' = 'unanswered',
 }
 
 export type ThreatMap = { [key: generic_id]: ThreatStatus };
@@ -36,7 +36,7 @@ export function ensure_id(node: MaybeRealNode, counter = 0): number {
 export function calc_threat_status(
   node: MaybeRealNode,
   map: ThreatMap,
-  no_req_reference?: boolean
+  no_req_reference?: boolean,
 ): ThreatStatus {
   let status = ThreatStatus.answered;
   let threats = 0;

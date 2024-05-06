@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { AxiosResponse } from 'axios';
 import { Member, CastingRole, memberPatchKeys } from '../types';
-import { getWSClient } from "../wsclient";
+import { getWSClient } from '../wsclient';
 import { useBaseStore, filterKeys } from './baseStore';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
 import { api, token_store, TOKEN_EXPIRATION } from '../boot/axios';
@@ -16,14 +16,14 @@ export interface MemberState {
 
 const TOKEN_RENEWAL = (TOKEN_EXPIRATION * 9) / 10;
 
-const baseState: MemberState = { 
-  member: undefined, 
+const baseState: MemberState = {
+  member: undefined,
   isAuthenticated: false,
   token: undefined,
   tokenExpiry: undefined,
 };
-const clearBaseState: MemberState = { 
-  member: undefined, 
+const clearBaseState: MemberState = {
+  member: undefined,
   isAuthenticated: false,
   token: undefined,
   tokenExpiry: undefined,
@@ -50,10 +50,11 @@ export const useMemberStore = defineStore('member', {
         (state.member?.casting || []).map((c) => [c.quest_id, c.guild_id]),
       ),
     castingRolesForQuest: (state: MemberState) => (questId: number) => {
-      if(state.member?.casting_role){
-      return state.member.casting_role.filter(
-        (role) => role.quest_id == questId,
-      )}
+      if (state.member?.casting_role) {
+        return state.member.casting_role.filter(
+          (role) => role.quest_id == questId,
+        );
+      }
     },
     castingRolesPerQuest: (state: MemberState) => {
       const castingRolesPerQuest: { [id: number]: CastingRole[] } = {};
@@ -68,10 +69,10 @@ export const useMemberStore = defineStore('member', {
   },
   actions: {
     async logout() {
-      window.localStorage.removeItem("token");
-      window.localStorage.removeItem("tokenExpiry");
+      window.localStorage.removeItem('token');
+      window.localStorage.removeItem('tokenExpiry');
       // legacy
-      window.localStorage.removeItem("email");
+      window.localStorage.removeItem('email');
       //getWSClient().logout();
       useBaseStore().reset();
     },
@@ -99,7 +100,7 @@ export const useMemberStore = defineStore('member', {
       return await this.registerUserCrypted(data);
     },
 
-    async ensureLoginUser(): Promise<Member|undefined> {
+    async ensureLoginUser(): Promise<Member | undefined> {
       // TODO: the case where the member is pending
       if (!this.member) {
         const expiry =
@@ -108,7 +109,7 @@ export const useMemberStore = defineStore('member', {
           this.fetchLoginUser();
           if (!this.tokenExpiry) {
             // add a commit for expiry?
-          }         
+          }
         }
         return this.member;
       }
@@ -135,7 +136,7 @@ export const useMemberStore = defineStore('member', {
             '*,quest_membership!member_id(*),guild_membership!member_id(*),casting!member_id(*),casting_role!member_id(*),guild_member_available_role!member_id(*)',
         },
       });
-      console.log("Status", res.status)
+      console.log('Status', res.status);
       if (res.status == 200) {
         this.member = res.data[0];
         this.isAuthenticated = true;
@@ -169,14 +170,17 @@ export const useMemberStore = defineStore('member', {
         console.error(res.data);
       }
     },
-    async sendConfirmEmail(email: string){
+    async sendConfirmEmail(email: string) {
       await api.post('/rpc/send_login_email', {
-        email
+        email,
       });
     },
-    async registerUserCrypted(data:Partial<Member>): Promise<Partial<Member>> {
+    async registerUserCrypted(data: Partial<Member>): Promise<Partial<Member>> {
       const membersStore = useMembersStore();
-      const res: AxiosResponse<Member> = await api.post('/rpc/create_member', data);
+      const res: AxiosResponse<Member> = await api.post(
+        '/rpc/create_member',
+        data,
+      );
       if (res.status == 200) {
         membersStore.ensureMemberById({
           id: res.data.id,
@@ -219,5 +223,3 @@ export const useMemberStore = defineStore('member', {
     },
   },
 });
-
-

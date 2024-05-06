@@ -41,52 +41,51 @@
 </template>
 
 <script setup lang="ts">
-import { Notify, useQuasar } from "quasar";
-import { useRoute, useRouter } from 'vue-router'
-import { onBeforeMount } from "vue";
-import { useMemberStore } from "src/stores/member";
+import { Notify, useQuasar } from 'quasar';
+import { useRoute, useRouter } from 'vue-router';
+import { onBeforeMount } from 'vue';
+import { useMemberStore } from 'src/stores/member';
 
-  let email: string | null= null;
-  let token: string | null = null;
-  const $q = useQuasar();
-  const router = useRouter();
-  const route = useRoute();
-  const memberStore = useMemberStore()
- 
+let email: string | null = null;
+let token: string | null = null;
+const $q = useQuasar();
+const router = useRouter();
+const route = useRoute();
+const memberStore = useMemberStore();
 
-  async function resend() {
-    let theEmail = email;
-    if (!theEmail) {
-      $q.notify({ type: "negative", message: "Missing Email" });
-      return;
-    }
-    await memberStore.sendConfirmEmail(theEmail);
+async function resend() {
+  let theEmail = email;
+  if (!theEmail) {
+    $q.notify({ type: 'negative', message: 'Missing Email' });
+    return;
   }
+  await memberStore.sendConfirmEmail(theEmail);
+}
 
-  async function getNewToken(prevToken: string | null) {
-    try {
-      await memberStore.renewToken();
-      await memberStore.fetchLoginUser();
-      Notify.create({
-        message: "Email Verified. You are now signed in",
-        color: "positive",
-      });
-      router.push({ name: "lobby" });
-    } catch (err) {
-      $q.notify({
-        message:
-          "There was an error renewing token. Please resend email verification.",
-        color: "negative",
-      });
-    }
+async function getNewToken(prevToken: string | null) {
+  try {
+    await memberStore.renewToken();
+    await memberStore.fetchLoginUser();
+    Notify.create({
+      message: 'Email Verified. You are now signed in',
+      color: 'positive',
+    });
+    router.push({ name: 'lobby' });
+  } catch (err) {
+    $q.notify({
+      message:
+        'There was an error renewing token. Please resend email verification.',
+      color: 'negative',
+    });
   }
-  onBeforeMount(async() =>{
-    const tokenArg = route.query.token;
-    if (tokenArg) {
-      token = Array.isArray(tokenArg) ? tokenArg[0] : tokenArg;
-      await getNewToken(token);
-    }
-  })
+}
+onBeforeMount(async () => {
+  const tokenArg = route.query.token;
+  if (tokenArg) {
+    token = Array.isArray(tokenArg) ? tokenArg[0] : tokenArg;
+    await getNewToken(token);
+  }
+});
 </script>
 <style>
 .card {

@@ -196,40 +196,40 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { useServerDataStore } from '../stores/serverData'
-import { useQuasar } from 'quasar'
+import { ref } from 'vue';
+import { useServerDataStore } from '../stores/serverData';
+import { useQuasar } from 'quasar';
 
 const serverDataStore = useServerDataStore();
-const isPwdSignIn= ref(true);
+const isPwdSignIn = ref(true);
 const serverData = ref(serverDataStore.getServerData);
 const $q = useQuasar();
 
 async function doUpdateServerData() {
   try {
     await serverDataStore.updateServerData({ data: serverData });
-    $q.notify({ type: "positive", message: "Server data updated" });
+    $q.notify({ type: 'positive', message: 'Server data updated' });
   } catch (err) {
     $q.notify({
-    type: "negative",
-    message: "Error in updating server data",
+      type: 'negative',
+      message: 'Error in updating server data',
     });
   }
 }
 async function doCancelUpdate() {
-    await serverDataStore.resetServerData();
+  await serverDataStore.resetServerData();
 }
 async function doResetDefaultAll() {
   try {
     await serverDataStore.resetDefaultAll();
-      $q.notify({
-      type: "positive",
-      message: "Server data reset to default values",
+    $q.notify({
+      type: 'positive',
+      message: 'Server data reset to default values',
     });
   } catch (err) {
-      $q.notify({
-      type: "negative",
-      message: "Error in resetting server data",
+    $q.notify({
+      type: 'negative',
+      message: 'Error in resetting server data',
     });
   }
 }
@@ -238,20 +238,20 @@ async function doResetDefaultAll() {
 #card {
   border-radius: 10px;
 }
-input[type="text"] {
+input[type='text'] {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
 }
-input[type="textaerea"] {
+input[type='textaerea'] {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
 }
 
-input[type="password"] {
+input[type='password'] {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
 }
-input[type="url"] {
+input[type='url'] {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
 }

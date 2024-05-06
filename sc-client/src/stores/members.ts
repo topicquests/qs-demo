@@ -80,7 +80,7 @@ export const useMembersStore = defineStore('members', {
     castingRolesPerQuest:
       (state: MembersState) => (member_id?: number, quest_id?: number) => {
         const castingRole: CastingRole[] = [];
-        const rolesPerQuest: CastingRole[]|undefined =
+        const rolesPerQuest: CastingRole[] | undefined =
           state.members[member_id!].casting_role;
         if (rolesPerQuest !== undefined && rolesPerQuest.length > 0) {
           rolesPerQuest.forEach((cr) => {
@@ -108,22 +108,19 @@ export const useMembersStore = defineStore('members', {
       full?: boolean;
     }) {
       if (!this.members[id]) {
-        await this.fetchMemberById(
-          id,
-          full,
-        );
+        await this.fetchMemberById(id, full);
       }
     },
     async reloadIfFull(id: number) {
       if (this.fullMembers[id]) {
-        await this.fetchMemberById( id, true );
+        await this.fetchMemberById(id, true);
       }
     },
     async ensureMembersOfGuild({
       guildId,
       full = true,
     }: {
-      guildId: number|null;
+      guildId: number | null;
       full?: boolean;
     }) {
       const guildStore = useGuildStore();
@@ -138,10 +135,7 @@ export const useMembersStore = defineStore('members', {
         membersId = membersId.filter((id: number) => !this.members[id]);
       }
       if (membersId.length > 0) {
-        await this.fetchMemberById(
-          membersId ,
-          full
-        );
+        await this.fetchMemberById(membersId, full);
       }
     },
     async ensurePlayersOfQuest(questId: number, full: boolean = true) {
@@ -160,10 +154,7 @@ export const useMembersStore = defineStore('members', {
       membersId = [...new Set(membersId)];
       membersId = membersId.filter((id: number) => !this.members[id]);
       if (membersId.length > 0) {
-        this.fetchMemberById(
-          membersId ,
-          full,         
-        );
+        this.fetchMemberById(membersId, full);
       }
     },
     resetMembers() {
@@ -232,12 +223,10 @@ export const useMembersStore = defineStore('members', {
               res.data.map((member: PublicMember) => [member.id, true]),
             ),
           };
-        }        
+        }
       }
     },
-    async updateMember(
-      data: Partial<Member>,
-    ) {
+    async updateMember(data: Partial<Member>) {
       const params = Object();
       params.id = data.id;
       data = filterKeys(data, memberPatchKeys);

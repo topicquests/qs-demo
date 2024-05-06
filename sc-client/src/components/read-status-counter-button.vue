@@ -8,7 +8,8 @@
         v-if="
           getChannelUnreadCount(readStatusProps.node_id)! > 0 &&
           channelStore.getChannelChildrenOf(readStatusProps.node_id) &&
-          channelStore.getChannelChildrenOf(readStatusProps.node_id)!.length > 0 &&
+          channelStore.getChannelChildrenOf(readStatusProps.node_id)!.length >
+            0 &&
           !isExpanded
         "
         size="9px"
@@ -25,7 +26,8 @@
         round
         v-else-if="
           channelStore.getChannelChildrenOf(readStatusProps.node_id) &&
-          channelStore.getChannelChildrenOf(readStatusProps.node_id)!.length > 0 &&
+          channelStore.getChannelChildrenOf(readStatusProps.node_id)!.length >
+            0 &&
           isExpanded
         "
         size="9px"
@@ -66,7 +68,10 @@
       <!--Node is not read has children and unfolded then blue-->
       <q-btn
         round
-        v-else-if="conversationStore.getChildrenOf(readStatusProps.node_id).length > 0 && isExpanded"
+        v-else-if="
+          conversationStore.getChildrenOf(readStatusProps.node_id).length > 0 &&
+          isExpanded
+        "
         size="9px"
         :color="localRead ? 'transparent' : 'blue'"
         text-color="black"
@@ -93,37 +98,37 @@ import { useReadStatusStore } from 'src/stores/readStatus';
 import { computed } from 'vue';
 
 const readStatusStore = useReadStatusStore();
-const channelStore = useChannelStore()
-const conversationStore = useConversationStore()
+const channelStore = useChannelStore();
+const conversationStore = useConversationStore();
 const readStatusProps = defineProps<{
-  node_id: number,
-  isRead: boolean,
+  node_id: number;
+  isRead: boolean;
   isChannel: {
-    type: boolean,
-    default: false,
-  },
-  isExpanded: boolean,
+    type: boolean;
+    default: false;
+  };
+  isExpanded: boolean;
 }>();
-let localRead= readStatusProps.isRead;
+let localRead = readStatusProps.isRead;
 const getChannelUnreadCount = computed(() => (nodeId: number) => {
   if (
     channelStore.getChannelById(nodeId) &&
-      channelStore.getChannelChildrenOf(nodeId)!.length > 0
-    ) {
-      return readStatusStore.getUnreadStatusCount(nodeId);
-    }
-    return 0;
-  })
+    channelStore.getChannelChildrenOf(nodeId)!.length > 0
+  ) {
+    return readStatusStore.getUnreadStatusCount(nodeId);
+  }
+  return 0;
+});
 
 function getUnreadCount(nodeId: number) {
-    if (
-      conversationStore.getConversationNodeById(nodeId) &&
-      conversationStore.getChildrenOf(nodeId).length > 0
-    ) {
-      return readStatusStore.getUnreadStatusCount(nodeId);
-    }
-    return 0;
+  if (
+    conversationStore.getConversationNodeById(nodeId) &&
+    conversationStore.getChildrenOf(nodeId).length > 0
+  ) {
+    return readStatusStore.getUnreadStatusCount(nodeId);
   }
+  return 0;
+}
 
 function getNodeCount(nodeId: number) {
   if (readStatusProps.isChannel) {
@@ -135,28 +140,26 @@ function getNodeCount(nodeId: number) {
     }
   } else {
     if (
-        conversationStore.getConversationNodeById(nodeId) &&
-        conversationStore.getChildrenOf(nodeId).length > 0
-      ) {
-        return readStatusStore.getNodeStatusCount(nodeId);
-      }
-    }
-    return 0;
-  }
-  async function toggleReadStatus() {
-    localRead = !localRead;
-    await readStatusStore.CreateOrUpdateReadStatus(
-      {
-        nodeid: readStatusProps.node_id,
-        new_status: localRead,
-        override: true,
-      },
-    );
-    if (readStatusProps.isChannel) {
-      await readStatusStore.ensureAllChannelReadStatus();
-    } else {
-      await readStatusStore.ensureAllQuestsReadStatus();
+      conversationStore.getConversationNodeById(nodeId) &&
+      conversationStore.getChildrenOf(nodeId).length > 0
+    ) {
+      return readStatusStore.getNodeStatusCount(nodeId);
     }
   }
+  return 0;
+}
+async function toggleReadStatus() {
+  localRead = !localRead;
+  await readStatusStore.CreateOrUpdateReadStatus({
+    nodeid: readStatusProps.node_id,
+    new_status: localRead,
+    override: true,
+  });
+  if (readStatusProps.isChannel) {
+    await readStatusStore.ensureAllChannelReadStatus();
+  } else {
+    await readStatusStore.ensureAllQuestsReadStatus();
+  }
+}
 </script>
 <style scoped></style>

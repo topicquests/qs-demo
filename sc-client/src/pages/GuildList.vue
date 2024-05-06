@@ -14,8 +14,7 @@
         <div class="column items-center">
           <div class="col-6" style="width: 100%">
             <div v-if="guildStore.getGuilds.length">
-              <guilds-table :guilds="guildStore.getGuilds" 
-                            :title="'Guilds'">
+              <guilds-table :guilds="guildStore.getGuilds" :title="'Guilds'">
               </guilds-table>
             </div>
             <h3 v-else>There currently are no guilds</h3>
@@ -27,31 +26,31 @@
 </template>
 
 <script setup lang="ts">
-import scoreboard from "../components/score-board.vue";
-import member from "../components/member-handle.vue";
-import { userLoaded } from "../boot/userLoaded";
-import GuildsTable from "../components/guilds-table.vue";
+import scoreboard from '../components/score-board.vue';
+import member from '../components/member-handle.vue';
+import { userLoaded } from '../boot/userLoaded';
+import GuildsTable from '../components/guilds-table.vue';
 import { useGuildStore } from '../stores/guilds';
-import { Guild } from "../types";
-import { onBeforeMount, ref } from "vue";
-import { useRoleStore } from "src/stores/role";
-import { useQuestStore } from "src/stores/quests";
+import { Guild } from '../types';
+import { onBeforeMount, ref } from 'vue';
+import { useRoleStore } from 'src/stores/role';
+import { useQuestStore } from 'src/stores/quests';
 
 const ready = ref(false);
 const guildStore = useGuildStore();
 const roleStore = useRoleStore();
 const questStore = useQuestStore();
 
-onBeforeMount(async() => {
+onBeforeMount(async () => {
   //await userLoaded;
   await Promise.all([
-      guildStore.ensureAllGuilds(),
-      await roleStore.ensureAllRoles(),
-      guildStore.setCurrentGuild(true),
-      questStore.setCurrentQuest(false),
-    ]);
-    ready.value = true;
-})
+    guildStore.ensureAllGuilds(),
+    await roleStore.ensureAllRoles(),
+    guildStore.setCurrentGuild(true),
+    questStore.setCurrentQuest(false),
+  ]);
+  ready.value = true;
+});
 </script>
 <style>
 .guildlist-card {

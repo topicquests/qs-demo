@@ -44,11 +44,13 @@
           <span v-else-if="guildId">
             You're playing in guild
             <router-link
-              :to="{ name: 'guild', params: { guild_id: guildId} }"
+              :to="{ name: 'guild', params: { guild_id: guildId } }"
               >{{ guildStore.getCurrentGuild!.name }}</router-link
             >
           </span>
-          <span v-else-if="questStore.getCurrentQuest!.status != 'registration'">
+          <span
+            v-else-if="questStore.getCurrentQuest!.status != 'registration'"
+          >
             The game has started
           </span>
           <span v-else-if="myPlayingGuilds.length == 1">
@@ -167,21 +169,19 @@
 </template>
 
 <script setup lang="ts">
-import member from "../components/member-handle.vue";
-import nodeTree from "../components/node-tree.vue";
-import {
-  permission_enum,
-} from "../enums";
+import member from '../components/member-handle.vue';
+import nodeTree from '../components/node-tree.vue';
+import { permission_enum } from '../enums';
 import { waitUserLoaded } from '../app-access';
 import { useRoute, useRouter } from 'vue-router';
-import { Casting, Guild, GuildData } from "../types";
-import { computed, ref } from "vue";
-import { useQuestStore } from "src/stores/quests";
-import { useGuildStore } from "src/stores/guilds";
-import { useMemberStore } from "src/stores/member";
-import { useBaseStore } from "../stores/baseStore"
-import memberGameRegistration from "../components/member_game_registration.vue";
-import { onBeforeMount } from "vue";
+import { Casting, Guild, GuildData } from '../types';
+import { computed, ref } from 'vue';
+import { useQuestStore } from 'src/stores/quests';
+import { useGuildStore } from 'src/stores/guilds';
+import { useMemberStore } from 'src/stores/member';
+import { useBaseStore } from '../stores/baseStore';
+import memberGameRegistration from '../components/member_game_registration.vue';
+import { onBeforeMount } from 'vue';
 
 const questStore = useQuestStore();
 const guildStore = useGuildStore();
@@ -192,59 +192,61 @@ const route = useRoute();
 const memberId = ref(memberStore.member!.id);
 const ready = ref(false);
 const registerMemberDialog = ref(false);
-const questId = ref<number|undefined>(undefined);
+const questId = ref<number | undefined>(undefined);
 let myPlayingGuilds: Guild[];
-const  selectedNodeId = ref<number | undefined>(undefined);
+const selectedNodeId = ref<number | undefined>(undefined);
 const mySelectedPlayingGuildId = ref<number | undefined>(undefined);
 
-const guildId = computed(():number|undefined => {
+const guildId = computed((): number | undefined => {
   const quest_id = questStore.getCurrentQuest?.id;
   const casting: Casting = memberStore.castingPerQuest[quest_id!];
   if (casting) {
     return casting.guild_id;
   } else {
-    return undefined
+    return undefined;
   }
-})
-
+});
 
 //data
-  //const newNode: Partial<ConversationNode> = {};
- 
-  //newNodeParent: number = null;
-  //const selectedIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
-  //const childIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
-  //allRoles!: RoleState["role"];
-  
-  function myGuilds(only_as_leader = false):GuildData[] {
-    let memberships = memberStore.member!.guild_membership || [];
-    memberships = memberships.filter((gm) => gm.status == "confirmed");
-    let guild_ids = memberships.map((gm) => gm.guild_id);
-    if (only_as_leader) {
-      guild_ids = guild_ids.filter((gid) =>
-        baseStore.hasPermission(permission_enum.joinQuest, gid),
-      );
-    }
-    return guild_ids.map((gid) => guildStore.getGuildById(gid));
-  }
+//const newNode: Partial<ConversationNode> = {};
 
-  function guildsPlayingGame(only_mine = false, recruiting = false) {
-    let guild_ids =
-      questStore.getCurrentQuest!.game_play?.map((gp:GuildData) => gp.guild_id) || [];
-    if (only_mine) {
-      guild_ids = guild_ids.filter((g) =>
-        (memberStore.member!.guild_membership || []).some(
-          (gm) => gm.guild_id === g && gm.status == "confirmed",
-        ),
-      );
-    }
-    let guilds = guild_ids.map((gid: GuildData) => guildStore.getGuildById(gid.id));
-    if (recruiting) {
-      guilds = guilds.filter((g) => g.open_for_applications);
-    }
-    return guilds;
-  }
+//newNodeParent: number = null;
+//const selectedIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
+//const childIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
+//allRoles!: RoleState["role"];
 
+function myGuilds(only_as_leader = false): GuildData[] {
+  let memberships = memberStore.member!.guild_membership || [];
+  memberships = memberships.filter((gm) => gm.status == 'confirmed');
+  let guild_ids = memberships.map((gm) => gm.guild_id);
+  if (only_as_leader) {
+    guild_ids = guild_ids.filter((gid) =>
+      baseStore.hasPermission(permission_enum.joinQuest, gid),
+    );
+  }
+  return guild_ids.map((gid) => guildStore.getGuildById(gid));
+}
+
+function guildsPlayingGame(only_mine = false, recruiting = false) {
+  let guild_ids =
+    questStore.getCurrentQuest!.game_play?.map(
+      (gp: GuildData) => gp.guild_id,
+    ) || [];
+  if (only_mine) {
+    guild_ids = guild_ids.filter((g) =>
+      (memberStore.member!.guild_membership || []).some(
+        (gm) => gm.guild_id === g && gm.status == 'confirmed',
+      ),
+    );
+  }
+  let guilds = guild_ids.map((gid: GuildData) =>
+    guildStore.getGuildById(gid.id),
+  );
+  if (recruiting) {
+    guilds = guilds.filter((g) => g.open_for_applications);
+  }
+  return guilds;
+}
 
 /*
 function route(to, from) {
@@ -252,57 +254,54 @@ function route(to, from) {
         ready.value = false;
         initialize();
   }
- */ 
+ */
 
- 
-
-  function selectionChanged(id: number) {
-    router.push({
-      name: id ? "quest_page_node" : "quest_page",
-      params: {
-        quest_id: String(questId),
-        node_id: id ? String(id) : undefined,
-      },
-    });
-  }
-
-  async function initialize() {
-    if (typeof route.params.quest_id === 'string') {
-      questId.value = Number.parseInt(route.params.quest_id);
-    }
-    if (typeof route.params.node_id === 'string') {
-      selectedNodeId.value = Number.parseInt(route.params.node_id);
-    }
-    await waitUserLoaded();
-    questStore.setCurrentQuest(questId.value!);
-    const promises: Promise<any>[] = [
-      questStore.ensureQuest({ quest_id: questId.value! }),
-      guildStore.ensureGuildsPlayingQuest({ quest_id: questId.value! }),
-    ];
-    await Promise.all(promises);
-    // after so we have game_play ready
-    await initializeGuildInner();
-    ready.value = true;
-  }
-  async function initializeGuildInner() {
-    if (guildId.value) {
-      ready.value = false;
-      guildStore.setCurrentGuild(guildId.value);
-      if(guildId.value)
-      await guildStore.ensureGuild(guildId.value );
-      if (!selectedNodeId.value) {
-        selectedNodeId.value = questStore.getCurrentGamePlay!.focus_node_id;
-      }
-    } else if (member) {
-      myPlayingGuilds = guildsPlayingGame(true);
-      if (myPlayingGuilds.length) {
-        mySelectedPlayingGuildId.value = myPlayingGuilds[0].id;
-      }
-    }
-  }
-  onBeforeMount (async () => {
-    await initialize();
+function selectionChanged(id: number) {
+  router.push({
+    name: id ? 'quest_page_node' : 'quest_page',
+    params: {
+      quest_id: String(questId),
+      node_id: id ? String(id) : undefined,
+    },
   });
+}
+
+async function initialize() {
+  if (typeof route.params.quest_id === 'string') {
+    questId.value = Number.parseInt(route.params.quest_id);
+  }
+  if (typeof route.params.node_id === 'string') {
+    selectedNodeId.value = Number.parseInt(route.params.node_id);
+  }
+  await waitUserLoaded();
+  questStore.setCurrentQuest(questId.value!);
+  const promises: Promise<any>[] = [
+    questStore.ensureQuest({ quest_id: questId.value! }),
+    guildStore.ensureGuildsPlayingQuest({ quest_id: questId.value! }),
+  ];
+  await Promise.all(promises);
+  // after so we have game_play ready
+  await initializeGuildInner();
+  ready.value = true;
+}
+async function initializeGuildInner() {
+  if (guildId.value) {
+    ready.value = false;
+    guildStore.setCurrentGuild(guildId.value);
+    if (guildId.value) await guildStore.ensureGuild(guildId.value);
+    if (!selectedNodeId.value) {
+      selectedNodeId.value = questStore.getCurrentGamePlay!.focus_node_id;
+    }
+  } else if (member) {
+    myPlayingGuilds = guildsPlayingGame(true);
+    if (myPlayingGuilds.length) {
+      mySelectedPlayingGuildId.value = myPlayingGuilds[0].id;
+    }
+  }
+}
+onBeforeMount(async () => {
+  await initialize();
+});
 </script>
 <style scoped>
 .page {

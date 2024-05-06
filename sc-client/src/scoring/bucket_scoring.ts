@@ -1,6 +1,6 @@
-import { ScoreMap, ThreatMap, ThreatStatus, calc_threat_status } from ".";
-import { MaybeRealNode, generic_id } from "../types";
-import { ibis_node_type_enum, meta_state_enum } from "../enums";
+import { ScoreMap, ThreatMap, ThreatStatus, calc_threat_status } from '.';
+import { MaybeRealNode, generic_id } from '../types';
+import { ibis_node_type_enum, meta_state_enum } from '../enums';
 
 type ValueForGuild = { [key: generic_id]: number };
 type ValuesForGuilds = { [key: generic_id]: ValueForGuild };
@@ -8,7 +8,7 @@ type StringSet = { [key: generic_id]: boolean };
 
 export function bucket_scoring(
   node: MaybeRealNode,
-  threat_status?: ThreatMap
+  threat_status?: ThreatMap,
 ): ScoreMap {
   if (!threat_status) {
     threat_status = {};
@@ -38,7 +38,7 @@ function base_scoring_internal(
   node: MaybeRealNode,
   guilds: StringSet,
   threat_status: ThreatMap,
-  scores: ScoreMap
+  scores: ScoreMap,
 ): ValuesForGuilds {
   let factor = 1.0;
   let values: ValuesForGuilds = {};

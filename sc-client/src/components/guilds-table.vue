@@ -52,8 +52,7 @@
                 <span v-else>View</span>
               </router-link>
               <router-link
-                v-if="
-                hasGuildAdminPermission(props.row.id)"
+                v-if="hasGuildAdminPermission(props.row.id)"
                 :to="{
                   name: 'guild_admin',
                   params: { guild_id: props.row.id },
@@ -100,7 +99,6 @@ import { computed, onBeforeMount, ref } from 'vue';
 import { permission_enum } from 'src/enums';
 import { useMemberStore } from 'src/stores/member';
 
-
 interface GuildRow extends GuildData {
   score?: number;
   status_order?: number;
@@ -122,9 +120,9 @@ const guildStore = useGuildStore();
 const baseStore = useBaseStore();
 const memberStore = useMemberStore();
 const extra = GuildsTableProp.extra_columns || [];
-const guildPermission = ref(false)
+const guildPermission = ref(false);
 const selectedGuild = ref<GuildRow[]>([]);
-const columns: QTableProps['columns']=[
+const columns: QTableProps['columns'] = [
   {
     name: 'info',
     required: true,
@@ -193,17 +191,17 @@ const columns: QTableProps['columns']=[
   ...extra,
 ];
 
-const hasGuildAdminPermission = computed(() => (id:number) => {
+const hasGuildAdminPermission = computed(() => (id: number) => {
   guildPermission.value = baseStore.hasPermission(
     permission_enum.guildAdmin,
-    id        
+    id,
   );
   return guildPermission;
-})
+});
 
 const guildData = computed((): Partial<GuildData[]> => {
   return GuildsTableProp.guilds.map((guild: GuildData) => guildRow(guild));
-})
+});
 
 function numPlayers(guild: Guild) {
   if (GuildsTableProp.showPlayers) {
@@ -221,18 +219,21 @@ function guildIfPlaying(quest_id: number) {
   }
 }
 
-const selectionChanged = computed(() => (rowEvent: {
-  rows: readonly any[];
-  keys: readonly any[];
-  added: boolean;
-  evt: Event;
-}) => {
-  if (rowEvent.added) {
-    guildStore.setCurrentGuild(rowEvent.rows[0].id);
-  } else {
-    guildStore.setCurrentGuild(null);
-  } 
-})
+const selectionChanged = computed(
+  () =>
+    (rowEvent: {
+      rows: readonly any[];
+      keys: readonly any[];
+      added: boolean;
+      evt: Event;
+    }) => {
+      if (rowEvent.added) {
+        guildStore.setCurrentGuild(rowEvent.rows[0].id);
+      } else {
+        guildStore.setCurrentGuild(null);
+      }
+    },
+);
 
 function guildRow(guild: GuildData): GuildRow {
   return {
@@ -273,7 +274,7 @@ onBeforeMount(async () => {
       selectedGuild.value = [guildRow(guild)];
       // does this mean we won't get update on other rows?
       await guildStore.setCurrentGuild(guild.id);
-    } 
+    }
   }
 });
 </script>

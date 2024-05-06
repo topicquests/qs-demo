@@ -16,7 +16,7 @@
               <div class="col-4 text-right q-pr-md">
                 <router-link
                   class="guild-header"
-                  v-if="canRegisterToQuest "
+                  v-if="canRegisterToQuest"
                   :to="{
                     name: 'guild_admin',
                     params: { guild_id: guildStore.currentGuild },
@@ -241,7 +241,7 @@ import {
   quest_status_enum,
   permission_enum,
 } from '../enums';
-import { Quest, GamePlay, Casting, Role} from '../types';
+import { Quest, GamePlay, Casting, Role } from '../types';
 import { ref } from 'vue';
 import castingRoleEdit from '../components/casting_role_edit.vue';
 import guildMembers from '../components/guild-members.vue';
@@ -285,18 +285,19 @@ let guildGamePlays: GamePlay[] = [];
 function castingRoles(): Role[] {
   const currentQuest = questStore.getCurrentQuest;
   const castingRoles =
-    membersStore.castingRolesPerQuest(member!.value?.id, currentQuest!.id) || [];
+    membersStore.castingRolesPerQuest(member!.value?.id, currentQuest!.id) ||
+    [];
   const roles = castingRoles.map((cr) => allRoles[cr.role_id]);
   return roles;
 }
-const availableRoles = ((): Role[] => {
+const availableRoles = (): Role[] => {
   if (!member || !member.value?.id || !guildId.value) {
     return [];
   }
-  return (membersStore.
-    getAvailableRolesForMemberAndGuild(member.value.id, guildId.value)
-    .map((cr) => allRoles[cr.role_id]));
-})
+  return membersStore
+    .getAvailableRolesForMemberAndGuild(member.value.id, guildId.value)
+    .map((cr) => allRoles[cr.role_id]);
+};
 /*
     currentQuestId: "onCurrentQuestChange",
     route(to, from) {
@@ -383,7 +384,7 @@ async function initializeStage2() {
   const confirmedPlayQuestIds = (guildGamePlays || []).map(
     (gp: GamePlay) => gp.quest_id,
   );
- 
+
   pastQuests = questStore.getQuests.filter(
     (q: Quest) =>
       (q.status == quest_status_enum.finished ||
@@ -452,11 +453,11 @@ async function onCurrentQuestChange() {
 }
 
 async function joinToGuild() {
-  if(typeof guildStore.currentGuild === 'number')
-  await guildStore.addGuildMembership({    
-    guild_id: guildStore.currentGuild,
-    member_id: member!.value?.id,
-  });
+  if (typeof guildStore.currentGuild === 'number')
+    await guildStore.addGuildMembership({
+      guild_id: guildStore.currentGuild,
+      member_id: member!.value?.id,
+    });
   isMember.value = true;
   await channelStore.resetChannel();
   $q.notify({
@@ -476,9 +477,9 @@ function findPlayOfGuild(gamePlays: []): GamePlay | undefined {
 function checkPermissions() {
   if (typeof guildStore.currentGuild === 'number') {
     isMember.value = !!guildStore.isGuildMember(guildStore.currentGuild);
-      canRegisterToQuest.value = baseStore.hasPermission(
-        permission_enum.joinQuest,
-        guildStore.currentGuild,
+    canRegisterToQuest.value = baseStore.hasPermission(
+      permission_enum.joinQuest,
+      guildStore.currentGuild,
     );
   }
 }
@@ -486,11 +487,13 @@ function checkPermissions() {
 async function castingRoleAdded(role_id: number) {
   const guild_id = guildId.value;
   const quest_id: number | undefined = questStore.currentQuest;
-  
-    await questStore.addCastingRole(
-      {member_id: member!.value?.id, role_id, guild_id: guild_id!, quest_id}
-    );
-    
+
+  await questStore.addCastingRole({
+    member_id: member!.value?.id,
+    role_id,
+    guild_id: guild_id!,
+    quest_id,
+  });
 }
 
 async function castingRoleRemoved(role_id: number) {

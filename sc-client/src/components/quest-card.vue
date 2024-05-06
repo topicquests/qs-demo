@@ -33,28 +33,39 @@
         <div class="col"></div>
         <div class="col-6">
           <p
-            v-if="QuestCardProps.currentQuest.casting && QuestCardProps.currentQuest.casting.length"
+            v-if="
+              QuestCardProps.currentQuest.casting &&
+              QuestCardProps.currentQuest.casting.length
+            "
             class="quest-card-data"
           >
             Players: {{ QuestCardProps.currentQuest.casting.length }}
           </p>
           <p v-else class="quest-card-data">Players: 0</p>
           <p
-            v-if="QuestCardProps.currentQuest.game_play && QuestCardProps.currentQuest.game_play.length"
+            v-if="
+              QuestCardProps.currentQuest.game_play &&
+              QuestCardProps.currentQuest.game_play.length
+            "
             class="quest-card-data"
           >
             Guilds: {{ QuestCardProps.currentQuest.game_play.length }}
           </p>
           <p v-else class="quest-card-data">Guilds: 0</p>
           <p
-            v-if="conversationStore.getNeighbourhood && conversationStore.getNeighbourhood.length"
+            v-if="
+              conversationStore.getNeighbourhood &&
+              conversationStore.getNeighbourhood.length
+            "
             class="quest-card-data"
           >
             Moves: {{ conversationStore.getNeighbourhood.length - 1 }}
           </p>
           <p v-else class="quest-card-data">Moves: 0</p>
 
-          <p class="quest-card-data">Status: {{ QuestCardProps.currentQuest.status }}</p>
+          <p class="quest-card-data">
+            Status: {{ QuestCardProps.currentQuest.status }}
+          </p>
         </div>
 
         <div class="col-6">
@@ -72,48 +83,48 @@
 </template>
 
 <script setup lang="ts">
-import { QuestData, Member, ConversationNode } from "../types";
-import { useConversationStore, ibis_node_icon } from "src/stores/conversation";
+import { QuestData, Member, ConversationNode } from '../types';
+import { useConversationStore, ibis_node_icon } from 'src/stores/conversation';
 
 const QuestCardProps = defineProps<{
-    currentQuest: QuestData;
-    creator?: object;
-    showQuestInfo?:  {
-      type: boolean,
-      default: true,
-    },
+  currentQuest: QuestData;
+  creator?: object;
+  showQuestInfo?: {
+    type: boolean;
+    default: true;
+  };
 }>();
 const conversationStore = useConversationStore();
 
 function getDate(dte: string) {
   if (dte) {
     let date: Date = new Date(dte);
-    let formattedDate: string = new Intl.DateTimeFormat("en-US").format(date);
+    let formattedDate: string = new Intl.DateTimeFormat('en-US').format(date);
     return formattedDate;
   }
-};
-  function getLastActivity() {
-    let date: Date = new Date();
-    let newestDate;
-    var dateArray: ConversationNode[] = [];
-    const neighbourhood: ConversationNode[] = conversationStore.getNeighbourhood;
-    if (neighbourhood.length) {
-      neighbourhood.forEach((pub) => {
-        if (pub.status == "published") {
-          date = new Date(pub.updated_at);
-          pub.updated_at = new Intl.DateTimeFormat("en-US").format(date);
-          dateArray.push(pub);
-        }
-      });
-
-      newestDate = dateArray.reduce((a, b) => {
-        return new Date(a.updated_at) > new Date(b.updated_at) ? a : b;
-      });
-      if (newestDate) {
-        return newestDate.updated_at;
+}
+function getLastActivity() {
+  let date: Date = new Date();
+  let newestDate;
+  var dateArray: ConversationNode[] = [];
+  const neighbourhood: ConversationNode[] = conversationStore.getNeighbourhood;
+  if (neighbourhood.length) {
+    neighbourhood.forEach((pub) => {
+      if (pub.status == 'published') {
+        date = new Date(pub.updated_at);
+        pub.updated_at = new Intl.DateTimeFormat('en-US').format(date);
+        dateArray.push(pub);
       }
+    });
+
+    newestDate = dateArray.reduce((a, b) => {
+      return new Date(a.updated_at) > new Date(b.updated_at) ? a : b;
+    });
+    if (newestDate) {
+      return newestDate.updated_at;
     }
   }
+}
 </script>
 <style>
 .quest_card {

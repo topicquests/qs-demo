@@ -31,59 +31,59 @@
 </template>
 
 <script setup lang="ts">
-import scoreboard from "../components/score-board.vue";
-import member_handle from "../components/member-handle.vue";
+import scoreboard from '../components/score-board.vue';
+import member_handle from '../components/member-handle.vue';
 import { waitUserLoaded } from '../app-access';
-import QuestCard from "../components/quest-edit-card.vue";
-import { useQuestStore } from "src/stores/quests";
-import { onBeforeMount } from "vue";
-import { useRouter } from "vue-router";
-import { useQuasar } from "quasar";
-import { QuestData } from "src/types";
+import QuestCard from '../components/quest-edit-card.vue';
+import { useQuestStore } from 'src/stores/quests';
+import { onBeforeMount } from 'vue';
+import { useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
+import { QuestData } from 'src/types';
 
 const router = useRouter();
 const $q = useQuasar();
 const questStore = useQuestStore();
 
-  const newQuest: Partial<QuestData> = {
-    name: "",
-    handle: "",
-    status: "draft",
-    public: true,
-    description: "",
-    start: "",
-    end: "",
-  };
+const newQuest: Partial<QuestData> = {
+  name: '',
+  handle: '',
+  status: 'draft',
+  public: true,
+  description: '',
+  start: '',
+  end: '',
+};
 
 function validateStartEnd(quest: Partial<QuestData>) {
-    if (quest.start && quest.end && (quest.start < quest.end)) {
-      return true;
-    }
-    return false;
+  if (quest.start && quest.end && quest.start < quest.end) {
+    return true;
   }
+  return false;
+}
 
-  async function  doSubmitQuest(quest: Partial<QuestData>) {
-    try {
-      if (!validateStartEnd(quest)) {
-        throw "End date is before start date";
-      }
-      const res = await questStore.createQuest(quest );
-      $q.notify({
-        message: "Quest was updated successfully",
-        color: "positive",
-      });
-      router.push({ name: "quest_edit", params: { quest_id: res.id } });
-    } catch (err) {
-      console.log("there was an error in updating quest ", err);
-      $q.notify({
-        message: `There was an error updating quest. If this issue persists, contact support.`,
-        color: "negative",
-      });
+async function doSubmitQuest(quest: Partial<QuestData>) {
+  try {
+    if (!validateStartEnd(quest)) {
+      throw 'End date is before start date';
     }
+    const res = await questStore.createQuest(quest);
+    $q.notify({
+      message: 'Quest was updated successfully',
+      color: 'positive',
+    });
+    router.push({ name: 'quest_edit', params: { quest_id: res.id } });
+  } catch (err) {
+    console.log('there was an error in updating quest ', err);
+    $q.notify({
+      message: `There was an error updating quest. If this issue persists, contact support.`,
+      color: 'negative',
+    });
   }
-  onBeforeMount(async () => {
-    await waitUserLoaded();
-  })
+}
+onBeforeMount(async () => {
+  await waitUserLoaded();
+});
 </script>
 
 <style>

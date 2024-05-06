@@ -32,10 +32,7 @@
         <div class="column items-center">
           <div class="col-4" style="width: 100%">
             <div v-if="myGuilds.length">
-              <guilds-table
-                :guilds="myGuilds"
-                :title="'My Guilds'"
-              />
+              <guilds-table :guilds="myGuilds" :title="'My Guilds'" />
               <q-btn :to="{ name: 'guild_list' }">All Guilds</q-btn>
             </div>
             <div v-else-if="getOpenGuilds.length">
@@ -85,17 +82,16 @@ let ready = ref(false);
 
 const quests = computed({
   get: () => questsStore.getQuests,
-  set: () => {}
+  set: () => {},
 });
 
-const getOpenGuilds = computed(
-  (): GuildData[] => guildsStore.getGuilds.filter(
+const getOpenGuilds = computed((): GuildData[] =>
+  guildsStore.getGuilds.filter(
     (guild: Guild) =>
       guild.open_for_applications && !guildsStore.isGuildMember(guild.id),
-  )
+  ),
 );
-const myGuilds = computed((): GuildData[] => guildsStore.getMyGuilds
-)
+const myGuilds = computed((): GuildData[] => guildsStore.getMyGuilds);
 
 onBeforeMount(async () => {
   await waitUserLoaded();
@@ -110,9 +106,7 @@ onBeforeMount(async () => {
   ready.value = true;
 });
 
-onMounted(() => {
-
-})
+onMounted(() => {});
 </script>
 
 <style>

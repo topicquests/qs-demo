@@ -21,16 +21,16 @@ import { filterKeys } from './base';
 
 interface GuildMap {
   [key: number]: GuildData;
-};
+}
 export interface GuildsState {
   guilds: GuildMap;
-  currentGuild: number|boolean;
+  currentGuild: number | boolean;
   fullFetch: boolean;
   fullGuilds: { [key: number]: boolean };
-};
+}
 const questStore = useQuestStore();
 const baseState: GuildsState = {
-  currentGuild:0,
+  currentGuild: 0,
   guilds: {},
   fullFetch: false,
   fullGuilds: {},
@@ -38,58 +38,57 @@ const baseState: GuildsState = {
 export const useGuildStore = defineStore('guild', {
   state: () => baseState,
 
-getters: {
-  getCurrentGuild: (state: GuildsState): GuildData|undefined => {
-    if (typeof state.currentGuild === 'number') { 
-      return state.guilds[state.currentGuild]
-    } else {
-      return undefined
-    }
-  },
-  getGuilds: (state: GuildsState):GuildData[] => Object.values(state.guilds),
-  getGuildById: (state: GuildsState) => (id: number) => state.guilds[id],
-  getMyGuilds: (state: GuildsState): GuildData[] => {
-    const memberId = useMemberStore().getUserId;
+  getters: {
+    getCurrentGuild: (state: GuildsState): GuildData | undefined => {
+      if (typeof state.currentGuild === 'number') {
+        return state.guilds[state.currentGuild];
+      } else {
+        return undefined;
+      }
+    },
+    getGuilds: (state: GuildsState): GuildData[] => Object.values(state.guilds),
+    getGuildById: (state: GuildsState) => (id: number) => state.guilds[id],
+    getMyGuilds: (state: GuildsState): GuildData[] => {
+      const memberId = useMemberStore().getUserId;
       return Object.values(state.guilds).filter((guild: GuildData) =>
-      guild?.guild_membership?.find(
-        (m: GuildMembership) =>
-         m.member_id == memberId &&
-         m.status == registration_status_enum.confirmed,
-      ),
-    )
-  },
-  isGuildMember: (state: GuildsState) => (guild_id: number) => {
-    const memberId = useMemberStore().getUserId;
-    return state.guilds[guild_id].guild_membership?.find(
+        guild?.guild_membership?.find(
+          (m: GuildMembership) =>
+            m.member_id == memberId &&
+            m.status == registration_status_enum.confirmed,
+        ),
+      );
+    },
+    isGuildMember: (state: GuildsState) => (guild_id: number) => {
+      const memberId = useMemberStore().getUserId;
+      return state.guilds[guild_id].guild_membership?.find(
         (m: GuildMembership) =>
           m.member_id == memberId &&
           m.status == registration_status_enum.confirmed,
-    );
-  },
-  getGuildMembershipById: (state: GuildsState) => (member_id: number) => {
-    if (state.currentGuild) {
-      const guildId: number = state.currentGuild;
-      return state.guilds[guildId]?.guild_membership?.find(
-        (m: GuildMembership) =>
-          m.member_id == member_id && m.guild_id == guildId,
       );
-    }
-  },
-  getMembersOfCurrentGuild: (state: GuildsState) => {
-    if(typeof state.currentGuild === 'number') {
-    const guild:GuildData|undefined = state.currentGuild!
-      ? state.guilds[state.currentGuild]
-      : undefined;
-    
-    const members = useMembersStore().members;
-    return guild?.guild_membership
-      ?.map((gm: GuildMembership) => members[gm.member_id])
-      .filter((member: PublicMember) => member);
-    }
-  },
-  getGuildsPlayingCurrentQuest: (state: GuildsState) => {
-    
-    const quest: QuestData = questStore.getCurrentQuest;
+    },
+    getGuildMembershipById: (state: GuildsState) => (member_id: number) => {
+      if (state.currentGuild) {
+        const guildId: number = state.currentGuild;
+        return state.guilds[guildId]?.guild_membership?.find(
+          (m: GuildMembership) =>
+            m.member_id == member_id && m.guild_id == guildId,
+        );
+      }
+    },
+    getMembersOfCurrentGuild: (state: GuildsState) => {
+      if (typeof state.currentGuild === 'number') {
+        const guild: GuildData | undefined = state.currentGuild!
+          ? state.guilds[state.currentGuild]
+          : undefined;
+
+        const members = useMembersStore().members;
+        return guild?.guild_membership
+          ?.map((gm: GuildMembership) => members[gm.member_id])
+          .filter((member: PublicMember) => member);
+      }
+    },
+    getGuildsPlayingCurrentQuest: (state: GuildsState) => {
+      const quest: QuestData = questStore.getCurrentQuest;
       if (!quest) return [];
       const guildId = quest.game_play?.map((gp: GamePlay) =>
         gp.game_status != game_play_status_enum.cancelled ? gp.guild_id : null,
@@ -107,42 +106,39 @@ getters: {
       }
       return this.guilds;
     },
-    setCurrentGuild(guild_id: number|boolean) {
+    setCurrentGuild(guild_id: number | boolean) {
       if (typeof guild_id === 'number') {
         this.currentGuild = guild_id;
       }
-     
+
       //getWSClient().setDefaultGuild(guild_id);
     },
-    async ensureGuild(
-      guild_id: number,
-      full: boolean | undefined = true,
-    ) {
+    async ensureGuild(guild_id: number, full: boolean | undefined = true) {
       if (
         this.getGuildById(guild_id) === undefined ||
         (full && !this.fullGuilds[guild_id])
       ) {
-        await this.fetchGuildById({id:guild_id}, full);
+        await this.fetchGuildById({ id: guild_id }, full);
       }
     },
-    async createGuild(data: Partial<Guild>): Promise<AxiosResponse<GuildData[]>> {
-      const res: AxiosResponse<GuildData[]>= await this.createGuildBase(data);
+    async createGuild(
+      data: Partial<Guild>,
+    ): Promise<AxiosResponse<GuildData[]>> {
+      const res: AxiosResponse<GuildData[]> = await this.createGuildBase(data);
       // Refetch to get memberships.
       // TODO: maybe add representation to creation instead?
       const guild = res.data[0];
       const guild_id = guild.id;
-      await this.fetchGuildById({id: guild_id});
+      await this.fetchGuildById({ id: guild_id });
       // TODO: Get the membership from the guild
       await useMemberStore().fetchLoginUser;
       const params = {
-        member_id: guild.creator, 
-        guild_id: guild_id, 
-        role_id: guild.default_role_id
+        member_id: guild.creator,
+        guild_id: guild_id,
+        role_id: guild.default_role_id,
       };
 
-      await this.addGuildMemberAvailableRole(
-        params
-      );
+      await this.addGuildMemberAvailableRole(params);
       return res;
     },
     async ensureCurrentGuild(guild_id: number, full: boolean = true) {
@@ -172,34 +168,31 @@ getters: {
       }
       if (guildId.length > 0) {
         const guildParam = guildId.length == 1 ? guildId[0] : guildId;
-        await this.fetchGuilds(
-          full,
-          guildParam ,
-        );
+        await this.fetchGuilds(full, guildParam);
       }
     },
     async addGuildMembership(membership: Partial<GuildMembership>) {
       const membersStore = useMembersStore();
       const memberStore = useMemberStore();
-      await this.doAddGuildMembership( membership );
-      if(this.guilds) {
-      const gMembership: GuildMembership|undefined = this.guilds[
-        membership.guild_id
-      ].guild_membership.find(
-        (c: GuildMembership) => c.member_id == membership.member_id,
-      );      
-      if (gMembership?.status == 'confirmed') {
-        await membersStore.fetchMemberById({
-          full: true,
-          params: { id: membership.member_id },
-        });
-        if(memberStore.getUserId) {
-          if (membership.member_id == memberStore.getUserId) {
-            await memberStore.fetchLoginUser();
+      await this.doAddGuildMembership(membership);
+      if (this.guilds) {
+        const gMembership: GuildMembership | undefined = this.guilds[
+          membership.guild_id
+        ].guild_membership.find(
+          (c: GuildMembership) => c.member_id == membership.member_id,
+        );
+        if (gMembership?.status == 'confirmed') {
+          await membersStore.fetchMemberById({
+            full: true,
+            params: { id: membership.member_id },
+          });
+          if (memberStore.getUserId) {
+            if (membership.member_id == memberStore.getUserId) {
+              await memberStore.fetchLoginUser();
+            }
           }
         }
       }
-    }
     },
     async updateGuildMembership(membership: Partial<GuildMembership>) {
       await this.doUpdateGuildMembership(membership);
@@ -269,13 +262,13 @@ getters: {
       return [];
     },
     async fetchGuildById(
-      data:{id: number | Array<number>},
+      data: { id: number | Array<number> },
       full: boolean = true,
-    ): Promise<AxiosResponse<GuildData[]>>{
+    ): Promise<AxiosResponse<GuildData[]>> {
       const params = Object.assign(data);
 
       if (Array.isArray(params.id)) {
-        params.id = `in.(${params.id.join(",")})`;
+        params.id = `in.(${params.id.join(',')})`;
       } else {
         params.id = `eq.${params.id}`;
       }
@@ -309,11 +302,13 @@ getters: {
               res.data.map((guild: GuildData) => [guild.id, true]),
             ),
           };
-        }       
+        }
       }
       return res;
     },
-    async createGuildBase(data: Partial<Guild>):  Promise<AxiosResponse<GuildData[]>>{
+    async createGuildBase(
+      data: Partial<Guild>,
+    ): Promise<AxiosResponse<GuildData[]>> {
       const res: AxiosResponse<GuildData[]> = await api.post('/guilds', data);
       if (res.status == 201) {
         const guildData: GuildData = Object.assign(res.data[0], {
@@ -321,7 +316,7 @@ getters: {
           member_request_count: 0,
           is_member: true,
           is_admin: true,
-          last_node_published_at: "",
+          last_node_published_at: '',
           node_count: 0,
           ongoing_quests_count: 0,
           finished_quests_count: 0,
@@ -333,7 +328,7 @@ getters: {
       }
       return res;
     },
-    async registerAllMembers({ guildId, questId  }) {
+    async registerAllMembers({ guildId, questId }) {
       await api.post('/rpc/register_all_members', {
         questId,
         guildId,
@@ -344,7 +339,7 @@ getters: {
       params.id = data!.id;
       data = filterKeys(data, guildPatchKeys);
       const res: AxiosResponse<GuildData[]> = await api.patch(
-        `/guilds?id=eq.${params.id}`, 
+        `/guilds?id=eq.${params.id}`,
         data,
       );
       if (res.status == 200) {
@@ -406,20 +401,24 @@ getters: {
         }
       }
     },
-    async addGuildMemberAvailableRole(data: { 
-      member_id:number,
-      guild_id: number,
-      role_id: number|null|undefined}) {
+    async addGuildMemberAvailableRole(data: {
+      member_id: number;
+      guild_id: number;
+      role_id: number | null | undefined;
+    }) {
       const memberStore = useMemberStore();
       const membersStore = useMembersStore();
       const res: AxiosResponse<GuildMemberAvailableRole[]> = await api.post(
         '/guild_member_available_role',
-          data,
+        data,
       );
       if (res.status == 200) {
         const availableRole = res.data[0];
         if (memberStore.getUserId == availableRole.member_id)
-          if (memberStore.member && memberStore.member.guild_member_available_role) {
+          if (
+            memberStore.member &&
+            memberStore.member.guild_member_available_role
+          ) {
             const guildMemberAvailableRoles =
               memberStore.member.guild_member_available_role.filter(
                 (a: GuildMemberAvailableRole) =>
@@ -429,20 +428,23 @@ getters: {
             memberStore.member.guild_member_available_role =
               guildMemberAvailableRoles;
           }
-      
-      const member_id = availableRole.member_id;
-      let member = membersStore.members[member_id];
-      if (member) {
-        const guild_member_available_role =
-          member.guild_member_available_role?.filter(
-            (a: GuildMemberAvailableRole) =>
-              a.role_id != availableRole.role_id,
-          ) || [];
-        guild_member_available_role.push(availableRole);
-        member = { ...member, guild_member_available_role };
-        membersStore.members = { ...membersStore.members, [member_id]: member };
+
+        const member_id = availableRole.member_id;
+        let member = membersStore.members[member_id];
+        if (member) {
+          const guild_member_available_role =
+            member.guild_member_available_role?.filter(
+              (a: GuildMemberAvailableRole) =>
+                a.role_id != availableRole.role_id,
+            ) || [];
+          guild_member_available_role.push(availableRole);
+          member = { ...member, guild_member_available_role };
+          membersStore.members = {
+            ...membersStore.members,
+            [member_id]: member,
+          };
+        }
       }
-    }
     },
     async deleteGuildMemberAvailableRole(
       data: Partial<GuildMemberAvailableRole>,
@@ -480,11 +482,11 @@ getters: {
           }
           const member_id = guildMemberAvailableRole.member_id;
           let member = membersStore.members[member_id];
-          
-            const guild_member_available_role =
-              member.guild_member_available_role;
-            if (member && guild_member_available_role) {
-              const pos = guild_member_available_role.findIndex(
+
+          const guild_member_available_role =
+            member.guild_member_available_role;
+          if (member && guild_member_available_role) {
+            const pos = guild_member_available_role.findIndex(
               (a: GuildMemberAvailableRole) =>
                 a.role_id == memberStore.guildMemberAvailableRole.role_id &&
                 a.member_id == guildMemberAvailableRole.member_id &&

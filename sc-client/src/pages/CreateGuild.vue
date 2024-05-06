@@ -25,17 +25,11 @@
               </q-option-group>
             </div>
             <div class="row justify-start q-pb-lg">
-              <q-input class="guildText" 
-                v-model="guild.name" 
-                label="Name" 
-              />
+              <q-input class="guildText" v-model="guild.name" label="Name" />
             </div>
             <div class="row justify-start q-pb-xs">Details<br /></div>
             <div class="row justify-start q-pb-lg">
-              <q-editor
-                v-model="description"
-                style="width: 85%"
-              ></q-editor>
+              <q-editor v-model="description" style="width: 85%"></q-editor>
             </div>
             <div class="row">
               <span class="q-pt-md"> Default Role </span>
@@ -88,17 +82,17 @@ import { AxiosResponse } from 'axios';
 import axios from 'axios';
 
 interface guildType {
-  name: string,
-  handle: string,
-  public: boolean,
-  description: string,
-  default_role_id: number | null | undefined
+  name: string;
+  handle: string;
+  public: boolean;
+  description: string;
+  default_role_id: number | null | undefined;
 }
 
 const roleStore = useRoleStore();
 const membersStore = useMembersStore();
 const guildStore = useGuildStore();
-const ready = ref(false)
+const ready = ref(false);
 const $q = useQuasar();
 const router = useRouter();
 const guild = ref<guildType>({
@@ -106,36 +100,35 @@ const guild = ref<guildType>({
   handle: '',
   public: false,
   description: '',
-  default_role_id: null
+  default_role_id: null,
 });
 
-const role = ref<Partial<Role>>({name: ''});
+const role = ref<Partial<Role>>({ name: '' });
 
-  const description = computed({
+const description = computed({
   get: () => guild.value?.description,
   set: (value) => {
-    if(guild.value)
-      guild.value.description = value;
+    if (guild.value) guild.value.description = value;
   },
 });
 
-async function doSubmit(guild:guildType) {
+async function doSubmit(guild: guildType) {
   try {
     guild.default_role_id = role.value.id;
-    const res:AxiosResponse<GuildData[]> = await guildStore.createGuild(guild);
-    
+    const res: AxiosResponse<GuildData[]> = await guildStore.createGuild(guild);
+
     $q.notify({
       message: 'Added new guild',
       color: 'positive',
     });
     router.push({ name: 'guild_admin', params: { guild_id: res.data[0].id } });
-  } catch (error:unknown) {
-    if(axios.isAxiosError(error)){
-      console.log(error.status)
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.log(error.status);
       $q.notify({
-      message: 'There was an error creating new guild.',
-      color: 'negative',
-    })
+        message: 'There was an error creating new guild.',
+        color: 'negative',
+      });
     } else {
       console.log('there was an error in creating guild ', error);
       $q.notify({
@@ -144,7 +137,7 @@ async function doSubmit(guild:guildType) {
       });
     }
   }
-};
+}
 onBeforeMount(async () => {
   //await userLoaded;
   await roleStore.ensureAllRoles();

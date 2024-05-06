@@ -18,7 +18,8 @@
               >
                 {{ getAllCastingRoleNames(member.id) }}
               </span>
-              <span v-if="playingAsGuildId(member.id) != GuildMembersProps.guild.id"
+              <span
+                v-if="playingAsGuildId(member.id) != GuildMembersProps.guild.id"
                 >Playing in
                 <router-link
                   :to="{
@@ -36,17 +37,17 @@
   </q-card>
 </template>
 <script setup lang="ts">
-import { Guild, Quest, PublicMember } from '../types'
-import { useQuestStore } from "src/stores/quests";
-import { useGuildStore } from "src/stores/guilds";
-import { useMembersStore } from "src/stores/members";
+import { Guild, Quest, PublicMember } from '../types';
+import { useQuestStore } from 'src/stores/quests';
+import { useGuildStore } from 'src/stores/guilds';
+import { useMembersStore } from 'src/stores/members';
 import { useRoleStore } from 'src/stores/role';
 
 const GuildMembersProps = defineProps<{
-    guild: Guild;
-    quest?: Quest;
-    members: PublicMember[] | undefined,
-    playersOnly?: boolean,
+  guild: Guild;
+  quest?: Quest;
+  members: PublicMember[] | undefined;
+  playersOnly?: boolean;
 }>();
 
 const questStore = useQuestStore();
@@ -59,16 +60,19 @@ function playingAsGuildId(member_id: number) {
 }
 function playingAsGuild(member_id: number): Guild {
   const guild_id = playingAsGuildId(member_id);
-    return guildStore.getGuildById(guild_id);
+  return guildStore.getGuildById(guild_id);
 }
 function getCastingRoleNamesForQuest(memberId: number) {
-  const castingRoles = membersStore.castingRolesPerQuest(memberId, GuildMembersProps.quest!.id);
+  const castingRoles = membersStore.castingRolesPerQuest(
+    memberId,
+    GuildMembersProps.quest!.id,
+  );
   const roles = castingRoles.map((cr) => roleStore.role[cr.role_id]);
   return roles;
 }
 function getAllCastingRoleNames(memberId: number) {
   const roles = getCastingRoleNamesForQuest(memberId);
-  const rolesName = roles.map((cr) => cr.name).join(",");
+  const rolesName = roles.map((cr) => cr.name).join(',');
   return rolesName;
 }
 </script>

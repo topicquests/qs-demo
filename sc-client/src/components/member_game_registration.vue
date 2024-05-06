@@ -9,7 +9,7 @@
           v-model="roleId"
           :label="role.name"
           :val="role.id"
-          @update:model-value="updateRole()"          
+          @update:model-value="updateRole()"
           v-close-popup="true"
         >
         </q-radio>
@@ -45,7 +45,7 @@ const questStore = useQuestStore();
 const ready = ref(false);
 const roleId = ref<number | undefined>(undefined);
 
-const availableRoles =computed((): Role[] => {
+const availableRoles = computed((): Role[] => {
   const memberId = memberStore.member?.id;
   return membersStore
     .getAvailableRolesForMemberAndGuild(
@@ -53,7 +53,7 @@ const availableRoles =computed((): Role[] => {
       MemberGameRegistrationProp.guildId,
     )
     .map((cr: GuildMemberAvailableRole) => roleStore.getRoleById(cr.role_id));
-})
+});
 async function doAddCasting(quest_id: number) {
   const guild_id = MemberGameRegistrationProp.guildId;
   const member_id = memberStore.member!.id;
@@ -74,8 +74,8 @@ async function updateRole() {
     quest_id,
     guild_id,
     member_id,
-    role_id
-  }) 
+    role_id,
+  });
 }
 
 async function ensureData() {

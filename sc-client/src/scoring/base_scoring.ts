@@ -1,6 +1,6 @@
-import { ScoreMap, ThreatMap, ThreatStatus, calc_threat_status } from ".";
-import { MaybeRealNode, generic_id } from "../types";
-import { meta_state_enum } from "../enums";
+import { ScoreMap, ThreatMap, ThreatStatus, calc_threat_status } from '.';
+import { MaybeRealNode, generic_id } from '../types';
+import { meta_state_enum } from '../enums';
 
 type NodeById = { [key: generic_id]: MaybeRealNode };
 type ParentMap = { [key: generic_id]: generic_id };
@@ -10,7 +10,7 @@ type ParentMap = { [key: generic_id]: generic_id };
 
 export function base_scoring(
   node: MaybeRealNode,
-  threat_status?: ThreatMap
+  threat_status?: ThreatMap,
 ): ScoreMap {
   if (!threat_status) {
     threat_status = {};
