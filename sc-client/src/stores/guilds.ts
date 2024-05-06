@@ -225,12 +225,14 @@ export const useGuildStore = defineStore('guild', {
         }
       }
       if (userId !== undefined) {
-        Object.assign(params, {
-          select:
-            '*,guild_membership!guild_id(*),casting!guild_id(*),game_play!guild_id(*)',
-          'guild_membership.member_id': `eq.${userId}`,
-          'casting.member_id': `eq.${userId}`,
-        });
+        params.select =
+          '*,guild_membership!guild_id(*),casting!guild_id(*),game_play!guild_id(*)';
+        if (!full) {
+          Object.assign(params, {
+            'guild_membership.member_id': `eq.${userId}`,
+            'casting.member_id': `eq.${userId}`,
+          });
+        }
       } else {
         params.select = '*,game_play!guild_id(*)';
       }
