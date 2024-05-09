@@ -1,2 +1,15 @@
+FROM postgres:16.2-alpine as build
+RUN apk add curl tar make && \
+  curl -L  https://github.com/michelp/pgjwt/tarball/master -o pgjwt.tgz && \
+  tar zxf pgjwt.tgz && \
+  mv michelp-pgjwt-* pgjwt && \
+  cd pgjwt && \
+  make
+
 FROM postgres:16.2-alpine
-RUN apk add curl tar make && curl -L  https://github.com/michelp/pgjwt/tarball/master -o pgjwt.tgz && tar zxf pgjwt.tgz && (cd michelp-pgjwt-* && make install) && rm -rf michelp-pgjwt-*
+COPY docker-healthcheck /usr/local/bin/
+COPY --from=build /pgjwt /pgjwt
+RUN cd /pgjwt && \
+  /usr/local/lib/postgresql/pgxs/config/install-sh -c -d '/usr/local/share/postgresql/extension' && \
+  /usr/bin/install -c -m 644 ./pgjwt.control ./pgjwt--*.sql '/usr/local/share/postgresql/extension/'
+HEALTHCHECK CMD ["docker-healthcheck"]
