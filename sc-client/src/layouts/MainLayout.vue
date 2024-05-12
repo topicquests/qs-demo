@@ -147,14 +147,14 @@ function checkIfAuthenticated(): boolean {
   }
   return false;
 }
-function goTo(route: string): void {
-  router.push(route);
+function goTo(newRoute: string): void {
+  router.push({name: newRoute});
 }
 async function onLogout() {
   rightDrawer.value = false;
   leftDrawer.value = false;
-  goTo('home');
   await memberStore.logout();
+  goTo('home');
   $q.notify({
     type: 'positive',
     message: 'You are now logged out',
@@ -171,7 +171,6 @@ function closeNav() {
   rightDrawer.value = false;
 }
 onBeforeMount(async () => {
-  await guildStore.ensureAllGuilds();
-  await questStore.ensureAllQuests();
+
 });
 </script>

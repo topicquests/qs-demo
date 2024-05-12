@@ -25,7 +25,8 @@
           <div>
             <q-btn icon="info" dense flat size="sm"
               ><q-tooltip max-width="25rem"
-                ><div v-html="props.row.description" class="tooltip"></div>
+                ><div v-html="props.row.description" 
+                  class="tooltip"></div>
               </q-tooltip>
             </q-btn>
           </div>
@@ -34,7 +35,6 @@
       <template v-slot:body-cell-name="props">
         <q-td :props="props">{{ props.row.name }}</q-td>
       </template>
-
       <template v-slot:body-cell-time="props">
         <td>
           <quest-date-time-interval :quest="props.row" />
@@ -49,7 +49,7 @@
       </template>
       <template v-slot:body-cell-view="props">
         <td>
-          <slot :quest="props.row">
+          <slot v-bind:quest="props.row">
             <span v-if="props.row.is_quest_member">
               <router-link
                 :to="{
@@ -96,7 +96,7 @@
                 Register to the game
               </router-link>
             </span>
-            <span v-else-if="canAdminGuilds()">
+            <span v-else-if="canAdminGuilds">
               <!-- TODO: Register in-place -->
               <router-link
                 :to="{
@@ -139,16 +139,18 @@ import {
 import { GuildMembership, Quest, QuestData } from '../types';
 import QuestDateTimeInterval from './quest-date-time-interval.vue';
 import { computed, onBeforeMount, ref } from 'vue';
+import { useMembersStore } from 'src/stores/members';
 
 const QuestTableProps = defineProps<{
-  quests: Quest[];
+  quests: QuestData[];
   title: string;
 }>();
 
 const questStore = useQuestStore();
 const memberStore = useMemberStore();
+const membersStore = useMembersStore();
 const baseStore = useBaseStore();
-let questStatus = ref<quest_status_type | string>('All');
+const questStatus = ref<quest_status_type | string>();
 let questStatusOptions: quest_status_type[];
 
 const columns: QTableProps['columns'] = [
@@ -229,22 +231,14 @@ const columns: QTableProps['columns'] = [
   },
 ];
 
-const getFilteredQuests = computed({
-  get: () => {
-    if (questStatus.value && questStatus.value != 'All') {
-      return questStore.getQuestsByStatus(questStatus.value);
-    } else {
-      console.log(
-        'Filtered quests',
-        questStore.getQuestsByStatus(quest_status_enum.finished),
-      );
-      //questStatus.value = 'All';
+const getFilteredQuests = computed(() => { 
+  if (questStatus.value && questStatus.value != 'All') {
+    return questStore.getQuestsByStatus(questStatus.value);
+  } else {
+      //questStatus.value = "All"
       return QuestTableProps.quests;
-    }
-  },
-  set: () => {},
-});
-
+  }
+})
 function refInterval(row: QuestData) {
   const start: number = DateTime.fromISO(row.start).millisecond;
   const end: number = DateTime.fromISO(row.end).millisecond;
@@ -266,7 +260,7 @@ function lastMoveFull(row: QuestData) {
     : '';
 }
 
-function canAdminGuilds(): boolean {
+const canAdminGuilds = computed((): boolean =>{
   return (
     baseStore.hasPermission(permission_enum.joinQuest) ||
     (memberStore.getUser?.guild_membership || []).find(
@@ -280,8 +274,8 @@ function canAdminGuilds(): boolean {
       },
     ) != undefined
   );
-}
-onBeforeMount(() => {
+})
+onBeforeMount(async() => {
   questStatusOptions = QuestTableProps.quests.map(
     (quest: Quest) => quest.status,
   );

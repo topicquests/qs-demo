@@ -73,28 +73,29 @@ export const useChannelStore = defineStore('channel', {
     getChannelNode:
       (state: ChannelState) => (channel_id: number, node_id: number) =>
         state.channelData[channel_id]?.[node_id],
-    canEdit: (state: ChannelState) => (channel_id: number, node_id: number) => {
+    canEdit: (state: ChannelState) => (channel_id?: number, node_id?: number) => {
       const memberStore = useMemberStore();
       const questStore = useQuestStore();
       const baseStore = useBaseStore();
       if (memberStore && memberStore.getUserId) {
         const userId = memberStore.getUserId;
-
-        const node = state.channelData[channel_id]?.[node_id];
-        if (node && userId) {
-          if (node.status == publication_state_enum.private_draft) {
-            return node.creator_id == userId;
+        if (typeof channel_id === 'number' && typeof node_id === 'number') {
+          const node = state.channelData[channel_id]?.[node_id];
+          if (node && userId) {
+            if (node.status == publication_state_enum.private_draft) {
+              return node.creator_id == userId;
             // TODO: role_draft
-          } else if (node.status == publication_state_enum.guild_draft) {
-            const casting = questStore.castingInQuest(node.guild_id);
-            return casting?.guild_id == node.guild_id;
+            } else if (node.status == publication_state_enum.guild_draft) {
+              const casting = questStore.castingInQuest(node.guild_id);
+              return casting?.guild_id == node.guild_id;
+            }
+          } else if (node.status == publication_state_enum.proposed) {
+            return baseStore.hasPermission(
+              permission_enum.guildAdmin,
+              node.guild_id,
+              node.guild_id,
+            );
           }
-        } else if (node.status == publication_state_enum.proposed) {
-          return baseStore.hasPermission(
-            permission_enum.guildAdmin,
-            node.guild_id,
-            node.guild_id,
-          );
         }
       }
       return false;

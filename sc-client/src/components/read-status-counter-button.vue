@@ -102,11 +102,8 @@ const channelStore = useChannelStore();
 const conversationStore = useConversationStore();
 const readStatusProps = defineProps<{
   node_id: number;
-  isRead: boolean;
-  isChannel: {
-    type: boolean;
-    default: false;
-  };
+  isRead?: boolean;
+  isChannel: boolean;
   isExpanded: boolean;
 }>();
 let localRead = readStatusProps.isRead;

@@ -73,7 +73,7 @@ export const useMemberStore = defineStore('member', {
       window.localStorage.removeItem('tokenExpiry');
       // legacy
       window.localStorage.removeItem('email');
-      //getWSClient().logout();
+      getWSClient().logout();
       useBaseStore().reset();
     },
     async signin(mail: string, pass: string): Promise<string | undefined> {
@@ -105,6 +105,7 @@ export const useMemberStore = defineStore('member', {
       if (!this.member) {
         const expiry =
           this.tokenExpiry || window.localStorage.getItem('tokenExpiry');
+          if(typeof expiry === 'string')
         if (expiry && Date.now() < Number.parseInt(expiry)) {
           this.fetchLoginUser();
           if (!this.tokenExpiry) {
@@ -136,7 +137,6 @@ export const useMemberStore = defineStore('member', {
             '*,quest_membership!member_id(*),guild_membership!member_id(*),casting!member_id(*),casting_role!member_id(*),guild_member_available_role!member_id(*)',
         },
       });
-      console.log('Status', res.status);
       if (res.status == 200) {
         this.member = res.data[0];
         this.isAuthenticated = true;

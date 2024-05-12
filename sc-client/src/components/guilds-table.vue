@@ -67,7 +67,7 @@
           <td>
             <guilds-playing-indicator
               v-if="showPlayers"
-              :quest="questStore.getCurrentQuest"
+              :quest="currentQuest!"
               :playing="questStore.isPlayingQuestAsGuildId() == props.row.id"
               :guild="props.row"
             />
@@ -190,6 +190,10 @@ const columns: QTableProps['columns'] = [
   },
   ...extra,
 ];
+const currentQuest = computed({
+  get: () => questStore.getCurrentQuest,
+  set: () => {}
+})
 
 const hasGuildAdminPermission = computed(() => (id: number) => {
   guildPermission.value = baseStore.hasPermission(
@@ -206,7 +210,7 @@ const guildData = computed((): Partial<GuildData[]> => {
 function numPlayers(guild: Guild) {
   if (GuildsTableProp.showPlayers) {
     const quest = questStore.getCurrentQuest;
-    return (quest.casting || []).filter((c: Casting) => c.guild_id == guild.id)
+    return (quest!.casting || []).filter((c: Casting) => c.guild_id == guild.id)
       .length;
   }
   return (guild.guild_membership || []).length;
@@ -230,7 +234,7 @@ const selectionChanged = computed(
       if (rowEvent.added) {
         guildStore.setCurrentGuild(rowEvent.rows[0].id);
       } else {
-        guildStore.setCurrentGuild(null);
+        guildStore.setCurrentGuild(true);
       }
     },
 );

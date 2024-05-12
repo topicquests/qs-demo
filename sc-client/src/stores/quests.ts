@@ -72,7 +72,7 @@ export const useQuestStore = defineStore('quest', {
         ),
       );
     },
-    getActiveQuests: (state: QuestsState): Quest[] =>
+    getActiveQuests: (state: QuestsState): QuestData[] =>
       Object.values(state.quests).filter(
         (quest) =>
           ['ongoing', 'paused', 'registration'].indexOf(quest.status) >= 0,
@@ -223,7 +223,7 @@ export const useQuestStore = defineStore('quest', {
         }
       },
     getQuestsByStatus:
-      (state: QuestsState) => (status: quest_status_enum | string) =>
+      (state: QuestsState) => (status: quest_status_enum | string):QuestData[] =>
         Object.values(state.quests).filter(
           (quest: QuestData) => quest.status == status,
         ),
@@ -277,7 +277,7 @@ export const useQuestStore = defineStore('quest', {
       if (typeof quest_id === 'number') {
         this.currentQuest = quest_id;
       }
-      //getWSClient().setDefaultQuest(quest_id);
+      getWSClient().setDefaultQuest(quest_id);
     },
     async fetchQuests(
       id: undefined | number | Array<number>,
@@ -379,7 +379,7 @@ export const useQuestStore = defineStore('quest', {
       } else {
         params.select = '*,game_play!quest_id(*)';
       }
-      const res: AxiosResponse<QuestData[]> = await api.get('/quests', params);
+      const res: AxiosResponse<QuestData[]> = await api.get('/quests', {params});
       if (res.status == 200) {
         this.quests = {
           ...this.quests,

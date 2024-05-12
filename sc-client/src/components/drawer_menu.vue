@@ -49,9 +49,14 @@
         <q-item-section>Registration</q-item-section>
       </q-item>
       <q-item-section></q-item-section>
-      <q-item v-if="checkIfAuthenticated()" class="lt-md">
-        <q-item-section>Logoff</q-item-section>
+      <q-item 
+        v-if="checkIfAuthenticated()" 
+        class="lt-md"
+        clickable @click="onLogout"
+        >
+        <q-item-section>logoff</q-item-section>
       </q-item>
+     
     </q-list>
   </div>
 </template>

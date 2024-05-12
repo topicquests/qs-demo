@@ -174,7 +174,7 @@ import nodeTree from '../components/node-tree.vue';
 import { permission_enum } from '../enums';
 import { waitUserLoaded } from '../app-access';
 import { useRoute, useRouter } from 'vue-router';
-import { Casting, Guild, GuildData } from '../types';
+import { Casting, GamePlay, Guild, GuildData } from '../types';
 import { computed, ref } from 'vue';
 import { useQuestStore } from 'src/stores/quests';
 import { useGuildStore } from 'src/stores/guilds';
@@ -230,7 +230,7 @@ function myGuilds(only_as_leader = false): GuildData[] {
 function guildsPlayingGame(only_mine = false, recruiting = false) {
   let guild_ids =
     questStore.getCurrentQuest!.game_play?.map(
-      (gp: GuildData) => gp.guild_id,
+      (gp: GamePlay) => gp.guild_id,
     ) || [];
   if (only_mine) {
     guild_ids = guild_ids.filter((g) =>
@@ -239,8 +239,8 @@ function guildsPlayingGame(only_mine = false, recruiting = false) {
       ),
     );
   }
-  let guilds = guild_ids.map((gid: GuildData) =>
-    guildStore.getGuildById(gid.id),
+  let guilds = guild_ids.map((gid: number) =>
+    guildStore.getGuildById(gid),
   );
   if (recruiting) {
     guilds = guilds.filter((g) => g.open_for_applications);

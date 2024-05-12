@@ -60,8 +60,7 @@ const guildStore = useGuildStore();
 const questStore = useQuestStore();
 
 onBeforeMount(async () => {
-  await guildStore.ensureAllGuilds();
-  await questStore.ensureAllQuests();
+ 
 });
 </script>
 

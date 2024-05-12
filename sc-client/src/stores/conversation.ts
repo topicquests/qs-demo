@@ -17,6 +17,7 @@ import { defineStore } from 'pinia';
 import { calc_threat_status, ThreatMap, ScoreMap } from '../scoring';
 import { base_scoring } from '../scoring/base_scoring';
 import { api } from 'src/boot/axios';
+import { useMemberStore } from './member';
 export function ibis_child_types(
   parent_type: ibis_node_type_type,
 ): ibis_node_type_type[] {
@@ -103,6 +104,11 @@ export const useConversationStore = defineStore('conversation', {
         state.neighbourhood[state.neighbourhoodRoot];
       }
     },
+    getPrivateConversationTree: (state: ConversationState) =>
+      makeTree(
+        Object.values(state.conversation),
+        publication_state_enum.private_draft,
+      ),
     getNeighbourhoodTree: (state: ConversationState) =>
       state.neighbourhood ? makeTree(Object.values(state.neighbourhood)) : null,
     getConversationTree: (state: ConversationState) =>
@@ -113,25 +119,21 @@ export const useConversationStore = defineStore('conversation', {
             false,
           )
         : null,
-    getPrivateConversationTree: (state: ConversationState) =>
-      makeTree(
-        Object.values(state.conversation),
-        publication_state_enum.private_draft,
-      ),
+    
     getTreeSequence: (state: ConversationState): number[] =>
       depthFirst(
         makeTree(Object.values(state.conversation || state.neighbourhood))[0],
       ),
     getThreatMap() {
-      const tree = this.getConversationTree();
+      const tree = this.getConversationTree;
       if (tree && tree.length > 0) {
         const threatMap: ThreatMap = {};
         calc_threat_status(tree[0], threatMap);
         return threatMap;
       }
     },
-    getPrivateThreatMap: (state: ConversationState): ThreatMap | undefined => {
-      const tree = state.getPrivateConversationTree();
+    getPrivateThreatMap (): ThreatMap | undefined  {
+      const tree = this.getPrivateConversationTree;
       if (tree && tree.length > 0) {
         const threatMap: ThreatMap = {};
         calc_threat_status(tree[0], threatMap);
@@ -139,35 +141,35 @@ export const useConversationStore = defineStore('conversation', {
       }
       return;
     },
-    getScoreMap: (state: ConversationState) => {
-      const tree = state.getConversationTree();
+    getScoreMap () {
+      const tree = this.getConversationTree;
       if (tree && tree.length > 0) {
-        const threatMap = state.getThreatMap();
+        const threatMap = this.getThreatMap;
         return base_scoring(tree[0], threatMap);
       }
     },
-    getPrivateScoreMap: (state: ConversationState): ScoreMap | undefined => {
-      const tree = state.getPrivateConversationTree();
+    getPrivateScoreMap (): ScoreMap | undefined {
+      const tree = this.getPrivateConversationTree;
       if (tree && tree.length > 0) {
-        const threatMap = state.getPrivateThreatMap();
+        const threatMap = this.getPrivateThreatMap;
         return base_scoring(tree[0], threatMap);
       }
     },
-    getGuildScoreMap: (state: ConversationState): ScoreMap => {
-      const scoreMap = state.getScoreMap() || {};
+    getGuildScoreMap (): ScoreMap {
+      const scoreMap = this.getScoreMap || {};
       const guildScoreMap: ScoreMap = {};
       Object.keys(scoreMap).forEach((key) => {
-        const guild_id = state.conversation[key].guild_id;
+        const guild_id = this.conversation[key].guild_id;
         guildScoreMap[guild_id] =
           (guildScoreMap[guild_id] || 0) + scoreMap[key];
       });
       return guildScoreMap;
     },
-    getPrivateGuildScoreMap: (state: ConversationState): ScoreMap => {
-      const scoreMap = state.getPrivateScoreMap() || {};
+    getPrivateGuildScoreMap (): ScoreMap {
+      const scoreMap = this.getPrivateScoreMap || {};
       const guildScoreMap: ScoreMap = {};
       Object.keys(scoreMap).forEach((key) => {
-        const guild_id = state.conversation[key].guild_id;
+        const guild_id = this.conversation[key].guild_id;
         guildScoreMap[guild_id] =
           (guildScoreMap[guild_id] || 0) + scoreMap[key];
       });
@@ -180,6 +182,7 @@ export const useConversationStore = defineStore('conversation', {
       );
     },
     canEdit: (state: ConversationState) => (node_id: number) => {
+      const memberStore = useMemberStore()
       const userId = memberStore.getUserId();
       const node = state.conversation[node_id];
       if (

@@ -3,32 +3,32 @@
     <q-card v-if="QuestCardProps.currentQuest" class="quest_card">
       <q-card-section class="q-pb-none">
         <q-avatar size="45px" class="q-ma-sm">
-          <img :src="conversationStore.ibis_node_icon('quest', false)" />
+          <img :src="ibis_node_icon('quest', false)" />
         </q-avatar>
         <div class="row justify-center">
           <h3 class="q-mt-md">
             {{ QuestCardProps.currentQuest.name }}
           </h3>
-          <q-btn
+          <q-btn v-if="QuestCardProps.currentQuest.description"
             class="q-ml-xs q-mt-md"
             size="md"
             :flat="true"
-            icon="info"
-            v-if="QuestCardProps.currentQuest.description"
+            icon="info"            
           >
             <q-tooltip self="bottom middle" max-width="25rem">
               <div v-html="QuestCardProps.currentQuest.description"></div>
             </q-tooltip>
           </q-btn>
           <router-link
-            :to="{ name: 'quest_page', params: { quest_id: currentQuest.id } }"
+            :to="{ name: 'quest_page', 
+             params: { quest_id: currentQuest.id } }"
             class="q-ml-sm q-mt-md"
-            >Game</router-link
           >
+            Game
+          </router-link>
         </div>
       </q-card-section>
       <q-separator color="black"></q-separator>
-
       <q-card-section v-if="showQuestInfo" class="row">
         <div class="col"></div>
         <div class="col-6">
@@ -89,10 +89,7 @@ import { useConversationStore, ibis_node_icon } from 'src/stores/conversation';
 const QuestCardProps = defineProps<{
   currentQuest: QuestData;
   creator?: object;
-  showQuestInfo?: {
-    type: boolean;
-    default: true;
-  };
+  showQuestInfo?: boolean;
 }>();
 const conversationStore = useConversationStore();
 

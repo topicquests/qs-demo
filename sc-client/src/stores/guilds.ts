@@ -157,7 +157,7 @@ export const useGuildStore = defineStore('guild', {
         full: true,
       });
       const quest = questStore.getQuestById(quest_id);
-      let guildId: number[] = quest.game_play?.map(
+      let guildId: number[]|undefined = quest.game_play?.map(
         (gp: GamePlay) => gp.guild_id,
       );
       if (guildId == undefined) return [];

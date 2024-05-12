@@ -2,14 +2,14 @@
   <div>
     <span v-if="GuildsPlayingIndicatorProp.playing">
       Playing ({{
-        questStore.getGamePlayForGuild(GuildsPlayingIndicatorProp.guild.id)
+        questStore.getGamePlayForGuild(GuildsPlayingIndicatorProp.guild.id)!
           .game_status
       }})
     </span>
     <span
       v-else-if="
         open_play_status.indexOf(
-          questStore.getGamePlayForGuild(GuildsPlayingIndicatorProp.guild.id)
+          questStore.getGamePlayForGuild(GuildsPlayingIndicatorProp.guild.id)!
             .game_status,
         ) >= 0
       "
@@ -26,7 +26,7 @@
         Join this Guild!
         <span
           v-if="
-            questStore.getGamePlayForGuild(GuildsPlayingIndicatorProp.guild.id)
+            questStore.getGamePlayForGuild(GuildsPlayingIndicatorProp.guild.id)!
               .game_status == game_play_status_enum.confirmed
           "
         >
@@ -36,7 +36,7 @@
       </span>
       <span
         v-else-if="
-          questStore.getGamePlayForGuild(GuildsPlayingIndicatorProp.guild.id)
+          questStore.getGamePlayForGuild(GuildsPlayingIndicatorProp.guild.id)!
             .game_status == game_play_status_enum.confirmed
         "
       >
@@ -44,7 +44,7 @@
       </span>
       <span
         v-else-if="
-          questStore.getGamePlayForGuild(GuildsPlayingIndicatorProp.guild.id)
+          questStore.getGamePlayForGuild(GuildsPlayingIndicatorProp.guild.id)!
             .game_status == game_play_status_enum.interested
         "
       >

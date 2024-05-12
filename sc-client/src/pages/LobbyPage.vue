@@ -11,19 +11,19 @@
           </div>
         </div>
         <div class="column items-center">
-          <div v-if="questsStore.getActiveQuests.length" style="width: 100%">
+          <div v-if="getActiveQuests" style="width: 100%">
             <quest-table
-              :quests="questsStore.getActiveQuests"
+              :quests="getActiveQuests"
               :title="'Active Quests'"
             />
             <q-btn :to="{ name: 'quest_list' }">All Quests</q-btn>
           </div>
           <div
-            v-else-if="questsStore.getQuests.length"
+            v-else-if="quests.length"
             class="col-6"
             style="width: 100%"
           >
-            <quest-table :quests="questsStore.getQuests" :title="'Quests'" />
+            <quest-table :quests="quests" :title="'Quests'" />
           </div>
           <div v-else class="column items-center q-mt-md">
             <h4>There are no quests</h4>
@@ -84,6 +84,7 @@ const quests = computed({
   get: () => questsStore.getQuests,
   set: () => {},
 });
+const getActiveQuests = computed(() => questsStore.getActiveQuests) 
 
 const getOpenGuilds = computed((): GuildData[] =>
   guildsStore.getGuilds.filter(
@@ -101,7 +102,6 @@ onBeforeMount(async () => {
   await Promise.all([
     questsStore.ensureAllQuests(),
     guildsStore.ensureAllGuilds(),
-    membersStore.ensureAllMembers(),
   ]);
   ready.value = true;
 });

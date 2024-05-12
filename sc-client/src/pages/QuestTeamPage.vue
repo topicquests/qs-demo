@@ -15,7 +15,8 @@
         <div class="row justify-center">
           <div class="column quest-card-col">
             <div class="col-12 q-mb-md">
-              <questCard :currentQuest="questStore.getCurrentQuest!">
+              <questCard 
+                :currentQuest="currentQuest">
               </questCard>
             </div>
           </div>
@@ -24,14 +25,14 @@
         <div class="column items-center">
           <div
             class="q-ma-sm guilds-table-col"
-            v-if="guildStore.getGuildsPlayingCurrentQuest.length"
+            v-if="guildsPlayingCurrentQuest.length"
           >
             <guilds-table
-              :guilds="guildStore.getGuildsPlayingCurrentQuest"
+              :guilds="guildsPlayingCurrentQuest"
               :scores="conversationStore.getGuildScoreMap"
               :showPlayers="true"
               :selectable="true"
-              :quest="questStore.getCurrentQuest"
+              :quest="currentQuest"
             >
               <template v-slot:default="slotProps">
                 <router-link
@@ -42,12 +43,12 @@
                 >
                   View
                 </router-link>
-                <span v-if="questStore.getCurrentQuest!.is_playing">
+                <span v-if="currentQuest!.is_playing">
                   <!-- already playing -->
                 </span>
                 <span
                   v-else-if="
-                    questStore.getCurrentQuest!.status != 'registration'
+                    currentQuest!.status != 'registration'
                   "
                 >
                   <!-- not in registration phase -->
@@ -58,8 +59,8 @@
                 </span>
                 <span
                   v-else-if="
-                    questStore.getCurrentQuest!.my_confirmed_guild_count +
-                      questStore.getCurrentQuest!.my_recruiting_guild_count >
+                    currentQuest!.my_confirmed_guild_count +
+                      currentQuest!.my_recruiting_guild_count >
                     0
                   "
                 >
@@ -94,12 +95,11 @@
 </template>
 
 <script setup lang="ts">
-import Vue, { onBeforeMount, ref } from 'vue';
+import { computed, onBeforeMount, ref } from 'vue';
 import questCard from '../components/quest-card.vue';
 import scoreboard from '../components/score-board.vue';
 import member from '../components/member-handle.vue';
 import GuildsTable from '../components/guilds-table.vue';
-import GuildsPlayingIndicator from '../components/guilds-playing-indicator.vue';
 import GuildMembers from '../components/guild-members.vue';
 import { useGuildStore } from 'src/stores/guilds';
 import { useQuestStore } from 'src/stores/quests';
@@ -107,6 +107,7 @@ import { useConversationStore } from 'src/stores/conversation';
 import { useMembersStore } from 'src/stores/members';
 import { useRoleStore } from 'src/stores/role';
 import { useRoute } from 'vue-router';
+import { QuestData } from 'src/types';
 
 const guildStore = useGuildStore();
 const questStore = useQuestStore();
@@ -116,11 +117,18 @@ const membersStore = useMembersStore();
 const ready = ref(false);
 let questId: number;
 const route = useRoute();
+const currentQuest = computed<QuestData>({
+  get: () =>  questStore.getCurrentQuest!, 
+  set: () => {}
+})
+const guildsPlayingCurrentQuest = computed({
+  get: () => guildStore.getGuildsPlayingCurrentQuest,
+  set: () => {}
+})
 
 async function initialize() {
   if (typeof route.params.quest_id === 'string') {
-    const quest_id = Number.parseInt(route.params.quest_id);
-    questId = quest_id;
+    questId = Number.parseInt(route.params.quest_id);
   }
   await Promise.all([
     membersStore.ensurePlayersOfQuest(questId),
@@ -128,11 +136,12 @@ async function initialize() {
     questStore.ensureCurrentQuest(questId),
     conversationStore.ensureConversation(questId),
   ]);
-  await guildStore.ensureGuildsPlayingQuest(questId);
-  ready.value = true;
+  await guildStore.ensureGuildsPlayingQuest({quest_id: questId});
+ 
 }
 onBeforeMount(async () => {
   await initialize();
+  ready.value = true;
 });
 </script>
 <style>

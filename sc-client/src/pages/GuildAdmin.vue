@@ -329,6 +329,16 @@ const description = computed({
     if (guild.value) guild.value.description = value;
   },
 });
+const potentialQuests = computed({
+  get: () => {
+  return questStore.getQuests.filter(
+    (q: QuestData) =>
+      (q.status == quest_status_enum.registration ||
+        q.status == quest_status_enum.ongoing) &&
+      confirmedPlayQuestIds().length == 0,
+  )},
+  set: () => {}
+});
 
 function activeQuests(): Partial<QuestData[]> {
   confirmedPlayQuestId = confirmedPlayQuestIds();
@@ -372,14 +382,7 @@ function guildGamePlays() {
     return [];
   }
 }
-const potentialQuests = computed((): QuestData[] => {
-  return questStore.getQuests.filter(
-    (q: Quest) =>
-      (q.status == quest_status_enum.registration ||
-        q.status == quest_status_enum.ongoing) &&
-      confirmedPlayQuestIds().length == 0,
-  );
-});
+
 function confirmedPlayQuestIds(): GamePlay[] | number[] {
   return (guildGamePlays() || []).map((gp: GamePlay) => gp.quest_id);
 }
