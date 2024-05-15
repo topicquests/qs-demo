@@ -190,7 +190,7 @@ const NodeTreeProps = defineProps<{
   isChannel: boolean;
   editable: boolean;
   hideDescription?: boolean;
-  initialSelectedNodeId: number | undefined;
+  initialSelectedNodeId?: number | undefined;
 }>();
 
 const channelStore = useChannelStore();
@@ -220,7 +220,6 @@ let selectedIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
 let childIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
 const newNode = ref<Partial<ConversationNode>>({});
 const tree = ref<QTree>();
-const editForm_= ref<typeof NodeForm>();
 const addChildForm_ = ref<typeof NodeForm>();
 let vnode= ref<Element|null>(null);
 
@@ -253,15 +252,18 @@ function nodeMap(): ConversationMap {
     entries.filter(([id, node]) => node.status == 'published'),
   );
 }
-const nodesTree = computed((): QTreeNode[] =>{
-  if (NodeTreeProps.channelId)
-    return channelStore.getChannelConversationTree(NodeTreeProps.channelId);
-  if (showFocusNeighbourhood.value)
-    return conversationStore.getNeighbourhoodTree!;
-  if (NodeTreeProps.currentGuildId)
-    return conversationStore.getPrivateConversationTree;
-  return conversationStore.getConversationTree!;
-})
+const nodesTree = computed({
+  get: ()=> {
+    if (NodeTreeProps.channelId)
+      return channelStore.getChannelConversationTree(NodeTreeProps.channelId);
+    if (showFocusNeighbourhood.value)
+      return conversationStore.getNeighbourhoodTree!;
+    if (NodeTreeProps.currentGuildId)
+      return conversationStore.getPrivateConversationTree;
+    return conversationStore.getConversationTree!;
+  },
+  set: () => {}
+});
 const threats = computed((): ThreatMap | undefined => {
   if (NodeTreeProps.channelId) return undefined;
   if (NodeTreeProps.currentGuildId && showDraft.value)
@@ -275,7 +277,7 @@ const scores = computed((): ScoreMap | undefined => {
   return conversationStore.getScoreMap;
 });
 //currentGuildId: "guildChanged",
-//conversation: "conversationChanged",
+//const conversation: "conversationChanged",
 
 function calcPublicationConstraints(node: Partial<ConversationNode>) {
   if (!NodeTreeProps.currentGuildId) {
@@ -464,7 +466,7 @@ async function confirmAddChild(node: Partial<ConversationNode>) {
   // const parent = this.getNode(this.addingChildToNodeId);
   try {
     if (NodeTreeProps.channelId) {
-      await channelStore.createChannelNode({ data: node });
+      await channelStore.createChannelNode(node);
     } else {
       await conversationStore.createConversationNode(node );
     }
@@ -520,19 +522,17 @@ async function treePromise() {
       node_id = conversationStore.getRootNode?.id;
     }
     if (!NodeTreeProps.initialSelectedNodeId) selectedNodeId.value = node_id;
-    return await conversationStore.ensureConversationNeighbourhood({
-      node_id,
-      guild: NodeTreeProps.currentGuildId,
+      return await conversationStore.ensureConversationNeighbourhood({
+        node_id, guild: NodeTreeProps.currentGuildId,
     });
   }
   if (NodeTreeProps.channelId) {
-    return await channelStore.ensureChannelConversation({
-      channel_id: NodeTreeProps.channelId,
-      guild: NodeTreeProps.currentGuildId,
-  });
-  }
+    return await channelStore.ensureChannelConversation(
+      NodeTreeProps.channelId,
+      NodeTreeProps.currentGuildId!,
+  )};
   return await conversationStore.ensureConversation(
-    NodeTreeProps.currentQuestId,
+    NodeTreeProps.currentQuestId!,
   );
 }
 

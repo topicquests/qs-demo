@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { ConversationNode } from '../types';
 import { useChannelStore } from 'src/stores/channel';
 import { waitUserLoaded } from '../app-access';
@@ -65,13 +65,16 @@ const ChannelListProps = defineProps<{
 const channelStore = useChannelStore();
 const ready = ref(false);
 
-function getChannels(): ConversationNode[] {
+const getChannels = computed({
+  get: () => {
   return ChannelListProps.quest_id
     ? channelStore.getGameChannelsOfQuest(ChannelListProps.quest_id)
     : channelStore.getGuildChannels;
-}
+  },
+  set: () => {}
+});
 async function ensureData() {
-  await channelStore.ensureChannels(ChannelListProps.guild_id);
+  await channelStore.ensureChannels(ChannelListProps.guild_id!);
 }
 onBeforeUpdate(async () => {
   await ensureData();

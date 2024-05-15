@@ -7,23 +7,23 @@
         </div>
         <div class="row justify-center q-mt-lg">
           <h3 class="q-mt-md">
-            {{ questStore.getCurrentQuest!.name }}
+            {{ currentQuest.name }}
             <q-btn
-              v-if="questStore.getCurrentQuest!.description"
+              v-if="currentQuest.description"
               class="q-ml-xs q-mt-md"
               size="md"
               :flat="true"
               icon="info"
             >
               <q-tooltip self="bottom middle" max-width="25rem">
-                <div v-html="questStore.getCurrentQuest!.description"></div>
+                <div v-html="currentQuest!.description"></div>
               </q-tooltip>
             </q-btn>
           </h3>
           <router-link
             :to="{
               name: 'quest_teams',
-              params: { quest_id: questStore.getCurrentQuest!.id },
+              params: { quest_id: currentQuest!.id },
             }"
             class="q-ml-sm q-mt-md"
             >Teams</router-link
@@ -49,7 +49,7 @@
             >
           </span>
           <span
-            v-else-if="questStore.getCurrentQuest!.status != 'registration'"
+            v-else-if="currentQuest!.status != 'registration'"
           >
             The game has started
           </span>
@@ -171,10 +171,10 @@
 <script setup lang="ts">
 import member from '../components/member-handle.vue';
 import nodeTree from '../components/node-tree.vue';
-import { permission_enum } from '../enums';
+import { ibis_node_type_list, ibis_node_type_type, permission_enum } from '../enums';
 import { waitUserLoaded } from '../app-access';
 import { useRoute, useRouter } from 'vue-router';
-import { Casting, GamePlay, Guild, GuildData } from '../types';
+import { Casting, ConversationNode, GamePlay, Guild, GuildData, QuestData } from '../types';
 import { computed, ref } from 'vue';
 import { useQuestStore } from 'src/stores/quests';
 import { useGuildStore } from 'src/stores/guilds';
@@ -189,7 +189,6 @@ const memberStore = useMemberStore();
 const baseStore = useBaseStore();
 const router = useRouter();
 const route = useRoute();
-const memberId = ref(memberStore.member!.id);
 const ready = ref(false);
 const registerMemberDialog = ref(false);
 const questId = ref<number | undefined>(undefined);
@@ -206,15 +205,8 @@ const guildId = computed((): number | undefined => {
     return undefined;
   }
 });
-
-//data
-//const newNode: Partial<ConversationNode> = {};
-
-//newNodeParent: number = null;
-//const selectedIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
-//const childIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
-//allRoles!: RoleState["role"];
-
+const memberId = computed((): number => memberStore.member!.id)
+const currentQuest = computed(():QuestData => questStore.getCurrentQuest!)
 function myGuilds(only_as_leader = false): GuildData[] {
   let memberships = memberStore.member!.guild_membership || [];
   memberships = memberships.filter((gm) => gm.status == 'confirmed');
@@ -226,7 +218,6 @@ function myGuilds(only_as_leader = false): GuildData[] {
   }
   return guild_ids.map((gid) => guildStore.getGuildById(gid));
 }
-
 function guildsPlayingGame(only_mine = false, recruiting = false) {
   let guild_ids =
     questStore.getCurrentQuest!.game_play?.map(

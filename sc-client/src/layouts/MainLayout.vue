@@ -90,12 +90,12 @@
         />
       </div>
       <div
-        v-if="currentGuild && questStore.getCurrentQuest"
+        v-if="currentGuild && currentQuest"
         class="q-pa-md q-gutter-sm"
       >
         <channel-list
           v-bind:guild_id="currentGuild.id"
-          v-bind:quest_id="questStore.getCurrentQuest.id"
+          v-bind:quest_id="currentQuest.id"
           :inPage="false"
           title="Game Channels"
         />
@@ -119,7 +119,7 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue';
+import { computed, onBeforeMount, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useMemberStore } from '../stores/member';
 import { useGuildStore } from '../stores/guilds';
@@ -137,8 +137,9 @@ const $q = useQuasar();
 const leftDrawer = ref(false);
 const isAuthenticated = ref(false);
 const rightDrawer = ref(false);
-const showTree = true;
-const currentGuild = ref<GuildData | undefined>(guildStore.getCurrentGuild);
+const showTree = ref(true);
+const currentGuild = computed(() => guildStore.getCurrentGuild)
+const currentQuest = computed(() => questStore.getCurrentQuest)
 
 function checkIfAuthenticated(): boolean {
   isAuthenticated.value = memberStore.isAuthenticated;

@@ -114,16 +114,15 @@ export const useChannelStore = defineStore('channel', {
     async ensureChannelConversation(
       channel_id: number,
       guild: number,
-      channelData: [],
     ) {
       const guildStore = useGuildStore();
       if (
         guild != guildStore.currentGuild ||
-        channelData[channel_id] === undefined
+        this.channelData![channel_id] === undefined
       ) {
-        await this.fetchChannelConversation({
-          params: { node_id: channel_id },
-        });
+        await this.fetchChannelConversation(
+          channel_id 
+        );
       }
     },
     resetChannel() {
@@ -170,16 +169,17 @@ export const useChannelStore = defineStore('channel', {
       }
     },
 
-    async fetchChannelConversation(params: { node_id: number }) {
-      const res: AxiosResponse<Partial<ConversationNode[]>> = api.get(
-        'rpc/node_subtree',
-        params,
-      );
+    async fetchChannelConversation( node_id:number ):Promise <ConversationNode[]> {
+      const params = Object();
+      params.node_id = node_id
+      const res: AxiosResponse<ConversationNode[]> = await api.get('rpc/node_subtree',{
+        params
+      })    
       if (res.status == 200) {
         const channel_id = params.node_id;
         const firstNode = res.data[0];
-        if (this.currentGuild !== firstNode.guild_id) {
-          this.currentGuild = firstNode.guild_id;
+        if (this.currentGuild !== firstNode!.guild_id) {
+          this.currentGuild = firstNode!.guild_id;
           this.channels = {};
         }
         const nodes: ConversationMap = Object.fromEntries(
@@ -190,26 +190,26 @@ export const useChannelStore = defineStore('channel', {
           throw Error('not a channel');
         this.channelData = { ...this.channelData, [channel_id]: nodes };
         this.currentChannel = channel_id;
+        return res.data
       }
+      return[]
     },
-    async createChannelNode(params) {
+    async createChannelNode(node:Partial<ConversationNode>) {
       const res: AxiosResponse<ConversationNode[]> = await api.post(
-        '/conversation_node',
-        {
-          params,
-        },
+        '/conversation_node',        
+          node,
       );
       if (res.status == 200) {
         const node = res.data[0];
         this.addToState(node);
       }
     },
-    async updateChannelNode(params: Partial<conversationNode>) {
+    async updateChannelNode(data: Partial<ConversationNode>) {
       data = filterKeys(data, conversationNodePatchKeys);
       const res: AxiosResponse<ConversationNode[]> = await api.patch(
         '/conversation_node/${params.id}',
         {
-          params,
+          data,
         },
       );
       if (res.status == 200) {
