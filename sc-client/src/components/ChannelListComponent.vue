@@ -65,14 +65,11 @@ const ChannelListProps = defineProps<{
 const channelStore = useChannelStore();
 const ready = ref(false);
 
-const getChannels = computed({
-  get: () => {
+const getChannels = computed(() => {
   return ChannelListProps.quest_id
-    ? channelStore.getGameChannelsOfQuest(ChannelListProps.quest_id)
+    ? channelStore.getGameChannelsOfQuest(ChannelListProps.quest_id!)
     : channelStore.getGuildChannels;
-  },
-  set: () => {}
-});
+})
 async function ensureData() {
   await channelStore.ensureChannels(ChannelListProps.guild_id!);
 }

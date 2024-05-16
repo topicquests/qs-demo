@@ -252,8 +252,7 @@ function nodeMap(): ConversationMap {
     entries.filter(([id, node]) => node.status == 'published'),
   );
 }
-const nodesTree = computed({
-  get: ()=> {
+const nodesTree = computed(() => {
     if (NodeTreeProps.channelId)
       return channelStore.getChannelConversationTree(NodeTreeProps.channelId);
     if (showFocusNeighbourhood.value)
@@ -261,9 +260,7 @@ const nodesTree = computed({
     if (NodeTreeProps.currentGuildId)
       return conversationStore.getPrivateConversationTree;
     return conversationStore.getConversationTree!;
-  },
-  set: () => {}
-});
+})
 const threats = computed((): ThreatMap | undefined => {
   if (NodeTreeProps.channelId) return undefined;
   if (NodeTreeProps.currentGuildId && showDraft.value)
@@ -377,7 +374,7 @@ function filterMethod(node: Partial<ConversationNode>, filter_string: string) {
 }
 
 function canEdit(nodeId: number): boolean {
-  const quest = questStore.getCurrentQuest;
+  const quest = questStore.getQuestById(NodeTreeProps.currentQuestId!);
   if (quest && (!quest.is_playing || quest.status == 'finished')) return false;
   if (NodeTreeProps.channelId) {
     return channelStore.canEdit(NodeTreeProps.channelId, nodeId);
@@ -386,7 +383,7 @@ function canEdit(nodeId: number): boolean {
   }
 }
 function canAddTo(nodeId: number): boolean {
-  const quest = questStore.getCurrentQuest;
+  const quest = questStore.getQuestById(NodeTreeProps.currentQuestId!);
   if (quest) {
     return (
       (quest.is_playing || quest.is_quest_member) && quest.status != 'finished'

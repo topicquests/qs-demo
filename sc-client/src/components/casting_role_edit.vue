@@ -11,7 +11,7 @@
 
       <div class="row">
         <span class="handle q-pl-md q-mt-md">
-          {{ memberStore.member.handle }}
+          {{ memberStore.member!.handle }}
         </span>
         <q-select
           class="q-ml-md q-mt-xs"

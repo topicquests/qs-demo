@@ -60,7 +60,7 @@ function playingAsGuildId(member_id: number) {
 }
 function playingAsGuild(member_id: number): Guild {
   const guild_id = playingAsGuildId(member_id);
-  return guildStore.getGuildById(guild_id);
+  return guildStore.getGuildById(guild_id!);
 }
 function getCastingRoleNamesForQuest(memberId: number) {
   const castingRoles = membersStore.castingRolesPerQuest(
