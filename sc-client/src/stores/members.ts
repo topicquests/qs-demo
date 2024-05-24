@@ -124,7 +124,7 @@ export const useMembersStore = defineStore('members', {
       const guildStore = useGuildStore();
       await guildStore.ensureGuild(guildId!, true);
       const guild = guildStore.getGuildById(guildId!);
-      let membersId: number[]|number =
+      let membersId: number[] | number =
         guild.guild_membership?.map((mp: GuildMembership) => mp.member_id) ||
         [];
       if (full) {
@@ -133,7 +133,6 @@ export const useMembersStore = defineStore('members', {
         membersId = membersId.filter((id: number) => !this.members[id]);
       }
       if (membersId.length > 0) {
-        if (typeof membersId === 'number')
         await this.fetchMemberById(membersId, full);
       }
     },
@@ -144,14 +143,16 @@ export const useMembersStore = defineStore('members', {
         full: true,
       });
       const quest = questStore.getQuestById(questId);
-      let membersId: (number|undefined)[] =
+      let membersId: (number | undefined)[] =
         quest.casting?.map((mp: Casting) => mp.member_id) || [];
       membersId.concat(
         quest.quest_membership?.map((mp: QuestMembership) => mp.member_id) ||
           [],
       );
       membersId = [...new Set(membersId)];
-      membersId = membersId.filter((id: number|undefined) => !this.members[id!]);
+      membersId = membersId.filter(
+        (id: number | undefined) => !this.members[id!],
+      );
       if (membersId.length > 0 && typeof membersId === 'number') {
         this.fetchMemberById(membersId, full);
       }
@@ -165,7 +166,7 @@ export const useMembersStore = defineStore('members', {
         await api.get('/public_members');
       if (res.status == 200) {
         const fullMembers = Object.values(this.members).filter(
-          (member:PublicMember) => this.fullMembers[member.id],
+          (member: PublicMember) => this.fullMembers[member.id],
         );
         const members = Object.fromEntries(
           res.data.map((member: PublicMember) => [member.id, member]),
@@ -184,7 +185,7 @@ export const useMembersStore = defineStore('members', {
       }
     },
     async fetchMemberById(
-      id: undefined | number,
+      id: undefined | number | number[],
       full: boolean = true,
     ) {
       const memberStore = useMemberStore();
