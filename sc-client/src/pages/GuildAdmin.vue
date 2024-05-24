@@ -589,7 +589,7 @@ async function doSubmit() {
     currentGuild.value = await guildStore.getGuildById(guildId!)
     
     availableRolesByMember.value = Object.fromEntries(
-      guildMembers.value!.map((m: PublicMember ) => [
+      guildStore.getMembersOfCurrentGuild!.map((m: PublicMember ) => [
         m.id,
         m.guild_member_available_role
           ?.filter((r: GuildMemberAvailableRole) => r.guild_id == guildId)
