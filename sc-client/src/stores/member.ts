@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { AxiosResponse } from 'axios';
-import { Member, CastingRole, memberPatchKeys } from '../types';
+import { Member, CastingRole, memberPatchKeys, Role } from '../types';
 import { getWSClient } from '../wsclient';
 import { useBaseStore, filterKeys } from './baseStore';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
@@ -31,7 +31,6 @@ const clearBaseState: MemberState = {
 
 export const useMemberStore = defineStore('member', {
   state: () => baseState,
-
   getters: {
     getUser: (state: MemberState) => state.member,
     getUserId: (state: MemberState) => state.member?.id,
@@ -127,7 +126,7 @@ export const useMemberStore = defineStore('member', {
       if (!token) {
         return undefined;
       }
-      const token_payload = jwtDecode<JwtPayload>(token); //jwtDecode(token);
+      const token_payload = jwtDecode<JwtPayload|string[]>(token); //jwtDecode(token);
       const parts: string[] = token_payload.role.split('_');
       const role = parts[parts.length - 1];
       const res: AxiosResponse<Member[]> = await api.get('/members', {

@@ -1,13 +1,13 @@
 import { AxiosResponse } from 'axios';
-import { ServerData } from 'src/types';
+import { Member, ServerData } from 'src/types';
 import { defineStore } from 'pinia';
 import { api } from '../boot/axios';
 
 export interface ServerDataState {
-  serverData: ServerData;
+  serverData?: ServerData;
 }
 const baseState: ServerDataState = {
-  serverData: null,
+  serverData: undefined,
 };
 export const useServerDataStore = defineStore('serverData', {
   state: () => baseState,
@@ -30,37 +30,37 @@ export const useServerDataStore = defineStore('serverData', {
       }
     },
 
-    async fetchServerData(): Promise<serverData> {
-      const res: AxiosResponse<Member[]> = await api.get('/server_data');
+    async fetchServerData(): Promise<ServerData> {
+      const res: AxiosResponse<ServerData[]> = await api.get('/server_data');
       if (res.status == 200) {
         this.serverData = res.data[0];
       }
+      return res.data[0]
     },
-    async updateServerData(serverData): Partial<serverData> {
-      const res: AxiosResponse<Member[]> = await api.patch(
+    async updateServerData(serverData:ServerData): Promise<Partial<ServerData>> {
+      const res: AxiosResponse<ServerData[]> = await api.patch(
         '/server_data',
         serverData,
       );
       if (res.status == 200) {
         this.serverData = Object.assign({}, this.serverData, res.data[0]);
       }
+      return res.data[0]
     },
-    async resetDefaultSingle(): Promise<string> {
-      const res: AxiosResponse<Member[]> = await api.get(
-        '/server_data',
-        serverData,
+    async resetDefaultSingle() {
+      const res: AxiosResponse<ServerData[]> = await api.get(
+        '/server_data'
       );
-      if (res == 200) {
-        fetchServerData();
+      if (res.status == 200) {
+        this.fetchServerData();
       }
     },
-    async resetDefaultAll(): void {
+    async resetDefaultAll(): Promise<void> {
       const res: AxiosResponse<Member[]> = await api.post(
-        '/rpc/reset_all_default_data',
-        serverData,
+        '/rpc/reset_all_default_data'
       );
-      if (res == 200) {
-        fetchServerData();
+      if (res.status == 200) {
+        this.fetchServerData();
       }
     },
   },

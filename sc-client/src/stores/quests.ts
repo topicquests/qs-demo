@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 //import { filterKeys} from './base';
-import axios, { AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { useMemberStore } from './member';
 import { useMembersStore } from './members';
 import { useGuildStore } from './guilds';
@@ -10,7 +10,6 @@ import { api } from '../boot/axios';
 
 import {
   QuestData,
-  Guild,
   Quest,
   Casting,
   QuestMembership,
@@ -20,7 +19,6 @@ import {
   PublicMember,
   questPatchKeys,
   GuildData,
-  Member,
 } from '../types';
 import {
   quest_status_enum,
@@ -29,8 +27,6 @@ import {
   publication_state_type,
   publication_state_list,
 } from '../enums';
-
-//import type { RoleState } from './role';
 import { getWSClient } from '../wsclient';
 import { filterKeys } from './base';
 
@@ -279,6 +275,7 @@ export const useQuestStore = defineStore('quest', {
       }
       getWSClient().setDefaultQuest(quest_id);
     },
+    //axios calls
     async fetchQuests(
       id: undefined | number | Array<number>,
     ): Promise<QuestData[] | undefined> {
@@ -608,29 +605,29 @@ export const useQuestStore = defineStore('quest', {
     },
     async addGamePlay(params: Partial<GamePlay>) {
       const guildStore = useGuildStore();
-      const res: AxiosResponse<GamePlay[]> = await api.post(
+      const res: AxiosResponse<Partial<GamePlay[]>> = await api.post(
         '/game_play',
         params,
       );
       if (res.status == 201) {
-        const game_play: Partial<GamePlay> = res.data[0];
-        let quest = this.quests[game_play.quest_id!];
+        const game_play: GamePlay|undefined = res.data[0];
+        let quest = this.quests[game_play!.quest_id!];
         if (quest) {
           const game_plays = quest.game_play || [] || undefined;
-          game_plays.push(game_play);
+          game_plays.push(game_play!);
           quest = { ...quest, game_play: game_plays };
           this.quests = { ...this.quests, [quest.id]: quest };
         }
-        const guild_id = game_play.guild_id;
+        const guild_id = game_play!.guild_id;
         const guild = guildStore.guilds[guild_id!];
         // Assuming it is definitely not there
         if (guild) {
           const game_plays =
             guild.game_play?.filter(
-              (gp: GamePlay) => gp.quest_id !== game_play.quest_id,
+              (gp: GamePlay) => gp.quest_id !== game_play!.quest_id,
             ) || [];
-          game_plays.push(game_play);
-          guildStore.guilds.game_play = game_plays;
+          game_plays.push(game_play!);
+          guild.game_play = game_plays;
         }
       }
     },
@@ -643,13 +640,13 @@ export const useQuestStore = defineStore('quest', {
         params,
       );
       if (res.status == 200) {
-        const game_play: Partial<GamePlay> = res.data[0];
+        const game_play: GamePlay = res.data[0];
         const quest = this.quests[game_play.quest_id!];
         if (quest) {
-          const game_plays: Partial<GamePlay[]> = quest.game_play?.filter(
+          const game_plays: GamePlay[] | undefined = quest.game_play?.filter(
             (gp: GamePlay) => gp.quest_id !== game_play.quest_id,
           );
-          game_plays.push(game_plays);
+          game_plays!.push(game_play);
           quest.game_play = game_plays;
         }
         const guild_id = game_play.guild_id;

@@ -4,7 +4,6 @@ import {
   GuildMembership,
   GamePlay,
   PublicMember,
-  Quest,
   QuestData,
   GuildMemberAvailableRole,
   guildPatchKeys,
@@ -68,14 +67,15 @@ export const useGuildStore = defineStore('guild', {
     },
     getGuildMembershipById: (state: GuildsState) => (member_id: number) => {
       if (state.currentGuild) {
-        const guildId: number = state.currentGuild;
+        const guildId: number|boolean = state.currentGuild;
+       if (typeof guildId === 'number')
         return state.guilds[guildId]?.guild_membership?.find(
           (m: GuildMembership) =>
             m.member_id == member_id && m.guild_id == guildId,
         );
       }
     },
-    getMembersOfCurrentGuild: (state: GuildsState) => {
+    getMembersOfCurrentGuild: (state: GuildsState):PublicMember[]|undefined => {
       if (typeof state.currentGuild === 'number') {
         const guild: GuildData | undefined = state.currentGuild!
           ? state.guilds[state.currentGuild]
@@ -86,11 +86,12 @@ export const useGuildStore = defineStore('guild', {
           ?.map((gm: GuildMembership) => members[gm.member_id])
           .filter((member: PublicMember) => member);
       }
+      else return []
     },
-    getGuildsPlayingCurrentQuest: (state: GuildsState) => {
-      const quest: QuestData = questStore.getCurrentQuest;
+    getGuildsPlayingCurrentQuest: (state: GuildsState):GuildData[]|undefined => {
+      const quest: QuestData|undefined = questStore.getCurrentQuest;
       if (!quest) return [];
-      const guildId = quest.game_play?.map((gp: GamePlay) =>
+      const guildId:(number|null)[]|undefined = quest.game_play?.map((gp: GamePlay) =>
         gp.game_status != game_play_status_enum.cancelled ? gp.guild_id : null,
       );
       if (guildId == undefined) return [];
@@ -111,7 +112,7 @@ export const useGuildStore = defineStore('guild', {
         this.currentGuild = guild_id;
       }
 
-      //getWSClient().setDefaultGuild(guild_id);
+      getWSClient().setDefaultGuild(guild_id);
     },
     async ensureGuild(guild_id: number, full: boolean | undefined = true) {
       if (
@@ -176,16 +177,17 @@ export const useGuildStore = defineStore('guild', {
       const memberStore = useMemberStore();
       await this.doAddGuildMembership(membership);
       if (this.guilds) {
+        if(typeof membership.guild_id === 'number') {
         const gMembership: GuildMembership | undefined = this.guilds[
           membership.guild_id
-        ].guild_membership.find(
+        ].guild_membership!.find(
           (c: GuildMembership) => c.member_id == membership.member_id,
         );
         if (gMembership?.status == 'confirmed') {
-          await membersStore.fetchMemberById({
-            full: true,
-            params: { id: membership.member_id },
-          });
+          await membersStore.fetchMemberById(
+            membership.member_id ,
+            true
+          );
           if (memberStore.getUserId) {
             if (membership.member_id == memberStore.getUserId) {
               await memberStore.fetchLoginUser();
@@ -193,20 +195,24 @@ export const useGuildStore = defineStore('guild', {
           }
         }
       }
+    }
     },
     async updateGuildMembership(membership: Partial<GuildMembership>) {
+      const membersStore = useMembersStore();
       await this.doUpdateGuildMembership(membership);
-      const gMembership: GuildMembership = this.guilds[
-        membership.guild_id
-      ].guild_membership.find(
+      if (typeof membership.guild_id === 'number') {
+        const gMembership: GuildMembership|undefined = this.guilds[
+          membership.guild_id
+        ].guild_membership!.find(
         (c: GuildMembership) => c.member_id == membership.member_id,
-      );
-      if (gMembership.status == 'confirmed') {
-        await useMembersStore().reloadIfFull(membership.member_id);
+        );
+      if (gMembership?.status == 'confirmed') {
+        await membersStore.reloadIfFull(membership.member_id!);
         if (membership.member_id == useMemberStore().getUserId) {
           await useMemberStore().fetchLoginUser();
         }
       }
+    }
     },
     resetGuilds() {
       Object.assign(this, baseState);
@@ -330,7 +336,7 @@ export const useGuildStore = defineStore('guild', {
       }
       return res;
     },
-    async registerAllMembers({ guildId, questId }) {
+    async registerAllMembers(guildId:number, questId:number ) {
       await api.post('/rpc/register_all_members', {
         questId,
         guildId,
@@ -472,17 +478,17 @@ export const useGuildStore = defineStore('guild', {
               memberStore.member.guild_member_available_role;
             const pos = guild_member_available_role!.findIndex(
               (a: GuildMemberAvailableRole) =>
-                a.role_id == guild_Member_Available_Role.role_id &&
-                a.member_id == guild_Member_Available_Role.member_id &&
-                a.guild_id == guild_Member_Available_Role.guild_id,
+                a.role_id === availableRole.role_id &&
+                a.member_id === availableRole.member_id &&
+                a.guild_id === availableRole.guild_id,
             );
-            guild_member_available_role.splice(pos, 1);
+            guild_member_available_role!.splice(pos, 1);
             memberStore.member = {
               ...memberStore.member,
               guild_member_available_role,
             };
           }
-          const member_id = guildMemberAvailableRole.member_id;
+          const member_id = availableRole.member_id;
           let member = membersStore.members[member_id];
 
           const guild_member_available_role =
@@ -490,9 +496,9 @@ export const useGuildStore = defineStore('guild', {
           if (member && guild_member_available_role) {
             const pos = guild_member_available_role.findIndex(
               (a: GuildMemberAvailableRole) =>
-                a.role_id == memberStore.guildMemberAvailableRole.role_id &&
-                a.member_id == guildMemberAvailableRole.member_id &&
-                a.guild_id == guildMemberAvailableRole.guild_id,
+                a.role_id == availableRole.role_id &&
+                a.member_id == availableRole.member_id &&
+                a.guild_id == availableRole.guild_id,
             );
             if (pos >= 0) {
               guild_member_available_role.splice(pos, 1);
@@ -503,10 +509,10 @@ export const useGuildStore = defineStore('guild', {
               };
             }
           }
-          const castingRoles = questStore.getCastingRolesById({
-            member_id: availableRole.member_id,
-            role_id: availableRole.role_id,
-          });
+          const castingRoles = questStore.getCastingRolesById(
+            availableRole.member_id,
+            availableRole.role_id,
+          );
           if (castingRoles?.length) {
             castingRoles.array.forEach((element) => {
               questStore.deleteCastingRole(element);

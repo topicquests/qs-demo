@@ -6,7 +6,6 @@ import {
   GuildMembership,
   QuestMembership,
   Casting,
-  GuildMemberAvailableRole,
   CastingRole,
   memberPatchKeys,
   Member,
@@ -93,7 +92,6 @@ export const useMembersStore = defineStore('members', {
         return [];
       },
   },
-
   actions: {
     async ensureAllMembers() {
       if (Object.keys(this.members).length === 0 || !this.fullFetch) {
@@ -124,9 +122,9 @@ export const useMembersStore = defineStore('members', {
       full?: boolean;
     }) {
       const guildStore = useGuildStore();
-      await guildStore.ensureGuild(guildId, true);
-      const guild = guildStore.getGuildById(guildId);
-      let membersId: number[] =
+      await guildStore.ensureGuild(guildId!, true);
+      const guild = guildStore.getGuildById(guildId!);
+      let membersId: number[]|number =
         guild.guild_membership?.map((mp: GuildMembership) => mp.member_id) ||
         [];
       if (full) {
@@ -135,6 +133,7 @@ export const useMembersStore = defineStore('members', {
         membersId = membersId.filter((id: number) => !this.members[id]);
       }
       if (membersId.length > 0) {
+        if (typeof membersId === 'number')
         await this.fetchMemberById(membersId, full);
       }
     },
@@ -145,15 +144,15 @@ export const useMembersStore = defineStore('members', {
         full: true,
       });
       const quest = questStore.getQuestById(questId);
-      let membersId: number[] =
+      let membersId: (number|undefined)[] =
         quest.casting?.map((mp: Casting) => mp.member_id) || [];
       membersId.concat(
         quest.quest_membership?.map((mp: QuestMembership) => mp.member_id) ||
           [],
       );
       membersId = [...new Set(membersId)];
-      membersId = membersId.filter((id: number) => !this.members[id]);
-      if (membersId.length > 0) {
+      membersId = membersId.filter((id: number|undefined) => !this.members[id!]);
+      if (membersId.length > 0 && typeof membersId === 'number') {
         this.fetchMemberById(membersId, full);
       }
     },
@@ -166,7 +165,7 @@ export const useMembersStore = defineStore('members', {
         await api.get('/public_members');
       if (res.status == 200) {
         const fullMembers = Object.values(this.members).filter(
-          (member) => this.fullMembers[member.id],
+          (member:PublicMember) => this.fullMembers[member.id],
         );
         const members = Object.fromEntries(
           res.data.map((member: PublicMember) => [member.id, member]),
@@ -185,7 +184,7 @@ export const useMembersStore = defineStore('members', {
       }
     },
     async fetchMemberById(
-      id: undefined | number | Array<number>,
+      id: undefined | number,
       full: boolean = true,
     ) {
       const memberStore = useMemberStore();
@@ -241,7 +240,7 @@ export const useMembersStore = defineStore('members', {
 
     removeCastingRole(castingRole: CastingRole) {
       const { member_id } = castingRole;
-      let member = this.members[member_id];
+      let member = this.members[member_id!];
       if (
         member &&
         member.casting_role !== undefined &&
@@ -257,7 +256,7 @@ export const useMembersStore = defineStore('members', {
         if (pos >= 0) {
           casting_role.splice(pos, 1);
           member = { ...member, casting_role };
-          this.members = { ...this.members, [member_id]: member };
+          this.members = { ...this.members, [member_id!]: member };
         }
       }
     },
