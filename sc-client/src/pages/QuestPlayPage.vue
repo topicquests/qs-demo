@@ -151,7 +151,7 @@
               :currentGuildId="guildId"
               :initialSelectedNodeId="selectedNodeId"
               @tree-selection="selectionChanged"
-              :channelId="null"
+              :channelId="undefined"
               :isChannel="false"
               :editable="true"
             />
@@ -175,7 +175,7 @@ import { ibis_node_type_list, ibis_node_type_type, permission_enum } from '../en
 import { waitUserLoaded } from '../app-access';
 import { useRoute, useRouter } from 'vue-router';
 import { Casting, ConversationNode, GamePlay, Guild, GuildData, QuestData } from '../types';
-import { computed, ref } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import { useQuestStore } from 'src/stores/quests';
 import { useGuildStore } from 'src/stores/guilds';
 import { useMemberStore } from 'src/stores/member';
@@ -195,10 +195,9 @@ const questId = ref<number | undefined>(undefined);
 let myPlayingGuilds: Guild[];
 const selectedNodeId = ref<number | undefined>(undefined);
 const mySelectedPlayingGuildId = ref<number | undefined>(undefined);
-
 const guildId = computed((): number | undefined => {
-  const quest_id = questStore.getCurrentQuest?.id;
-  const casting: Casting = memberStore.castingPerQuest[quest_id!];
+const quest_id = questStore.getCurrentQuest?.id;
+const casting: Casting = memberStore.castingPerQuest[quest_id!];
   if (casting) {
     return casting.guild_id;
   } else {
@@ -207,7 +206,7 @@ const guildId = computed((): number | undefined => {
 });
 const memberId = computed((): number => memberStore.member!.id)
 const currentQuest = computed(():QuestData => questStore.getCurrentQuest!)
-function myGuilds(only_as_leader = false): GuildData[] {
+const myGuilds=computed(() => (only_as_leader = false): GuildData[] => {
   let memberships = memberStore.member!.guild_membership || [];
   memberships = memberships.filter((gm) => gm.status == 'confirmed');
   let guild_ids = memberships.map((gm) => gm.guild_id);
@@ -217,8 +216,8 @@ function myGuilds(only_as_leader = false): GuildData[] {
     );
   }
   return guild_ids.map((gid) => guildStore.getGuildById(gid));
-}
-function guildsPlayingGame(only_mine = false, recruiting = false) {
+})
+function guildsPlayingGame(only_mine = false, recruiting = false){
   let guild_ids =
     questStore.getCurrentQuest!.game_play?.map(
       (gp: GamePlay) => gp.guild_id,
@@ -238,16 +237,7 @@ function guildsPlayingGame(only_mine = false, recruiting = false) {
   }
   return guilds;
 }
-
-/*
-function route(to, from) {
-  if (from.params.quest_id != to.params.quest_id) {
-        ready.value = false;
-        initialize();
-  }
- */
-
-function selectionChanged(id: number) {
+const selectionChanged=computed(() =>(id: number) => {
   router.push({
     name: id ? 'quest_page_node' : 'quest_page',
     params: {
@@ -255,7 +245,7 @@ function selectionChanged(id: number) {
       node_id: id ? String(id) : undefined,
     },
   });
-}
+})
 
 async function initialize() {
   if (typeof route.params.quest_id === 'string') {

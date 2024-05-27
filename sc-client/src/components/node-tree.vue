@@ -53,7 +53,7 @@
       @update:selected="selectionChanged"
       :selected.sync="selectedNodeId"
       :filter-method="filterMethod"
-      :filter="searchFilter_()"
+      :filter="searchFilter_"
     >
       <template v-slot:default-header="prop">
         <div class="row items-center" :ref="'node_' + prop.node.id">
@@ -182,11 +182,12 @@ import { useQuestStore } from 'src/stores/quests';
 import { computed, onBeforeMount, ref } from 'vue';
 import { useReadStatusStore } from 'src/stores/readStatus';
 import { useRoleStore } from 'src/stores/role';
+import { watchEffect } from 'vue';
 
 const NodeTreeProps = defineProps<{
   currentQuestId: number | undefined;
   currentGuildId: number | undefined;
-  channelId: number | null;
+  channelId: number | undefined;
   isChannel: boolean;
   editable: boolean;
   hideDescription?: boolean;
@@ -223,12 +224,11 @@ const tree = ref<QTree>();
 const addChildForm_ = ref<typeof NodeForm>();
 let vnode= ref<Element|null>(null);
 
-function checkIfExpanded(nodeId: QTreeNode) {
+function checkIfExpanded(nodeId: QTreeNode):boolean {
   const qtree = tree.value;
   if (qtree) {
     // For example, you can check if a node is expanded
     const isExpanded = qtree.isExpanded(nodeId);
-
     if (isExpanded) {
       return true;
     } else {
@@ -237,9 +237,9 @@ function checkIfExpanded(nodeId: QTreeNode) {
   }
   return false;
 }
-function searchFilter_() {
+const searchFilter_=computed(() => {
   return searchFilter.value + '_';
-}
+});
 function nodeMap(): ConversationMap {
   if (NodeTreeProps.channelId)
     return channelStore.getChannelById(NodeTreeProps.channelId);
@@ -252,7 +252,7 @@ function nodeMap(): ConversationMap {
     entries.filter(([id, node]) => node.status == 'published'),
   );
 }
-const nodesTree = computed(() => {
+const nodesTree=computed((): QTreeNode[] => {
     if (NodeTreeProps.channelId)
       return channelStore.getChannelConversationTree(NodeTreeProps.channelId);
     if (showFocusNeighbourhood.value)
@@ -260,7 +260,7 @@ const nodesTree = computed(() => {
     if (NodeTreeProps.currentGuildId)
       return conversationStore.getPrivateConversationTree;
     return conversationStore.getConversationTree!;
-})
+});
 const threats = computed((): ThreatMap | undefined => {
   if (NodeTreeProps.channelId) return undefined;
   if (NodeTreeProps.currentGuildId && showDraft.value)
@@ -273,9 +273,6 @@ const scores = computed((): ScoreMap | undefined => {
     return conversationStore.getPrivateScoreMap;
   return conversationStore.getScoreMap;
 });
-//currentGuildId: "guildChanged",
-//const conversation: "conversationChanged",
-
 function calcPublicationConstraints(node: Partial<ConversationNode>) {
   if (!NodeTreeProps.currentGuildId) {
     baseNodePubStateConstraints = [
@@ -533,32 +530,11 @@ async function treePromise() {
   );
 }
 
-async function guildChanged() {
-  // TODO. Force reload of tree
-}
-
-async function conversationChanged(after, before) {
-  const before_ids = new Set(Object.keys(before));
-  const added_ids = [...Object.keys(after)].filter((id) => !before_ids.has(id));
-  if (added_ids.length == 1) {
-    let node = after[added_ids[0]];
-    const qtree = tree.value;
-    if (qtree && node.parent_id) {
-      setTimeout(() => {
-        while (node.parent_id) {
-          node = after[node.parent_id];
-          qtree.setExpanded(node.id, true);
-        }
-      }, 0);
-    }
-  }
-}
-
-function keyResponder(evt) {
+function keyResponder(evt:Event) {
   if (!(selectedNodeId.value || addingChildToNodeId)) return;
   const qtree = tree.value;
   if (!qtree) return;
-  const nodeName = evt.target.nodeName;
+  const nodeName = evt.target!.nodeName;
   const inField = !(nodeName == 'BODY' || nodeName == 'DIV');
   if (editingNodeId.value || addingChildToNodeId) {
     if (evt.key == 'Escape' || (evt.key == 'Enter' && nodeName == 'BODY')) {

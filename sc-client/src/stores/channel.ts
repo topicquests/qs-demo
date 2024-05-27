@@ -57,7 +57,7 @@ export const useChannelStore = defineStore('channel', {
     getChannelConversation: (state: ChannelState) => (channel_id: number) =>
       state.channelData[channel_id],
     getChannelConversationTree:
-      (state: ChannelState) => (channel_id: number) => {
+      (state: ChannelState) => (channel_id: number):QTreeNode[] => {
         const channel = state.channelData[channel_id];
         if (channel) return makeTree(Object.values(channel));
         return [];
