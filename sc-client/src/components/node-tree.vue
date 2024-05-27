@@ -223,35 +223,24 @@ const newNode = ref<Partial<ConversationNode>>({});
 const tree = ref<QTree>();
 const addChildForm_ = ref<typeof NodeForm>();
 let vnode= ref<Element|null>(null);
-
-function checkIfExpanded(nodeId: QTreeNode):boolean {
-  const qtree = tree.value;
-  if (qtree) {
-    // For example, you can check if a node is expanded
-    const isExpanded = qtree.isExpanded(nodeId);
-    if (isExpanded) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-  return false;
-}
-const searchFilter_=computed(() => {
+  const searchFilter_=computed(() => {
   return searchFilter.value + '_';
 });
-function nodeMap(): ConversationMap {
-  if (NodeTreeProps.channelId)
-    return channelStore.getChannelById(NodeTreeProps.channelId);
-  if (showFocusNeighbourhood.value) return conversationStore.neighbourhood!;
-  if (NodeTreeProps.currentGuildId) return conversationStore.conversation;
-  const entries: [string, ConversationNode][] = Object.entries(
-    conversationStore.conversation,
-  );
-  return Object.fromEntries(
-    entries.filter(([id, node]) => node.status == 'published'),
-  );
-}
+const getMemberHandle = computed(() => (id: number) => {
+  const member = membersStore.getMemberById(id);
+  if (member) {
+    if (questStore.getCurrentQuest && !NodeTreeProps.channelId) {
+      const castings = questStore.getCurrentQuest.casting || [];
+      const guild_id = castings.find((c) => c.member_id == id)?.guild_id;
+      if (guild_id) {
+        const guild = guildStore.getGuildById(guild_id);
+        return `${member.handle} of ${guild?.name}`;
+      }
+    }
+    return member.handle;
+  }
+  return '';
+});
 const nodesTree=computed((): QTreeNode[] => {
     if (NodeTreeProps.channelId)
       return channelStore.getChannelConversationTree(NodeTreeProps.channelId);
@@ -273,6 +262,31 @@ const scores = computed((): ScoreMap | undefined => {
     return conversationStore.getPrivateScoreMap;
   return conversationStore.getScoreMap;
 });
+function checkIfExpanded(nodeId: QTreeNode):boolean {
+  const qtree = tree.value;
+  if (qtree) {
+    // For example, you can check if a node is expanded
+    const isExpanded = qtree.isExpanded(nodeId);
+    if (isExpanded) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  return false;
+}
+function nodeMap(): ConversationMap {
+  if (NodeTreeProps.channelId)
+    return channelStore.getChannelById(NodeTreeProps.channelId);
+  if (showFocusNeighbourhood.value) return conversationStore.neighbourhood!;
+  if (NodeTreeProps.currentGuildId) return conversationStore.conversation;
+  const entries: [string, ConversationNode][] = Object.entries(
+    conversationStore.conversation,
+  );
+  return Object.fromEntries(
+    entries.filter(([id, node]) => node.status == 'published'),
+  );
+}
 function calcPublicationConstraints(node: Partial<ConversationNode>) {
   if (!NodeTreeProps.currentGuildId) {
     baseNodePubStateConstraints = [
@@ -313,22 +327,6 @@ function calcPublicationConstraints(node: Partial<ConversationNode>) {
   }
   baseNodePubStateConstraints = pub_states;
 }
-function getMemberHandle(id: number) {
-  const member = membersStore.getMemberById(id);
-  if (member) {
-    if (questStore.getCurrentQuest && !NodeTreeProps.channelId) {
-      const castings = questStore.getCurrentQuest.casting || [];
-      const guild_id = castings.find((c) => c.member_id == id)?.guild_id;
-      if (guild_id) {
-        const guild = guildStore.getGuildById(guild_id);
-        return `${member.handle} of ${guild?.name}`;
-      }
-    }
-    return member.handle;
-  }
-  return '';
-}
-
 function calcSpecificPubConstraints(node: Partial<ConversationNode>) {
   if (node.meta == 'channel' || !NodeTreeProps.currentGuildId)
     return baseNodePubStateConstraints;
@@ -354,7 +352,6 @@ function calcSpecificPubConstraints(node: Partial<ConversationNode>) {
   }
   return pub_states;
 }
-
 function filterMethod(node: Partial<ConversationNode>, filter_string: string) {
   if (!showObsolete.value && node.status == 'obsolete') return false;
   if (!showMeta.value && node.meta == 'meta') return false;
@@ -369,7 +366,6 @@ function filterMethod(node: Partial<ConversationNode>, filter_string: string) {
   }
   return true;
 }
-
 function canEdit(nodeId: number): boolean {
   const quest = questStore.getQuestById(NodeTreeProps.currentQuestId!);
   if (quest && (!quest.is_playing || quest.status == 'finished')) return false;
@@ -397,7 +393,6 @@ function getNode(nodeId: number | null): ConversationNode {
     return conversationStore.getConversationNodeById(nodeId!);
   }
 }
-
 function editNode(nodeId: number | null) {
   const selectedNode = getNode(nodeId);
   newNode.value = {

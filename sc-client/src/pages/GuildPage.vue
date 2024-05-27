@@ -523,6 +523,7 @@ async function initialize() {
 }
 onBeforeMount(async () => {
   await initialize();
+  console.log("Quests", questStore.getQuests)
 });
 </script>
 
