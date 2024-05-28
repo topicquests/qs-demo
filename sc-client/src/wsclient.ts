@@ -114,10 +114,7 @@ export class WSClient {
         if (crud == 'D') {
           // TODO
         } else {
-          await this.guildStore.fetchGuildById({
-            full: true,
-            params: { id },
-          });
+          await this.guildStore.fetchGuildsById(id, true);
         }
         break;
       case 'members':
