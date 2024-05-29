@@ -1,4 +1,4 @@
-FROM postgres:16.2-alpine as build
+FROM postgres:16.3-alpine as build
 RUN apk add curl tar make && \
   curl -L  https://github.com/michelp/pgjwt/tarball/master -o pgjwt.tgz && \
   tar zxf pgjwt.tgz && \
@@ -6,7 +6,7 @@ RUN apk add curl tar make && \
   cd pgjwt && \
   make
 
-FROM postgres:16.2-alpine
+FROM postgres:16.3-alpine
 COPY docker-healthcheck /usr/local/bin/
 COPY --from=build /pgjwt /pgjwt
 RUN cd /pgjwt && \
