@@ -262,12 +262,40 @@ export const useQuestStore = defineStore('quest', {
       },
   },
   actions: {
+    async createQuest(data: Partial<QuestData>) {
+      const res: Partial<QuestData> = await this.createQuestBase(data);
+      // Refetch to get memberships.
+      // TODO: maybe add representation to creation instead?
+      await this.fetchQuestById(res.id);
+      // TODO: Get the membership from the quest
+      await useMemberStore().fetchLoginUser();
+      await useConversationStore().resetConversation();
+      return res;
+    },
     async ensureAllQuests(): Promise<QuestData[] | undefined> {
       if (Object.keys(this.quests).length === 0 || !this.fullFetch) {
         const quest: QuestData[] | undefined =
-          await this.fetchQuests(undefined);
+          await this.fetchQuests();
         if (quest!.length > 0) return quest;
       } else return undefined;
+    },
+    async ensureQuest({
+      quest_id,
+      full = true,
+    }: {
+      quest_id: number;
+      full?: boolean;
+    }) {
+      if (
+        this.getQuestById(quest_id) === undefined ||
+        (full && !this.fullQuests![quest_id])
+      ) {
+        await this.fetchQuestById(quest_id, full);
+      }
+    },
+    async ensureCurrentQuest(quest_id: number, full = true) {
+      await this.ensureQuest({ quest_id, full });
+      await this.setCurrentQuest(quest_id);
     },
     setCurrentQuest(quest_id: number | boolean) {
       if (typeof quest_id === 'number') {
@@ -275,20 +303,15 @@ export const useQuestStore = defineStore('quest', {
       }
       getWSClient().setDefaultQuest(quest_id);
     },
+    resetQuests() {
+      Object.assign(this, baseState);
+    },
     //axios calls
-    async fetchQuests(
-      id: undefined | number | Array<number>,
-    ): Promise<QuestData[] | undefined> {
+    async fetchQuests(): Promise<QuestData[] | undefined> {
       const userId = useMemberStore().getUserId;
       const params = Object();
-      if (id !== undefined) {
-        if (Array.isArray(id)) {
-          params.id = `in.(${id.join(',')})`;
-        } else {
-          params.id = `eq.${id}`;
-        }
-      }
-      if (userId !== undefined) {
+      
+      if (userId) {
         Object.assign(params, {
           select:
             '*,quest_membership!quest_id(*),casting!quest_id(*),game_play!quest_id(*)',
@@ -298,7 +321,6 @@ export const useQuestStore = defineStore('quest', {
       } else {
         params.select = '*,game_play!quest_id(*)';
       }
-
       const res: AxiosResponse<QuestData[]> = await api.get('/quests_data', {
         params,
       });
@@ -323,39 +345,6 @@ export const useQuestStore = defineStore('quest', {
       }
       return undefined;
     },
-    async ensureQuest({
-      quest_id,
-      full = true,
-    }: {
-      quest_id: number;
-      full?: boolean;
-    }) {
-      if (
-        this.getQuestById(quest_id) === undefined ||
-        (full && !this.fullQuests![quest_id])
-      ) {
-        await this.fetchQuestById(quest_id, full);
-      }
-    },
-    async createQuest(data: Partial<QuestData>) {
-      const res: Partial<QuestData> = await this.createQuestBase(data);
-      // Refetch to get memberships.
-      // TODO: maybe add representation to creation instead?
-      await this.fetchQuestById(res.id);
-      // TODO: Get the membership from the quest
-      await useMemberStore().fetchLoginUser();
-      await useConversationStore().resetConversation();
-      return res;
-    },
-
-    async ensureCurrentQuest(quest_id: number, full = true) {
-      await this.ensureQuest({ quest_id, full });
-      await this.setCurrentQuest(quest_id);
-    },
-    resetQuests() {
-      Object.assign(this, baseState);
-    },
-
     async fetchQuestById(id: number | number[] | undefined, full?: boolean) {
       const params = Object();
       if (Array.isArray(id)) {
@@ -376,7 +365,7 @@ export const useQuestStore = defineStore('quest', {
       } else {
         params.select = '*,game_play!quest_id(*)';
       }
-      const res: AxiosResponse<QuestData[]> = await api.get('/quests', {params});
+      const res: AxiosResponse<QuestData[]> = await api.get('/quests_data', {params});
       if (res.status == 200) {
         this.quests = {
           ...this.quests,

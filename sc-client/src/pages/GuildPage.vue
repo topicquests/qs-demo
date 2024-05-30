@@ -403,36 +403,7 @@ function getGuildMembers(): PublicMember[] | undefined {
 //allRoles!: RoleState["role"];
 //castingRoles!: Role[];
 
-async function initializeStage2() {
-  checkPermissions();
-  const playQuestIds = guildStore.getCurrentGuild!.game_play.map(
-    (gp: GamePlay) => gp.quest_id,
-  );
-  guildGamePlays = guildStore.getCurrentGuild!.game_play.filter(
-    (gp: GamePlay) => gp.status == registration_status_enum.confirmed,
-  );
-  const confirmedPlayQuestIds = (guildGamePlays || []).map(
-    (gp: GamePlay) => gp.quest_id,
-  );
 
-  pastQuests = questStore.getQuests.filter(
-    (q: Quest) =>
-      (q.status == quest_status_enum.finished ||
-        q.status == quest_status_enum.scoring) &&
-      playQuestIds.includes(q.id),
-  );
-  activeQuests = questStore.getQuests.filter(
-    (q: Quest) =>
-      (q.status == quest_status_enum.ongoing ||
-        q.status == quest_status_enum.paused ||
-        q.status == quest_status_enum.registration) &&
-      confirmedPlayQuestIds.includes(q.id),
-  );
-
-  if (guildGamePlays.length > 0) {
-    await initializeQuest();
-  }
-}
 async function initializeQuest() {
   var quest_id: number | undefined | null = questStore.currentQuest;
   if (
@@ -513,13 +484,42 @@ async function initialize() {
   guildStore.setCurrentGuild(guild_id!);
   await Promise.all([
     questStore.ensureAllQuests(),
-    guildStore.ensureGuild(guild_id!),
     roleStore.ensureAllRoles(),
     channelStore.ensureChannels(guild_id!),
     membersStore.ensureMembersOfGuild({ guildId: guild_id }),
   ]);
   await initializeStage2();
   ready.value = true;
+}
+async function initializeStage2() {
+  checkPermissions();
+  const playQuestIds = guildStore.getCurrentGuild!.game_play.map(
+    (gp: GamePlay) => gp.quest_id,
+  );
+  guildGamePlays = guildStore.getCurrentGuild!.game_play.filter(
+    (gp: GamePlay) => gp.status == registration_status_enum.confirmed,
+  );
+  const confirmedPlayQuestIds = (guildGamePlays || []).map(
+    (gp: GamePlay) => gp.quest_id,
+  );
+
+  pastQuests = questStore.getQuests.filter(
+    (q: Quest) =>
+      (q.status == quest_status_enum.finished ||
+        q.status == quest_status_enum.scoring) &&
+      playQuestIds.includes(q.id),
+  );
+  activeQuests = questStore.getQuests.filter(
+    (q: Quest) =>
+      (q.status == quest_status_enum.ongoing ||
+        q.status == quest_status_enum.paused ||
+        q.status == quest_status_enum.registration) &&
+      confirmedPlayQuestIds.includes(q.id),
+  );
+
+  if (guildGamePlays.length > 0) {
+    await initializeQuest();
+  }
 }
 onBeforeMount(async () => {
   await initialize();
