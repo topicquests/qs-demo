@@ -12,12 +12,14 @@ import {
   publication_state_enum,
   publication_state_list,
   meta_state_enum,
+  permission_enum
 } from '../enums';
 import { defineStore } from 'pinia';
 import { calc_threat_status, ThreatMap, ScoreMap } from '../scoring';
 import { base_scoring } from '../scoring/base_scoring';
 import { api } from 'src/boot/axios';
 import { useMemberStore } from './member';
+import { useBaseStore } from './baseStore';
 export function ibis_child_types(
   parent_type: ibis_node_type_type,
 ): ibis_node_type_type[] {
@@ -57,6 +59,7 @@ export function ibis_child_types(
         ibis_node_type_enum.pro,
       ];
   }
+  return []
 }
 
 export interface ConversationMap {
@@ -98,7 +101,7 @@ export const useConversationStore = defineStore('conversation', {
       return undefined;
     },
     getNeighbourhood: (state: ConversationState): ConversationNode[] =>
-      Object.values(state.neighbourhood),
+      Object.values(state.neighbourhood!),
     getFocusNode: (state: ConversationState) => {
       if (state.neighbourhoodRoot && state.neighbourhood) {
         state.neighbourhood[state.neighbourhoodRoot];
@@ -183,7 +186,8 @@ export const useConversationStore = defineStore('conversation', {
     },
     canEdit: (state: ConversationState) => (node_id: number) => {
       const memberStore = useMemberStore()
-      const userId = memberStore.getUserId();
+      const baseStore = useBaseStore()
+      const userId = memberStore.getUserId;
       const node = state.conversation[node_id];
       if (
         !(
@@ -191,24 +195,25 @@ export const useConversationStore = defineStore('conversation', {
           node.status == publication_state_enum.role_draft ||
           node.status == publication_state_enum.guild_draft ||
           (node.status == publication_state_enum.proposed &&
-            baseStore.hasPermission()(
-              'publishGameMove',
+            baseStore.hasPermission(
+              permission_enum.publishGameMove,
               node.guild_id,
               node.quest_id,
               node.node_type,
-            ))
+            )
+          )
         )
       ) {
         return false;
       }
       if (node && userId) {
         if (node.creator_id == userId) return true;
-        return baseStore.hasPermission()(
-          'editConversationNode',
+        return baseStore.hasPermission(
+          permission_enum.editConversationNode,
           node.guild_id,
           node.quest_id,
           node.node_type,
-        );
+        )
       }
       return false;
     },
@@ -228,7 +233,7 @@ export const useConversationStore = defineStore('conversation', {
     async ensureConversation(quest_id: number) {
       // maybe allow guildId, min status.
       if (quest_id != this.currentQuest || !this.full) {
-        await this.fetchConversation({ quest_id });
+        await this.fetchConversation({quest_id});
       }
     },
     async ensureRootNode(quest_id: number | undefined) {
@@ -291,13 +296,13 @@ export const useConversationStore = defineStore('conversation', {
         }
       }
       if (this.neighbourhoodRoot) {
-        const root = this.neighbourhood[state.neighbourhoodRoot];
+        const root = this.neighbourhood![this.neighbourhoodRoot];
         if (root && node.ancestry.startsWith(root.ancestry)) {
           this.neighbourhood = { ...this.neighbourhood, [node.id]: node };
         }
       }
     },
-    async fetchConversation(params) {
+    async fetchConversation(params: {quest_id: number}) {
       const res: AxiosResponse = await api.get(
         `/conversation_node?quest_id=eq.${params.quest_id}&meta=not.eq.channel`,
       );
@@ -449,6 +454,7 @@ export function ibis_node_icon(
         return 'icons/ibis/challenge.png';
     }
   }
+  return ""
 }
 
 export function depthFirst(tree: QTreeNode, seq: number[] = []): number[] {

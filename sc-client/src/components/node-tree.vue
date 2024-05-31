@@ -372,7 +372,7 @@ function canEdit(nodeId: number): boolean {
   if (NodeTreeProps.channelId) {
     return channelStore.canEdit(NodeTreeProps.channelId, nodeId);
   } else {
-    return channelStore.canEdit(nodeId);
+    return conversationStore.canEdit(nodeId);
   }
 }
 function canAddTo(nodeId: number): boolean {
@@ -590,7 +590,7 @@ function hiddenByCollapse(qnode: QTreeNode) {
 
 function inSearchFilter(qnode: QTreeNode) {
   // assume searchFilter not empty
-  if (filterMethod(qnode, searchFilter_())) return true;
+  if (filterMethod(qnode, searchFilter_.value)) return true;
   for (const child of qnode.children || []) {
     if (inSearchFilter(child)) return true;
   }
