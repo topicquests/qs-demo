@@ -12,7 +12,7 @@ import {
   publication_state_enum,
   publication_state_list,
   meta_state_enum,
-  permission_enum
+  permission_enum,
 } from '../enums';
 import { defineStore } from 'pinia';
 import { calc_threat_status, ThreatMap, ScoreMap } from '../scoring';
@@ -59,7 +59,7 @@ export function ibis_child_types(
         ibis_node_type_enum.pro,
       ];
   }
-  return []
+  return [];
 }
 
 export interface ConversationMap {
@@ -122,7 +122,7 @@ export const useConversationStore = defineStore('conversation', {
             false,
           )
         : null,
-    
+
     getTreeSequence: (state: ConversationState): number[] =>
       depthFirst(
         makeTree(Object.values(state.conversation || state.neighbourhood))[0],
@@ -135,7 +135,7 @@ export const useConversationStore = defineStore('conversation', {
         return threatMap;
       }
     },
-    getPrivateThreatMap (): ThreatMap | undefined  {
+    getPrivateThreatMap(): ThreatMap | undefined {
       const tree = this.getPrivateConversationTree;
       if (tree && tree.length > 0) {
         const threatMap: ThreatMap = {};
@@ -144,21 +144,21 @@ export const useConversationStore = defineStore('conversation', {
       }
       return;
     },
-    getScoreMap () {
+    getScoreMap() {
       const tree = this.getConversationTree;
       if (tree && tree.length > 0) {
         const threatMap = this.getThreatMap;
         return base_scoring(tree[0], threatMap);
       }
     },
-    getPrivateScoreMap (): ScoreMap | undefined {
+    getPrivateScoreMap(): ScoreMap | undefined {
       const tree = this.getPrivateConversationTree;
       if (tree && tree.length > 0) {
         const threatMap = this.getPrivateThreatMap;
         return base_scoring(tree[0], threatMap);
       }
     },
-    getGuildScoreMap (): ScoreMap {
+    getGuildScoreMap(): ScoreMap {
       const scoreMap = this.getScoreMap || {};
       const guildScoreMap: ScoreMap = {};
       Object.keys(scoreMap).forEach((key) => {
@@ -168,7 +168,7 @@ export const useConversationStore = defineStore('conversation', {
       });
       return guildScoreMap;
     },
-    getPrivateGuildScoreMap (): ScoreMap {
+    getPrivateGuildScoreMap(): ScoreMap {
       const scoreMap = this.getPrivateScoreMap || {};
       const guildScoreMap: ScoreMap = {};
       Object.keys(scoreMap).forEach((key) => {
@@ -185,8 +185,8 @@ export const useConversationStore = defineStore('conversation', {
       );
     },
     canEdit: (state: ConversationState) => (node_id: number) => {
-      const memberStore = useMemberStore()
-      const baseStore = useBaseStore()
+      const memberStore = useMemberStore();
+      const baseStore = useBaseStore();
       const userId = memberStore.getUserId;
       const node = state.conversation[node_id];
       if (
@@ -200,8 +200,7 @@ export const useConversationStore = defineStore('conversation', {
               node.guild_id,
               node.quest_id,
               node.node_type,
-            )
-          )
+            ))
         )
       ) {
         return false;
@@ -213,7 +212,7 @@ export const useConversationStore = defineStore('conversation', {
           node.guild_id,
           node.quest_id,
           node.node_type,
-        )
+        );
       }
       return false;
     },
@@ -233,7 +232,7 @@ export const useConversationStore = defineStore('conversation', {
     async ensureConversation(quest_id: number) {
       // maybe allow guildId, min status.
       if (quest_id != this.currentQuest || !this.full) {
-        await this.fetchConversation({quest_id});
+        await this.fetchConversation({ quest_id });
       }
     },
     async ensureRootNode(quest_id: number | undefined) {
@@ -302,7 +301,7 @@ export const useConversationStore = defineStore('conversation', {
         }
       }
     },
-    async fetchConversation(params: {quest_id: number}) {
+    async fetchConversation(params: { quest_id: number }) {
       const res: AxiosResponse = await api.get(
         `/conversation_node?quest_id=eq.${params.quest_id}&meta=not.eq.channel`,
       );
@@ -422,39 +421,39 @@ export function ibis_node_icon(
   if (small_icon) {
     switch (node_type) {
       case ibis_node_type_enum.question:
-        return 'icons/ibis/issue_sm.png';
+        return '/icons/ibis/issue_sm.png';
       case ibis_node_type_enum.answer:
-        return 'icons/ibis/position_sm.png';
+        return '/icons/ibis/position_sm.png';
       case ibis_node_type_enum.con_answer:
-        return 'icons/ibis/con_position_sm.png';
+        return '/icons/ibis/con_position_sm.png';
       case ibis_node_type_enum.pro:
-        return 'icons/ibis/plus_sm.png';
+        return '/icons/ibis/plus_sm.png';
       case ibis_node_type_enum.con:
-        return 'icons/ibis/minus_sm.png';
+        return '/icons/ibis/minus_sm.png';
       case ibis_node_type_enum.reference:
-        return 'icons/ibis/reference_sm.png';
+        return '/icons/ibis/reference_sm.png';
       case ibis_node_type_enum.quest:
-        return 'icons/ibis/challenge_sm.png';
+        return '/icons/ibis/challenge_sm.png';
     }
   } else {
     switch (node_type) {
       case ibis_node_type_enum.question:
-        return 'icons/ibis/issue.png';
+        return '/icons/ibis/issue.png';
       case ibis_node_type_enum.answer:
-        return 'icons/ibis/position.png';
+        return '/icons/ibis/position.png';
       case ibis_node_type_enum.con_answer:
-        return 'icons/ibis/con_position.png';
+        return '/icons/ibis/con_position.png';
       case ibis_node_type_enum.pro:
-        return 'icons/ibis/plus.png';
+        return '/icons/ibis/plus.png';
       case ibis_node_type_enum.con:
-        return 'icons/ibis/minus.png';
+        return '/icons/ibis/minus.png';
       case ibis_node_type_enum.reference:
-        return 'icons/ibis/reference.png';
+        return '/icons/ibis/reference.png';
       case ibis_node_type_enum.quest:
-        return 'icons/ibis/challenge.png';
+        return '/icons/ibis/challenge.png';
     }
   }
-  return ""
+  return '';
 }
 
 export function depthFirst(tree: QTreeNode, seq: number[] = []): number[] {
