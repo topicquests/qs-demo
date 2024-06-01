@@ -130,7 +130,7 @@ export const useReadStatusStore = defineStore('readStatus', {
         new_node_id: number;
         new_member_id: number;
         status_new: boolean;
-      }> = await api.post('node_set_read_status', data);
+      }> = await api.post('rpc/node_set_read_status', data);
       if (res.status == 200) {
         const memberStore = useMemberStore();
         const memberId = memberStore.getUserId;

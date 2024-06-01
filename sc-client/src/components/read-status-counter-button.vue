@@ -53,7 +53,7 @@
         round
         v-if="
           getUnreadCount(readStatusProps.node_id)! > 0 &&
-          conversationStore.getChildrenOf(readStatusProps.node_id).length > 0 &&
+          getChildren(readStatusProps.node_id).length > 0 &&
           !isExpanded
         "
         size="9px"
@@ -69,7 +69,7 @@
       <q-btn
         round
         v-else-if="
-          conversationStore.getChildrenOf(readStatusProps.node_id).length > 0 &&
+        getChildren(readStatusProps.node_id).length > 0 &&
           isExpanded
         "
         size="9px"
@@ -117,7 +117,7 @@ const getChannelUnreadCount = computed(() => (nodeId: number) => {
   return 0;
 });
 
-function getUnreadCount(nodeId: number) {
+const getUnreadCount=computed(() => (nodeId: number) => {
   if (
     conversationStore.getConversationNodeById(nodeId) &&
     conversationStore.getChildrenOf(nodeId).length > 0
@@ -125,9 +125,9 @@ function getUnreadCount(nodeId: number) {
     return readStatusStore.getUnreadStatusCount(nodeId);
   }
   return 0;
-}
+});
 
-function getNodeCount(nodeId: number) {
+const getNodeCount=computed(() => (nodeId: number) => {
   if (readStatusProps.isChannel) {
     if (
       channelStore.getChannelById(nodeId) &&
@@ -144,7 +144,9 @@ function getNodeCount(nodeId: number) {
     }
   }
   return 0;
-}
+});
+const getChildren = computed(() => (id: number) => 
+  conversationStore.getChildrenOf(id))
 async function toggleReadStatus() {
   localRead = !localRead;
   await readStatusStore.CreateOrUpdateReadStatus({

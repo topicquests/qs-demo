@@ -323,9 +323,7 @@ export const useGuildStore = defineStore('guild', {
     async doAddGuildMembership(data: Partial<GuildMembership>) {
       const res: AxiosResponse<GuildMembership[]> = await api.post(
         'guild_membership',
-        {
           data,
-        },
       );
       if (res.status == 200) {
         const membership = res.data[0];

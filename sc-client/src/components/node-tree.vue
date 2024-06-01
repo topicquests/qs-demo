@@ -113,7 +113,7 @@
             :node_id="prop.node.id"
             :isChannel="isChannel"
             :isExpanded="checkIfExpanded(prop.node.id)"
-            :isRead="readStatusStore.getNodeReadStatus(prop.node.id)"
+            :isRead="readStatus(prop.node.id)"
           ></read-status-counter-button>
         </div>
       </template>
@@ -262,6 +262,8 @@ const scores = computed((): ScoreMap | undefined => {
     return conversationStore.getPrivateScoreMap;
   return conversationStore.getScoreMap;
 });
+const readStatus = computed(() => (id: number) => 
+  readStatusStore.getNodeReadStatus(id))
 function checkIfExpanded(nodeId: QTreeNode):boolean {
   const qtree = tree.value;
   if (qtree) {
