@@ -19,20 +19,20 @@
                   v-if="canRegisterToQuest"
                   :to="{
                     name: 'guild_admin',
-                    params: { guild_id: guildStore.currentGuild },
+                    params: { guild_id: currentGuild!.id },
                   }"
                   >>>go to admin page</router-link
                 >
               </div>
             </div>
-            <div class="col-12" v-if="guildStore.getCurrentGuild">
+            <div class="col-12" v-if="currentGuild">
               <h1 class="text-center">
-                {{ guildStore.getCurrentGuild.name }}
+                {{ currentGuild.name }}
                 <q-btn
                   v-if="
                     member &&
                     !isMember &&
-                    guildStore.getCurrentGuild.open_for_applications
+                    currentGuild.open_for_applications
                   "
                   label="Join Guild"
                   @click="joinToGuild()"
@@ -40,12 +40,12 @@
                   class="bg-dark-blue"
                 />
               </h1>
-              <span v-if="!guildStore.getCurrentGuild.open_for_applications">
+              <span v-if="!currentGuild.open_for_applications">
                 guild closed</span
               >
               <span
                 v-if="
-                  !member && guildStore.getCurrentGuild.open_for_applications
+                  !member && currentGuild.open_for_applications
                 "
               >
                 login or register to join</span
@@ -57,7 +57,7 @@
                   <div class="content-container">
                     <div
                       class="content"
-                      v-html="guildStore.getCurrentGuild!.description"
+                      v-html="currentGuild!.description"
                     ></div>
                   </div>
                 </q-card>
@@ -143,10 +143,10 @@
             <div class="row">
               <div
                 v-if="
-                  questStore.getCurrentQuest &&
+                currentQuest &&
                   questStore.isPlayingQuestInGuild(
-                    questStore.getCurrentQuest.id,
-                    guildStore.getCurrentGuild!.id,
+                    currentQuest.id,
+                    currentGuild!.id,
                   )
                 "
                 class="col-12"
@@ -167,9 +167,9 @@
             <div class="row justify-center">
               <div class="col-12 q-mb-md q-mt-md">
                 <guild-members
-                  :guild="guildStore.getCurrentGuild!"
-                  :quest="questStore.getCurrentQuest"
-                  :members="guildStore.getMembersOfCurrentGuild"
+                  :guild="currentGuild!"
+                  :quest="currentQuest"
+                  :members="getGuildMembers"
                 />
               </div>
             </div>
@@ -241,7 +241,7 @@ import {
   quest_status_enum,
   permission_enum,
 } from '../enums';
-import { Quest, GamePlay, Casting, Role } from '../types';
+import { Quest, GamePlay, Casting, Role, PublicMember } from '../types';
 import { computed, ref, watchEffect } from 'vue';
 import castingRoleEdit from '../components/casting_role_edit.vue';
 import guildMembers from '../components/guild-members.vue';
@@ -262,8 +262,6 @@ import { storeToRefs } from 'pinia';
 
 const router = useRouter();
 const route = useRoute();
-let pastQuests: Quest[] = [];
-const canRegisterToQuest = ref(false);
 const baseStore = useBaseStore();
 const guildStore = useGuildStore();
 const memberStore = useMemberStore();
@@ -272,6 +270,8 @@ const questStore = useQuestStore();
 const roleStore = useRoleStore();
 const channelStore = useChannelStore();
 const conversationStore = useConversationStore();
+let pastQuests: Quest[] = [];
+const canRegisterToQuest = ref(false);
 const isMember = ref(false);
 let activeQuests: Quest[] = [];
 const prompt = ref(false);
@@ -327,44 +327,42 @@ const columns: QTableProps['columns'] = [
 ];
 
 const currentQuestId = computed(() => questStore.currentQuest)
+const currentGuild = computed(() => guildStore.getCurrentGuild)
+const currentQuest = computed(() => questStore.getCurrentQuest)
+const currentGuildId = computed(() => guildStore.currentGuild)
 
 watchEffect(async() => {
-  const quest: Quest | undefined = questStore.getCurrentQuest!;
-  if (!quest) {
+  if (!currentQuest.value) {
     return;
   }
-  await membersStore.ensureMemberById({ id: quest.creator });
-  await guildStore.ensureGuildsPlayingQuest({ quest_id: quest.id });
-  const questCasting = quest.casting?.find(
+  await membersStore.ensureMemberById({ id: currentQuest.value!.creator });
+  await guildStore.ensureGuildsPlayingQuest({ quest_id: currentQuest.value!.id });
+  const questCasting = currentQuest.value!.casting?.find(
     (ct: Casting) => ct.member_id == member!.value?.id,
   );
   if (questCasting) {
-    if (questCasting.guild_id == guildStore.currentGuild) {
+    if (questCasting.guild_id == currentGuildId.value) {
       memberPlaysQuestInThisGuild = true;
       casting = questCasting;
     }
   }
-  const guild = guildStore.currentGuild;
-  const gamePlay: GamePlay | undefined = findPlayOfGuild(quest.game_play);
+  const gamePlay: Partial<GamePlay> | undefined = findPlayOfGuild(currentQuest.value!.game_play);
   var node_id = gamePlay?.focus_node_id;
   if (!node_id) {
     await conversationStore.ensureRootNode(questStore.currentQuest);
     node_id = conversationStore.conversationRoot?.id;
   }
-  if (node_id && typeof guild === 'number') {
-    await conversationStore.ensureConversationNeighbourhood({ node_id, guild });
+  if (node_id && typeof currentGuildId.value === 'number') {
+    await conversationStore.ensureConversationNeighbourhood({ node_id, guild: currentGuildId.value });
   } else {
     // ill-constructed quest
     await conversationStore.resetConversation();
   }
   return 'success';
 });
-
-
 function castingRoles(): Role[] {
-  const currentQuest = questStore.getCurrentQuest;
   const castingRoles =
-    membersStore.castingRolesPerQuest(member!.value?.id, currentQuest!.id) ||
+    membersStore.castingRolesPerQuest(member!.value?.id, currentQuest.value!.id) ||
     [];
   const roles = castingRoles.map((cr) => allRoles[cr.role_id]);
   return roles;
@@ -377,32 +375,13 @@ const availableRoles = (): Role[] => {
     .getAvailableRolesForMemberAndGuild(member.value.id, guildId.value)
     .map((cr) => allRoles[cr.role_id]);
 };
-/*
- 
-function getGuildMembers(): PublicMember[] | undefined {
-  if (guildStore.getCurrentGuild) {
+
+const getGuildMembers = computed((): PublicMember[] | undefined => {
+  if (currentGuild.value) {
     return guildStore.getMembersOfCurrentGuild;
   }
   return [];
-}
-*/
-// data
-
-
-
-// let questGamePlay: GamePlay[] = [];
-// let roles: Role[] = [];
-// let isAdmin = false;
-// let members: Member[] = [];
-// let label = "";
-// let questId: number;
-// let gamePlay = null;
-// let roleId: number = null;
-
-// declare state bindings for TypeScript
-//allRoles!: RoleState["role"];
-//castingRoles!: Role[];
-
+})
 
 async function initializeQuest() {
   var quest_id: number | undefined | null = questStore.currentQuest;
@@ -433,7 +412,7 @@ async function joinToGuild() {
   return;
 }
 
-function findPlayOfGuild(gamePlays: GamePlay[]|undefined): Partial<GamePlay[] | undefined> {
+function findPlayOfGuild(gamePlays: GamePlay[]|undefined): Partial<GamePlay | undefined> {
   if (gamePlays)
     return gamePlays.find(
       (gp: GamePlay) => gp.guild_id == guildStore.currentGuild,
@@ -493,10 +472,10 @@ async function initialize() {
 }
 async function initializeStage2() {
   checkPermissions();
-  const playQuestIds = guildStore.getCurrentGuild!.game_play.map(
+  const playQuestIds = currentGuild.value!.game_play.map(
     (gp: GamePlay) => gp.quest_id,
   );
-  guildGamePlays = guildStore.getCurrentGuild!.game_play.filter(
+  guildGamePlays = currentGuild.value!.game_play.filter(
     (gp: GamePlay) => gp.status == registration_status_enum.confirmed,
   );
   const confirmedPlayQuestIds = (guildGamePlays || []).map(
@@ -523,7 +502,7 @@ async function initializeStage2() {
 }
 onBeforeMount(async () => {
   await initialize();
-  console.log("Quests", questStore.getQuests)
+
 });
 </script>
 
