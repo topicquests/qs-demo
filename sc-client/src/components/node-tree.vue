@@ -130,7 +130,7 @@
           <div class="node-description" v-html="prop.node.description"></div>
         </div>
         <node-form
-          :ref="'editForm_' + prop.node.id"
+          :ref="nodeFormRef(prop.node.id)"
           v-if="editable && prop.node.id == editingNodeId"
           :nodeInput="selectedNode(true)"
           :allowAddChild="false"
@@ -143,7 +143,7 @@
           v-on:cancel="cancel"
         />
         <node-form
-          :ref="'addChildForm_' + prop.node.id"
+          :ref="nodeFormRef(prop.node.id)"
           v-if="editable && prop.node.id == addingChildToNodeId"
           :nodeInput="newNode"
           :allowAddChild="false"
@@ -162,9 +162,9 @@
 
 <script setup lang="ts">
 import { ConversationNode, QTreeNode } from '../types';
-import NodeForm from './node-form.vue';
+import NodeForm  from './node-form.vue';
 import ReadStatusCounterButton from './read-status-counter-button.vue';
-import { ConversationMap, ibis_child_types } from '../stores/conversation';
+import { ibis_child_types } from '../stores/conversation';
 import { QTree, useQuasar } from 'quasar';
 import {
   ibis_node_type_type,
@@ -179,10 +179,10 @@ import { useConversationStore } from '../stores/conversation';
 import { useGuildStore } from 'src/stores/guilds';
 import { useMembersStore } from 'src/stores/members';
 import { useQuestStore } from 'src/stores/quests';
-import { computed, onBeforeMount, ref } from 'vue';
+import { computed, onBeforeMount, ref, shallowRef } from 'vue';
 import { useReadStatusStore } from 'src/stores/readStatus';
 import { useRoleStore } from 'src/stores/role';
-import { watchEffect } from 'vue';
+
 
 const NodeTreeProps = defineProps<{
   currentQuestId: number | undefined;
@@ -221,9 +221,13 @@ let selectedIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
 let childIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
 const newNode = ref<Partial<ConversationNode>>({});
 const tree = ref<QTree>();
-const addChildForm_ = ref<typeof NodeForm>();
-let vnode= ref<Element|null>(null);
-  const searchFilter_=computed(() => {
+const nodeForms = shallowRef<Record<string, InstanceType<typeof NodeForm> | null>>({});
+const nodeFormRef = computed(() => (nodeId: string | number) => (el: InstanceType<typeof NodeForm> | null) => {
+  nodeForms.value[`editForm_${nodeId}`] = el;
+});
+const form = ref<InstanceType<typeof NodeForm> | null>(null);
+const vnode= ref<Element|null>(null);
+const searchFilter_=computed(() => {
   return searchFilter.value + '_';
 });
 const getMemberHandle = computed(() => (id: number) => {
@@ -277,6 +281,7 @@ function checkIfExpanded(nodeId: QTreeNode):boolean {
   }
   return false;
 }
+/*
 function nodeMap(): ConversationMap {
   if (NodeTreeProps.channelId)
     return channelStore.getChannelById(NodeTreeProps.channelId);
@@ -289,6 +294,7 @@ function nodeMap(): ConversationMap {
     entries.filter(([id, node]) => node.status == 'published'),
   );
 }
+*/
 function calcPublicationConstraints(node: Partial<ConversationNode>) {
   if (!NodeTreeProps.currentGuildId) {
     baseNodePubStateConstraints = [
@@ -368,7 +374,7 @@ function filterMethod(node: Partial<ConversationNode>, filter_string: string) {
   }
   return true;
 }
-function canEdit(nodeId: number): boolean {
+const canEdit = computed(() => (nodeId: number): boolean => {
   const quest = questStore.getQuestById(NodeTreeProps.currentQuestId!);
   if (quest && (!quest.is_playing || quest.status == 'finished')) return false;
   if (NodeTreeProps.channelId) {
@@ -376,8 +382,9 @@ function canEdit(nodeId: number): boolean {
   } else {
     return conversationStore.canEdit(nodeId);
   }
-}
+})
 function canAddTo(nodeId: number): boolean {
+  console.log("nodeId", nodeId)
   const quest = questStore.getQuestById(NodeTreeProps.currentQuestId!);
   if (quest) {
     return (
@@ -395,29 +402,35 @@ function getNode(nodeId: number | null): ConversationNode {
     return conversationStore.getConversationNodeById(nodeId!);
   }
 }
-function editNode(nodeId: number | null) {
-  const selectedNode = getNode(nodeId);
-  newNode.value = {
-    ...selectedNode,
-  };
-  addingChildToNodeId = null;
-  if (selectedNode.parent_id) {
-    const parent = getNode(selectedNode.parent_id);
-    selectedIbisTypes = ibis_child_types(parent.node_type);
-    allowChangeMeta.value =
-      parent.meta == 'conversation' && conversationStore.canMakeMeta(nodeId!);
-  } else {
-    selectedIbisTypes = ibis_node_type_list;
-    allowChangeMeta.value = false;
+function editNode(nodeId: number) {
+  if (typeof nodeId == 'number' ) {
+    const selectedNode = getNode(nodeId);
+    newNode.value = {
+      ...selectedNode,
+    };
+    addingChildToNodeId = null;
+    if (selectedNode.parent_id) {
+      const parent = getNode(selectedNode.parent_id);
+      selectedIbisTypes = ibis_child_types(parent.node_type);
+      allowChangeMeta.value =
+        parent.meta == 'conversation' && conversationStore.canMakeMeta(nodeId!);
+    } else {
+      selectedIbisTypes = ibis_node_type_list;
+      allowChangeMeta.value = false;
+    }
+    calcPublicationConstraints(selectedNode);
+    editingNodeId.value = nodeId;
   }
-  calcPublicationConstraints(selectedNode);
-  editingNodeId.value = nodeId;
   setTimeout(() => {
-    const form = [`editForm_.${nodeId}`];
-    if (form) form.setFocus();
+    const formKey = `editForm_${nodeId}`;
+    form.value = nodeForms.value[formKey]
+    if (form.value?.setFocus) 
+      form.value.setFocus();
   }, 0);
 }
 function addChildToNode(nodeId: number | null) {
+  const formKey = `addChildForm_${nodeId}`;
+  
   editingNodeId.value = null;
   const parent = getNode(nodeId);
   const parent_ibis_type = parent.node_type;
@@ -434,8 +447,9 @@ function addChildToNode(nodeId: number | null) {
   calcPublicationConstraints(newNode.value);
   addingChildToNodeId = nodeId;
   setTimeout(() => {
-    const form = [`addChildForm_${nodeId}`];
-    if (form) form.setFocus();
+    form.value = nodeForms.value[formKey]
+    if (form.value) 
+      form.value!.setFocus;
   }, 0);
 }
 function cancel() {
@@ -443,16 +457,13 @@ function cancel() {
   addingChildToNodeId = null;
   newNode.value = {};
 }
-function toggleDisplay(nodeId: number) {
-  // TODO
-}
-function selectedNode(copy?: boolean) {
+const selectedNode = computed(() => (copy?: boolean) => {
   let node = getNode(selectedNodeId.value!);
   if (copy) {
     node = { ...node };
   }
   return node;
-}
+})
 async function confirmAddChild(node: Partial<ConversationNode>) {
   // const parent = this.getNode(this.addingChildToNodeId);
   try {
@@ -478,9 +489,9 @@ async function confirmAddChild(node: Partial<ConversationNode>) {
 async function confirmEdit(node: Partial<ConversationNode>) {
   try {
     if (NodeTreeProps.channelId) {
-      await channelStore.updateChannelNode({ data: node });
+      await channelStore.updateChannelNode(node);
     } else {
-      await conversationStore.updateConversationNode({ data: node });
+      await conversationStore.updateConversationNode(node);
     }
     editingNodeId.value = null;
     $q.notify({
@@ -495,10 +506,10 @@ async function confirmEdit(node: Partial<ConversationNode>) {
     });
   }
 }
-function selectionChanged(id:number) {
+const selectionChanged = computed(() => (id:number) => {
   selectedNodeId.value = id;
   emit('selectionChanged', id);
-}
+})
 async function changeNeighbourhood() {
   ready.value = false;
   await treePromise();
@@ -508,14 +519,16 @@ async function treePromise() {
   if (showFocusNeighbourhood.value) {
     let node_id: number | null | undefined =
       questStore.getCurrentGamePlay?.focus_node_id;
-    if (!node_id) {
-      await conversationStore.ensureRootNode(NodeTreeProps.currentQuestId);
-      node_id = conversationStore.getRootNode?.id;
+    if (typeof node_id == 'number') {
+      if (!node_id) {
+        await conversationStore.ensureRootNode(NodeTreeProps.currentQuestId);
+        node_id = conversationStore.getRootNode?.id;
+      }
+      if (!NodeTreeProps.initialSelectedNodeId) selectedNodeId.value = node_id;
+        return await conversationStore.ensureConversationNeighbourhood({
+          node_id: node_id!, guild: NodeTreeProps.currentGuildId,
+      });
     }
-    if (!NodeTreeProps.initialSelectedNodeId) selectedNodeId.value = node_id;
-      return await conversationStore.ensureConversationNeighbourhood({
-        node_id, guild: NodeTreeProps.currentGuildId,
-    });
   }
   if (NodeTreeProps.channelId) {
     return await channelStore.ensureChannelConversation(
@@ -527,11 +540,13 @@ async function treePromise() {
   );
 }
 
-function keyResponder(evt:Event) {
-  if (!(selectedNodeId.value || addingChildToNodeId)) return;
+function keyResponder(evt:KeyboardEvent) {
   const qtree = tree.value;
-  if (!qtree) return;
-  const nodeName = evt.target!.nodeName;
+  const targetElement = evt.target as HTMLElement | null;
+  if (!(selectedNodeId.value || addingChildToNodeId)) return;  
+  if (!qtree) return; 
+  if (!targetElement) return;
+  const nodeName = targetElement.nodeName;
   const inField = !(nodeName == 'BODY' || nodeName == 'DIV');
   if (editingNodeId.value || addingChildToNodeId) {
     if (evt.key == 'Escape' || (evt.key == 'Enter' && nodeName == 'BODY')) {
@@ -599,14 +614,20 @@ function inSearchFilter(qnode: QTreeNode) {
   return false;
 }
 
-function scrollToNode(id: number | null, later: null | number = null) {
+function scrollToNode(id: number | null, later: number | null = null) {
   if (later !== null) {
     setTimeout(() => scrollToNode(id, null), later);
   } else {
-    vnode.value = ["node_" + id! ] as Element;
-    if (vnode.value) vnode.value.scrollIntoView({ block: 'center' });
+    // Query the DOM for the element with id `node_${id}`
+    const element = document.querySelector<HTMLElement>(`#node_${id}`);
+    if (element) {
+      element.scrollIntoView({ block: 'center' });
+    } else {
+      console.warn(`Element with id "node_${id}" not found.`);
+    }
   }
 }
+
 
 function selectPrevious() {
   const qtree = tree;

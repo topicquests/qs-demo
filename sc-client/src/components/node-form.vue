@@ -1,19 +1,22 @@
 <template>
   <q-card class="node-card q-pa-md">
     <section class="node-card-title">
-      <q-input v-model="node.title" label="Node title" ref="title" />
+      <q-input 
+        v-model="NodeFormProps.nodeInput!.title" 
+        label="Node title" 
+        ref="title" />
       <h3 class="q-ma-md">
-        <IbisButton :node_type="node.node_type"></IbisButton>
-        {{ node.title }}
+        <IbisButton :node_type="node!.node_type"></IbisButton>
+        {{ node!.title }}
       </h3>
     </section>
-    <section v-if="node.url || node.node_type == 'reference'">
+    <section v-if="node!.url || node!.node_type == 'reference'">
       <template v-if="NodeFormProps.editing">
-        <q-input v-model="node.url" label="URL" ref="url" />
+        <q-input v-model="node!.url" label="URL" ref="url" />
       </template>
       <template v-else>
-        <a v-bind:href="node.url" target="_blank">
-          {{ node.url }}
+        <a v-bind:href="node!.url" target="_blank">
+          {{ node!.url }}
         </a>
       </template>
     </section>
@@ -34,18 +37,18 @@
         />
       </template>
       <template v-else>
-        <span v-html="node.description" class="node-card-details" />
+        <span v-html="description" class="node-card-details" />
       </template>
     </section>
     <section v-if="NodeFormProps.editing">
       <div class="row justify-start">
         <ibis-button
-          :node_type="node.node_type"
+          :node_type="node!.node_type"
           :small="true"
           style="box-align: center; margin-top: 3ex; margin-right: 1ex"
         />
         <q-select
-          v-model="node.node_type"
+          v-model="node!.node_type"
           :options="ibisTypes"
           @input="statusChanged"
           label="Type"
@@ -55,14 +58,14 @@
     </section>
     <div v-if="NodeFormProps.editing" class="row justify-start q-pb-lg q-ml-lg">
       <q-select
-        v-model="node.status"
+        v-model="node!.status"
         :options="pub_state_list"
         label="Status"
         style="width: 25%"
       />
       <q-select
-        v-if="node.status == 'role_draft'"
-        v-model="node.draft_for_role_id"
+        v-if="node!.status == 'role_draft'"
+        v-model="node!.draft_for_role_id"
         :options="NodeFormProps.roles"
         option-label="name"
         option-value="id"
@@ -77,13 +80,13 @@
         name="meta"
         @input="statusChanged"
         v-if="allowChangeMeta"
-        v-model="node.meta"
+        v-model="node!.meta"
         true-value="meta"
         false-value="conversation"
         label="Comment Node"
       />
-      <p v-if="!allowChangeMeta && node.meta != 'channel'">
-        <span v-if="node.meta">Comment node</span>
+      <p v-if="!allowChangeMeta && node!.meta != 'channel'">
+        <span v-if="node!.meta">Comment node</span>
         <span v-else>Content node</span>
       </p>
     </div>
@@ -95,7 +98,7 @@
         class="q-mr-md q-ml-md"
       />
       <q-btn
-        v-if="node.id"
+        v-if="node!.id"
         label="Update"
         @click="action"
         color="primary"
@@ -121,32 +124,38 @@ import {
   publication_state_list,
   publication_state_type,
 } from '../enums';
-import { computed, ref } from 'vue';
+import { computed, onBeforeMount, ref, watchEffect } from 'vue';
 import { QInput } from 'quasar';
 
 const NodeFormProps = defineProps<{
-  nodeInput?: Partial<ConversationNode> | defaultNodeType;
+  nodeInput?: Partial<ConversationNode>;
   editing: boolean;
   ibisTypes: ibis_node_type_type[];
   allowChangeMeta?: boolean;
   roles?: Role[];
-  pubFn?: (node: Partial<ConversationNode>) => publication_state_type[];
+  pubFn?: (node: Partial<ConversationNode | defaultNodeType>) => publication_state_type[];
 }>();
 const emit = defineEmits(['action', 'cancel']);
-let node = ref<Partial<ConversationNode>>({});
+const title = ref<QInput>();
+  const node = computed(() => {
+    return NodeFormProps.nodeInput;
+});
 let pub_state_list: publication_state_type[] = publication_state_list;
 const description = computed<string>({
   get() {
     return NodeFormProps.nodeInput!.description || '';
   },
   set(value) {
-    node.value.description = value;
+    node.value!.description = value;
   },
 });
+if (NodeFormProps.pubFn) pub_state_list = NodeFormProps.pubFn(node.value!);
+  else pub_state_list = publication_state_list;
+const setFocus = () => {
+    if(title.value) 
+      title.value.focus();
+};
 
-node.value = { ...NodeFormProps.nodeInput };
-if (NodeFormProps.pubFn) pub_state_list = NodeFormProps.pubFn(node.value);
-else pub_state_list = publication_state_list;
 /*
 
 function getDescription() {
@@ -166,14 +175,12 @@ function cancel() {
   emit('cancel');
 }
 function statusChanged() {
-  if (NodeFormProps.pubFn) pub_state_list = NodeFormProps.pubFn(node.value);
+  if (NodeFormProps.pubFn) pub_state_list = NodeFormProps.pubFn(node.value!);
 }
-/*
-function setFocus() {
-  const titleEl = this.$refs.title as QInput;
-    titleEl.focus();
-}
-*/
+defineExpose({
+  setFocus,
+});
+
 </script>
 <style>
 #node-card {
