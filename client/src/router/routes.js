@@ -137,11 +137,11 @@ const routes = [
         name: "reset_pass",
         component: () => import("pages/ResetPassword.vue"),
       },
-      // {
-      //   path: "/node/:quest_id",
-      //   name: "conversation_column",
-      //   component: () => import("pages/ConversationColumn.vue"),
-      // },
+      {
+        path: "/node/:quest_id",
+        name: "conversation_column",
+        component: () => import("pages/ConversationColumn.vue"),
+      },
       {
         path: "/nodeEdit/:quest_id",
         name: "node_edit",

@@ -28,7 +28,7 @@
         </q-toolbar-title>
         <div>
           <q-btn
-            v-show="!checkIfAuthenticated()"
+            v-show="!checkIfAuthenticated"
             @click="goTo('signin')"
             roundeded
             label="sign in"
@@ -38,7 +38,7 @@
           >
           </q-btn>
           <q-btn
-            v-show="!checkIfAuthenticated()"
+            v-show="!checkIfAuthenticated"
             @click="goTo('register')"
             class="bg-deep-purple-7 gt-sm"
             name="registerBtn"
@@ -47,7 +47,7 @@
             id="register"
           ></q-btn>
         </div>
-        <div v-if="checkIfAuthenticated()">
+        <div v-if="checkIfAuthenticated">
           <q-btn
             class="gt-sm"
             @click="onLogout()"
@@ -59,7 +59,7 @@
           >
           </q-btn>
         </div>
-        <div v-if="checkIfAuthenticated() && showTree && currentGuild">
+        <div v-if="checkIfAuthenticated && showTree && currentGuild">
           <q-btn
             flat
             dense
@@ -81,26 +81,12 @@
       id="mySidenav"
       class="sidenav"
       :overlay="true"
-    >
-      <div v-if="currentGuild" class="q-pa-md q-gutter-sm">
-        <channel-list
-          :guild_id="currentGuild.id"
-          :inPage="false"
-          title="Guild Channels"
-        />
-      </div>
-      <div
-        v-if="currentGuild && currentQuest"
-        class="q-pa-md q-gutter-sm"
-      >
-        <channel-list
-          v-bind:guild_id="currentGuild.id"
-          v-bind:quest_id="currentQuest.id"
-          :inPage="false"
-          title="Game Channels"
-        />
-      </div>
-    </q-drawer>
+   >
+    <right_drawer
+      :currentGuild="currentGuild"
+      :currentQuest="currentQuest">
+    </right_drawer>
+  </q-drawer>
     <q-drawer v-model="leftDrawer" :breakpoint="500" bordered :overlay="true">
       <q-scroll-area class="fit">
         <drawer_menu v-on:onLogout="onLogout"></drawer_menu>
@@ -117,17 +103,16 @@
     </q-footer>
   </q-layout>
 </template>
-
 <script setup lang="ts">
 import { computed, onBeforeMount, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useMemberStore } from '../stores/member';
 import { useGuildStore } from '../stores/guilds';
 import { useQuestStore } from '../stores/quests';
-import channelList from '../components/ChannelListComponent.vue';
 import { GuildData } from '../types';
 import { useQuasar } from 'quasar';
 import drawer_menu from '../components/drawer_menu.vue';
+import right_drawer from 'src/components/right-drawer.vue';
 
 const router = useRouter();
 const memberStore = useMemberStore();
@@ -141,13 +126,9 @@ const showTree = ref(true);
 const currentGuild = computed(() => guildStore.getCurrentGuild)
 const currentQuest = computed(() => questStore.getCurrentQuest)
 
-function checkIfAuthenticated(): boolean {
-  isAuthenticated.value = memberStore.isAuthenticated;
-  if (isAuthenticated.value == true) {
-    return true;
-  }
-  return false;
-}
+const checkIfAuthenticated = computed((): boolean =>   
+  memberStore.isAuthenticated
+)
 function goTo(newRoute: string): void {
   router.push({name: newRoute});
 }
@@ -172,6 +153,6 @@ function closeNav() {
   rightDrawer.value = false;
 }
 onBeforeMount(async () => {
-
+  isAuthenticated.value = memberStore.isAuthenticated;
 });
 </script>

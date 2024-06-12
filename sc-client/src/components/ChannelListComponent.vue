@@ -16,7 +16,7 @@
     <p v-else>{{ ChannelListProps.title }}</p>
     <q-list
       style="color: darkgreen; background-color: lightblue"
-      :data="getChannels"
+      :row="getChannels"
       row-key="desc"
     >
       <q-item v-for="channel in getChannels" :key="channel.id">
@@ -50,7 +50,6 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { ConversationNode } from '../types';
 import { useChannelStore } from 'src/stores/channel';
 import { waitUserLoaded } from '../app-access';
 import { onBeforeUpdate } from 'vue';
