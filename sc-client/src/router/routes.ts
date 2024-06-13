@@ -171,8 +171,8 @@ const routes: RouteRecordRaw[] = [
       {
         path: "/node/:quest_id",
         name: "conversation_column",
-         component: () => import("pages/ConversationColumn.vue"),
-       },
+        component: () => import('pages/ConversationColumn.vue'),
+      },
     ],
   },
 
