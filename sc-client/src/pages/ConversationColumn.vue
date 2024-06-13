@@ -113,12 +113,13 @@
   </q-page>
 </template>
 <script setup lang="ts">
-import { computed, onBeforeMount, onMounted, ref } from "vue";
+import { computed, onBeforeMount, onMounted, ref, toValue } from "vue";
 import { useRoute } from "vue-router";
 import { waitUserLoaded } from '../app-access';
 import { useMemberStore } from "src/stores/member";
 import { useQuestStore } from "src/stores/quests";
 import { useGuildStore } from 'src/stores/guilds';
+import { useConversationStore } from "src/stores/conversation";
 import { QTreeNode } from 'src/types';
 import { ibis_node_type_enum } from 'src/enums';
 import issueIcon from 'src/statics/images/ibis/issue_sm.png';
@@ -132,6 +133,7 @@ import respondIcon from 'src/statics/images/respond_sm.png';
 const memberStore = useMemberStore();
 const questStore = useQuestStore();
 const guildStore = useGuildStore();
+const conversationStore = useConversationStore();
 
 // Route
 const route = useRoute();
@@ -143,6 +145,7 @@ const ready = ref(false);
 // Computed Properties
 const currentQuest = computed(() => questStore.getCurrentQuest ?? null);
 const isAuthenticated = computed(() => memberStore.member !== null);
+const currentNode = computed(() => conversationStore.getConversationTree)
 const filteredQuestions = computed(() => q.value?.filter(item => item.node_type === ibis_node_type_enum.question) || []);
 const filteredAnswers = computed(() => q.value?.filter(item => item.node_type === ibis_node_type_enum.answer) || []);
 const filteredPro = computed(() => q.value?.filter(item => item.node_type === ibis_node_type_enum.pro) || []);
@@ -184,8 +187,8 @@ onBeforeMount(async () => {
       questStore.setCurrentQuest(questId),
       questStore.ensureQuest({ quest_id: questId }),
       guildStore.ensureAllGuilds(),
+      conversationStore.ensureConversation(questId)
     ]);
-
     ready.value = true;
   }
 });
