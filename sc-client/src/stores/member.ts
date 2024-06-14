@@ -6,6 +6,7 @@ import { useBaseStore, filterKeys } from './baseStore';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
 import { api, token_store, TOKEN_EXPIRATION } from '../boot/axios';
 import { useMembersStore } from './members';
+import { LocationQueryValue } from 'vue-router';
 
 export interface MemberState {
   member?: Member;
@@ -146,8 +147,8 @@ export const useMemberStore = defineStore('member', {
       }
       return this.member;
     },
-    async renewToken() {
-      const token = token_store.getToken();
+    async renewToken(token: string | undefined | LocationQueryValue) {
+      //const token = token_store.getToken();
       if (!token) return;
       const res: AxiosResponse<string> = await api.post('/rpc/renew_token', {
         token,
@@ -156,7 +157,7 @@ export const useMemberStore = defineStore('member', {
         if (res.data) {
           token_store.setToken(res.data);
           window.setTimeout(() => {
-            this.renewToken();
+            this.renewToken(token);
           }, TOKEN_RENEWAL);
         } else {
           Object.assign(this, baseState);

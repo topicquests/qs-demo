@@ -37,7 +37,9 @@ class TokenStore {
     window.localStorage.setItem('tokenExpiry', tokenExpiry!.toString());
   }
   tokenIsValid() {
-    return this.token && this.tokenExpiry && Date.now() < this.tokenExpiry;
+    console.log("Date now", Date.now(), '  ', this.tokenExpiry)
+    //return this.token && this.tokenExpiry && (Date.now() < this.tokenExpiry);
+    return true;
   }
   getToken() {
     if (this.tokenIsValid()) {
@@ -45,7 +47,7 @@ class TokenStore {
     }
   }
   clearToken() {
-    this.token = undefined;
+    this.token = null;
     this.tokenExpiry = undefined;
     window.localStorage.removeItem('token');
     window.localStorage.removeItem('tokenExpiry');
