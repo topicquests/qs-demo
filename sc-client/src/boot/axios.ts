@@ -21,10 +21,10 @@ export const api = axios.create({ baseURL: server_url });
 export const TOKEN_EXPIRATION = 1000000;
 
 class TokenStore {
-  token: string | null;
+  token: string | undefined;
   tokenExpiry: number | undefined;
   constructor() {
-    this.token = window.localStorage.getItem('token');
+    this.token = window.localStorage.getItem('token') || undefined;
     const origTokenExpiry = window.localStorage.getItem('tokenExpiry');
     this.tokenExpiry = origTokenExpiry
       ? Number.parseInt(origTokenExpiry)
@@ -37,9 +37,8 @@ class TokenStore {
     window.localStorage.setItem('tokenExpiry', tokenExpiry!.toString());
   }
   tokenIsValid() {
-    console.log('Date now', Date.now(), '  ', this.tokenExpiry);
-    //return this.token && this.tokenExpiry && (Date.now() < this.tokenExpiry);
-    return true;
+    // console.log('Date now', Date.now(), '  ', this.tokenExpiry);
+    return this.token && this.tokenExpiry && Date.now() < this.tokenExpiry;
   }
   getToken() {
     if (this.tokenIsValid()) {
@@ -47,7 +46,7 @@ class TokenStore {
     }
   }
   clearToken() {
-    this.token = null;
+    this.token = undefined;
     this.tokenExpiry = undefined;
     window.localStorage.removeItem('token');
     window.localStorage.removeItem('tokenExpiry');
