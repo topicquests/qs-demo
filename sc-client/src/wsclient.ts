@@ -4,6 +4,7 @@ import { useMembersStore } from './stores/members';
 import { useConversationStore } from './stores/conversation';
 import { useQuestStore } from './stores/quests';
 import { useGuildStore } from './stores/guilds';
+import { token_store } from './boot/axios';
 
 export class WSClient {
   ws: RobustWebSocket;
@@ -37,7 +38,7 @@ export class WSClient {
       if (
         !this.login_message &&
         memberStore.member &&
-        memberStore.tokenIsValid()
+        token_store.tokenIsValid()
       ) {
         this.login(memberStore.member.id, memberStore.member.token);
       } else if (this.login_message) {
