@@ -191,7 +191,7 @@ export const useMembersStore = defineStore('members', {
       const memberStore = useMemberStore();
       const params = Object();
       params.id = id;
-      if (id !== undefined) {
+      if (id) {
         if (Array.isArray(id)) {
           params.id = `in.(${params.id.join(',')})`;
         } else {
