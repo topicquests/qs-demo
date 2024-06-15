@@ -1,116 +1,152 @@
 <template>
-  <q-page class="bg-secondary" v-if="ready">
-    <div class="row justify-center items-center">
-        <div class="q-pb-lg text-center">
-          <h4>
-            {{ currentQuest?.name }}
-          </h4>
-        </div>
-    </div>    
-    <div class="row justify-center items-center">  
-          <q-card class="" style="max-width: 60%;">
-            <div class="content-container">
-              <div
-                class="content"
-                v-html="currentQuest?.description"
-              ></div>
+    <q-page class="bg-secondary" v-if="ready">
+      <div class="row justify-center">
+        <q-card class="node-card q-mt-md q-pa-md">
+          <div class="col-12 justify-center">
+            <q-card class="q-mt-md q-pa-md">        
+              <div class="row justify-end" style="width: 92%">
+                <member-handle></member-handle>
+              </div>
+            <div class="row justify-center" style="width: 100%">
+              <div class="col-10 justify-center">
+                <scoreboard></scoreboard>
+              </div>
             </div>
-          </q-card>
-    </div> 
-    <div class="row justify-center items-center">   
-        <div class="col-4 q-pa-sm" style="width: 1000px">
-          <q-card class="q-ma-md">
-    <div class="columnscroller">
-      <div class="columncontainer q-ma-md">
-        <!-- Header Nodes -->
-        <div class="column headerNode">
-          <div class="icon-container">
-            <q-img :src="issueIcon" alt="Issue Icon" class="icon" />
-            <span>Question</span>
+            <q-card>
+              <div class="row justify-left">
+                <div class="q-pb-sm ">
+                  <h5>
+                    {{ currentQuest?.name }}
+                  </h5>
+                </div>
+              </div>    
+              <div class="row justify-center">
+                <div class="column; quest-description-col">
+                  <q-card class="q-mb-md">
+                    <div class="content-container">
+                      <div
+                        class="content"
+                        v-html="currentQuest!.description"
+                      ></div>
+                    </div>
+                  </q-card>
+                </div>
+              </div> 
+              <div class="row justify-center items-center">   
+                <div class="col-4 q-pa-sm" style="width: 98%">
+                  <q-card class="q-ma-md">
+                    <div class="row q-pb-lg q-pt-lg">
+                        <q-card class="q-mr-md q-pl-sm q-ml-xl" style="width: 17%"> 
+                          <!-- Header Nodes -->
+                          <div class="row">                  
+                              <q-img :src="issueIcon" alt="Issue Icon" class="icon" />                  
+                          </div>
+                          <div class="row">
+                            <span>Question</span>
+                          </div>                
+                          <!-- Question Data -->
+                          <div v-if="filteredQuestions.length">
+                            <div v-for="question in filteredQuestions" :key="question!.id">
+                              <span>{{ question!.title }}</span>
+                            </div>
+                            <div class="row">
+                              <a v-if="isAuthenticated" title="Respond" :href="'/conversation/newquestion/' + currentQuest?.id" class="respond-link">
+                                <q-img :src="respondIcon" alt="Respond" class="icon" />
+                              </a>
+                            </div>
+                          </div>              
+                        </q-card>             
+                        <q-card class="q-mr-md q-pl-sm" style="width: 17%"> 
+                          <div class="row">      
+                            <q-img :src="positionIcon" alt="Position Icon" class="icon" />
+                          </div>   
+                          <div class="row">
+                            <span>Answer</span>
+                          </div>
+                          <div class="row">
+                            <!-- Answer Data -->
+                            <div v-if="filteredAnswers.length">
+                              <div v-for="answer in filteredAnswers" :key="answer!.id">
+                              {{ answer!.title }}
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">           
+                          <a v-if="isAuthenticated" :href="'/conversation/newanswer/' + currentQuest?.id" class="respond-link">
+                            <q-img :src="respondIcon" alt="Respond" class="icon" />
+                          </a>
+                        </div>   
+                        </q-card> 
+                        <q-card class="q-mr-md q-pl-sm" style="width: 17%"> 
+                          <!-- Header Nodes -->
+                          <div class="row">                  
+                              <q-img :src="proIcon" alt="Pro Icon" class="icon" />                  
+                          </div>
+                          <div class="row">
+                            <span>Pro</span>
+                          </div>                
+                          <!-- Pro Data -->
+                          <div v-if="filteredPro.length">
+                            <div v-for="pro in filteredPro" :key="pro!.id">
+                            {{ pro!.title }}
+                            </div>
+                          </div>
+                          <div class="row">
+                            <a v-if="isAuthenticated" :href="'/conversation/newpro/' + currentQuest?.id" class="respond-link">
+                              <q-img :src="respondIcon" alt="Respond" class="icon" />
+                            </a>
+                          </div>             
+                        </q-card>
+                        <q-card class="q-mr-md q-pl-sm" style="width: 17%"> 
+                          <!-- Header Nodes -->
+                          <div class="row">                  
+                              <q-img :src="conIcon" alt="Pro Icon" class="icon" />                  
+                          </div>
+                          <div class="row">
+                            <span>Con</span>
+                          </div>                
+                          <!-- Con Data -->
+                          <div v-if="filteredCon.length">
+                            <div v-for="con in filteredCon" :key="con!.id">
+                            {{ con!.title }}
+                            </div>
+                          </div>
+                          <div class="row">
+                            <a v-if="isAuthenticated" :href="'/conversation/newcon/' + currentQuest?.id" class="respond-link">
+                              <q-img :src="respondIcon" alt="Respond" class="icon" />
+                            </a>
+                          </div>             
+                        </q-card>
+                        <q-card class="q-mr-md q-pl-sm" style="width: 20%"> 
+                          <!-- Header Nodes -->
+                          <div class="row">                  
+                              <q-img :src="refIcon" alt="Ref Icon" class="icon" />                  
+                          </div>
+                          <div class="row">
+                            <span>Ref</span>
+                          </div>                
+                          <!-- Ref Data -->
+                          <div v-if="filteredRef.length">
+                            <div v-for="ref in filteredRef" :key="ref!.id">
+                              {{ ref!.title }}
+                            </div>
+                          </div>
+                          <div class="row">
+                            <a v-if="isAuthenticated" :href="'/conversation/newref/' + currentQuest?.id" class="respond-link">
+                              <q-img :src="respondIcon" alt="Respond" class="icon" />
+                            </a>
+                          </div>             
+                        </q-card>                   
+                    </div>
+                    </q-card>
+                  </div> 
+                </div>
+              </q-card>
+            </q-card> 
           </div>
-          <a v-if="isAuthenticated" title="Respond" :href="'/conversation/newquestion/' + currentQuest?.id" class="respond-link">
-            <q-img :src="respondIcon" alt="Respond" class="icon" />
-          </a>
-        </div>
-        <div class="column headerNode">
-          <div class="icon-container">
-            <q-img :src="positionIcon" alt="Position Icon" class="icon" />
-            <span>Answer</span>
-          </div>
-          <a v-if="isAuthenticated" :href="'/conversation/newanswer/' + currentQuest?.id" class="respond-link">
-            <q-img :src="respondIcon" alt="Respond" class="icon" />
-          </a>
-        </div>
-        <div class="column headerNode">
-          <div class="icon-container">
-            <q-img :src="proIcon" alt="Pro Icon" class="icon" />
-            <span>Pro</span>
-          </div>
-          <a v-if="isAuthenticated" :href="'/conversation/newpro/' + currentQuest?.id" class="respond-link">
-            <q-img :src="respondIcon" alt="Respond" class="icon" />
-          </a>
-        </div>
-        <div class="column headerNode">
-          <div class="icon-container">
-            <q-img :src="conIcon" alt="Con Icon" class="icon" />
-            <span>Con</span>
-          </div>
-          <a v-if="isAuthenticated" :href="'/conversation/newcon/' + currentQuest?.id" class="respond-link">
-            <q-img :src="respondIcon" alt="Respond" class="icon" />
-          </a>
-        </div>
-        <div class="column headerNode">
-          <div class="icon-container">
-            <q-img :src="refIcon" alt="Ref Icon" class="icon" />
-            <span>Refs</span>
-          </div>
-          <a v-if="isAuthenticated" :href="'/conversation/newref/' + currentQuest?.id" class="respond-link">
-            <q-img :src="respondIcon" alt="Respond" class="icon" />
-          </a>
-        </div>
-        <!-- End Header Nodes -->
-
-        <!-- Data Columns -->
-        <div class="datacontainer">
-          <!-- Question Data -->
-          <div v-if="filteredQuestions.length">
-            <div class="datacolumn node" v-for="question in filteredQuestions" :key="question.id">
-              <router-link :to="{ name: 'node', params: { id: question.id, context: '' } }">{{ question.label }}</router-link>
-            </div>
-          </div>
-          <!-- Answer Data -->
-          <div v-if="filteredAnswers.length">
-            <div class="datacolumn node" v-for="answer in filteredAnswers" :key="answer.id">
-              <router-link :to="{ name: 'node', params: { id: answer.id, context: '' } }">{{ answer.label }}</router-link>
-            </div>
-          </div>
-          <!-- Pro Data -->
-          <div v-if="filteredPro.length">
-            <div class="datacolumn node" v-for="pro in filteredPro" :key="pro.id">
-              <router-link :to="{ name: 'node', params: { id: pro.id, context: '' } }">{{ pro.label }}</router-link>
-            </div>
-          </div>
-          <!-- Con Data -->
-          <div v-if="filteredCon.length">
-            <div class="datacolumn node" v-for="con in filteredCon" :key="con.id">
-              <router-link :to="{ name: 'node', params: { id: con.id, context: '' } }">{{ con.label }}</router-link>
-            </div>
-          </div>
-          <!-- Ref Data -->
-          <div v-if="filteredRef.length">
-            <div class="datacolumn node" v-for="ref in filteredRef" :key="ref.id">
-              <router-link :to="{ name: 'node', params: { id: ref.id, context: '' } }">{{ ref.label }}</router-link>
-            </div>
-          </div>
-        </div>
-        <!-- End Data Columns -->
+        </q-card>
       </div>
-    </div>
-  </q-card>
-        </div>
-      
-    </div>
-  </q-page>
+    </q-page>
 </template>
 <script setup lang="ts">
 import { computed, onBeforeMount, onMounted, ref, toValue } from "vue";
@@ -128,6 +164,8 @@ import proIcon from 'src/statics/images/ibis/plus_sm.png';
 import conIcon from 'src/statics/images/ibis/minus_sm.png';
 import refIcon from 'src/statics/images/ibis/reference_sm.png';
 import respondIcon from 'src/statics/images/respond_sm.png';
+import scoreboard from '../components/score-board.vue';
+import memberHandle from '../components/member-handle.vue';
 
 // Stores
 const memberStore = useMemberStore();
@@ -139,21 +177,21 @@ const conversationStore = useConversationStore();
 const route = useRoute();
 
 // Reactive Variables
-const q = ref<QTreeNode[] | undefined>(undefined);
+const q = ref<Partial<QTreeNode[]> | undefined>(undefined);
 const ready = ref(false);
 
 // Computed Properties
 const currentQuest = computed(() => questStore.getCurrentQuest ?? null);
 const isAuthenticated = computed(() => memberStore.member !== null);
-const currentNode = computed(() => conversationStore.getConversationTree)
-const filteredQuestions = computed(() => q.value?.filter(item => item.node_type === ibis_node_type_enum.question) || []);
-const filteredAnswers = computed(() => q.value?.filter(item => item.node_type === ibis_node_type_enum.answer) || []);
-const filteredPro = computed(() => q.value?.filter(item => item.node_type === ibis_node_type_enum.pro) || []);
-const filteredCon = computed(() => q.value?.filter(item => item.node_type === ibis_node_type_enum.con) || []);
-const filteredRef = computed(() => q.value?.filter(item => item.node_type === ibis_node_type_enum.reference) || []); 
+const filteredQuestions = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.question) || []);
+const filteredAnswers = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.answer) || []);
+const filteredPro = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.pro) || []);
+const filteredCon = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.con) || []);
+const filteredRef = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.reference) || []); 
 // Functions
 async function initialize(id: number | null = null) {
   const nodeId = id || Number(route.params.id);
+  /*
   if (typeof nodeId === 'number') {
     console.info("Initialize", "ensuring data for", nodeId);
     // Assuming fetch or store method to get the data
@@ -163,6 +201,7 @@ async function initialize(id: number | null = null) {
       console.error("Failed to load data for node", nodeId);
     }
   }
+  */
 }
 function getImage() {
   if (q.value && q.value[0]) {
@@ -189,6 +228,7 @@ onBeforeMount(async () => {
       guildStore.ensureAllGuilds(),
       conversationStore.ensureConversation(questId)
     ]);
+   q.value = conversationStore.getConversation
     ready.value = true;
   }
 });
@@ -203,32 +243,58 @@ onBeforeMount(async () => {
 .scroll.relative-position.overflow-hidden.fit.q-touch {
   user-select: auto !important;
 }
-
-.headerimage {
-  float: left;
-  vertical-align: middle;
-  margin-right: 4px;
+.node-card {
+  width: 70%;
 }
-
-.node {
-  margin-top: 4px;
-  float: top;
-  border: 1px solid black;
-  border-radius: 3px;
-  min-height: 40px;
-  overflow-wrap: inherit;
-  font-family: pragmatica-web, sans-serif;
-  white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
-  white-space: -pre-wrap; /* Opera 4-6 */
-  white-space: -o-pre-wrap; /* Opera 7 */
-  white-space: pre-wrap; /* css-3 */
-  word-wrap: break-word; /* Internet Explorer 5.5+ */
-  white-space: -webkit-pre-wrap; /* Newer versions of Chrome/Safari*/
-  white-space: normal;
+@media only screen and (max-width: 1300px) {
+  .node-card {
+    width: 70%;
+  }
 }
-
+@media only screen and (max-width: 800px) {
+  .node-card {
+    width: 98%;
+  }
+}
+.description {
+  max-height: 50px;
+  background-color: gray;
+}
 .node:hover {
   background-color: rgba(255, 255, 0, 0.801);
+}
+.content {
+  background-color: lightgrey;
+  padding: 1em;
+  margin-bottom: 1em;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+  width: 100%;
+  box-shadow: 0 60px 20px 0 rgb(151, 146, 146);
+}
+#node-description {
+  padding: 1em;
+  margin-bottom: 1em;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12pt;
+  width: 100%;
+  box-shadow: 0 60px 20px 0 rgb(151, 146, 146);
+}
+.content {
+  padding: 1em;
+  margin-bottom: 1em;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14pt;
+  width: 100%;
+  box-shadow: 0 60px 20px 0 rgb(151, 146, 146);
+}
+.quest-description-col {
+  width: 100%;
+}
+@media only screen and (max-width: 800px) {
+  quest-description-col {
+    width: 98%;
+  }
 }
 
 /** from view.hbs */
@@ -252,69 +318,6 @@ onBeforeMount(async () => {
 * width must increase.
 * The formula seems to be column width * num colums + 100px 2500
 */
-.headerimage {
-  vertical-align: middle;
-  margin-right: 4px;
-}
-
-.headernode {
-  float: top;
-  border: 1px solid black;
-  border-radius: 3px;
-  font-family: pragmatica-web, sans-serif;
-  white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
-  white-space: -pre-wrap; /* Opera 4-6 */
-  white-space: -o-pre-wrap; /* Opera 7 */
-  white-space: pre-wrap; /* css-3 */
-  word-wrap: break-word; /* Internet Explorer 5.5+ */
-  white-space: normal;
-}
-.column {
-  height: 134px;
-  float: left;
-  white-space: normal;
-  width: 260px;
-  border: 0px solid black;
-  border-radius: 3px;
-  margin-left: 1px;
-  margin-right: 1px;
-  font-family: pragmatica-web, sans-serif;
-}
-.content-container {
-  padding: 1em;
-  margin-bottom: 1em;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 12pt;
-  width: 100%;
-  box-shadow: 0 60px 20px 0 rgb(151, 146, 146);
-
-  border: 50px solid #ccc;
-  max-height: 300px; /*
-Set the maximum height you desire */
-  overflow-y: auto;
-}
-.columnscroller {
-  overflow-x: hidden;
-  overflow-y: auto;
-  height: 400px; /* Adjust as needed */
-}
-
-.columncontainer {
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: center;
-}
-
-.column {
-  margin: 10px;
-  flex: 1 1 200px; /* Adjust width as needed */
-}
-
-.headerNode {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
 
 .icon-container {
   display: flex;
@@ -328,19 +331,5 @@ Set the maximum height you desire */
 .icon {
   width: 20px;
   height: 20px;
-}
-
-.datacontainer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.datacolumn {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
 }
 </style>

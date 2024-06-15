@@ -107,7 +107,7 @@
                               size="sm"
                               @click="
                                 router.push({
-                                  name: 'quest_page',
+                                  name: 'conversation_column',
                                   params: { quest_id: String(quest.id) },
                                 })
                               "
@@ -598,7 +598,6 @@ onBeforeMount(async () => {
   font-size: 12pt;
   width: 100%;
   box-shadow: 0 60px 20px 0 rgb(151, 146, 146);
-
   border: 50px solid #ccc;
   max-height: 300px; /*
 Set the maximum height you desire */

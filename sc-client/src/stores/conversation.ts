@@ -90,9 +90,9 @@ const baseState: ConversationState = {
 export const useConversationStore = defineStore('conversation', {
   state: () => baseState,
   getters: {
-    getConversation: (state: ConversationState): ConversationNode[] =>
+    getConversation: (state: ConversationState):Partial<QTreeNode[] | undefined> =>
       Object.values(state.conversation),
-    getConversationNodeById: (state: ConversationState) => (id: number) =>
+    getConversationNodeById: (state: ConversationState) => (id: number):Partial<QTreeNode | undefined> =>
       state.conversation[id],
     getRootNode: (state: ConversationState): ConversationNode | undefined => {
       if (state.conversationRoot) {

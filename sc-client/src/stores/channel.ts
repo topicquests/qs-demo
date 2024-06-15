@@ -113,7 +113,7 @@ export const useChannelStore = defineStore('channel', {
     },
     async ensureChannelConversation(
       channel_id: number,
-      guild: number,
+      guild?: number,
     ) {
       const guildStore = useGuildStore();
       if (
