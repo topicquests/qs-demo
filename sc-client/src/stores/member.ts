@@ -105,13 +105,13 @@ export const useMemberStore = defineStore('member', {
       if (!this.member) {
         const expiry =
           this.tokenExpiry || window.localStorage.getItem('tokenExpiry');
-          if(typeof expiry === 'string')
-        if (expiry && Date.now() < Number.parseInt(expiry)) {
-          this.fetchLoginUser();
-          if (!this.tokenExpiry) {
-            // add a commit for expiry?
+        if (typeof expiry === 'string')
+          if (expiry && Date.now() < Number.parseInt(expiry)) {
+            this.fetchLoginUser();
+            if (!this.tokenExpiry) {
+              // add a commit for expiry?
+            }
           }
-        }
         return this.member;
       }
     },
@@ -127,7 +127,7 @@ export const useMemberStore = defineStore('member', {
       if (!token) {
         return undefined;
       }
-      const token_payload = jwtDecode<JwtPayload|string[]>(token); //jwtDecode(token);
+      const token_payload = jwtDecode<JwtPayload | string[]>(token); //jwtDecode(token);
       const parts: string[] = token_payload.role.split('_');
       const role = parts[parts.length - 1];
       const res: AxiosResponse<Member[]> = await api.get('/members', {
@@ -171,8 +171,9 @@ export const useMemberStore = defineStore('member', {
       }
     },
     async sendConfirmEmail(email: string) {
-      await api.post('/rpc/send_login_email', {
-        email,
+      await api.get('/rpc/send_login_email', {
+        params: { email },
+        headers: { Authorization: null },
       });
     },
     async registerUserCrypted(data: Partial<Member>): Promise<Partial<Member>> {

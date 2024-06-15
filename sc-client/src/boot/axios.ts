@@ -37,7 +37,7 @@ class TokenStore {
     window.localStorage.setItem('tokenExpiry', tokenExpiry!.toString());
   }
   tokenIsValid() {
-    console.log("Date now", Date.now(), '  ', this.tokenExpiry)
+    console.log('Date now', Date.now(), '  ', this.tokenExpiry);
     //return this.token && this.tokenExpiry && (Date.now() < this.tokenExpiry);
     return true;
   }
@@ -58,7 +58,7 @@ export const token_store = new TokenStore();
 
 api.interceptors.request.use(function (config) {
   const token = token_store.getToken();
-  if (token) {
+  if (token && config.headers['Authorization'] === undefined) {
     config.headers['Authorization'] = `Bearer ${token}`;
   }
   if (
