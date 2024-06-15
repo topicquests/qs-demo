@@ -315,10 +315,12 @@ export const useQuestStore = defineStore('quest', {
       full?: boolean,
     ): Promise<QuestData[]> {
       const params = Object();
-      if (Array.isArray(id)) {
-        params.id = `in.(${id.join(',')})`;
-      } else {
-        params.id = `eq.${id}`;
+      if (id !== undefined) {
+        if (Array.isArray(id)) {
+          params.id = `in.(${id.join(',')})`;
+        } else {
+          params.id = `eq.${id}`;
+        }
       }
       const userId = useMemberStore().getUserId;
       if (userId || full) {
