@@ -221,7 +221,7 @@ export const useGuildStore = defineStore('guild', {
       Object.assign(this, baseState);
     },
     async fetchGuildsById(
-      id: number | Array<number>,
+      id: number | number[] | undefined,
       full: boolean = true,
     ): Promise<GuildData[]> {
       const userId = useMemberStore().getUserId;
@@ -253,7 +253,7 @@ export const useGuildStore = defineStore('guild', {
           res.data.map((guild: GuildData) => [guild.id, guild]),
         );
         if (!full) {
-          for (const guild of Object.values(guilds)) {
+          for (const guild of Object.values(this.guilds)) {
             if (!this.fullGuilds[guild.id]) {
               continue;
             }
@@ -264,10 +264,17 @@ export const useGuildStore = defineStore('guild', {
               guilds[guild.id].guild_membership = guild.guild_membership;
             }
           }
+        } else {
+          this.fullGuilds = {
+            ...this.fullGuilds,
+            ...Object.fromEntries(
+              res.data.map((guild: GuildData) => [guild.id, true]),
+            ),
+          };
         }
         this.guilds = {
-          ...guilds,
           ...this.guilds,
+          ...guilds,
         };
         this.fullFetch = id === undefined;
         return res.data;
@@ -323,7 +330,7 @@ export const useGuildStore = defineStore('guild', {
     async doAddGuildMembership(data: Partial<GuildMembership>) {
       const res: AxiosResponse<GuildMembership[]> = await api.post(
         'guild_membership',
-          data,
+        data,
       );
       if (res.status == 200) {
         const membership = res.data[0];

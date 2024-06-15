@@ -35,7 +35,7 @@ interface QuestMap {
 }
 export interface QuestsState {
   quests: QuestMap;
-  fullQuests?: { [key: number]: boolean };
+  fullQuests: { [key: number]: boolean };
   fullFetch: boolean;
   currentQuest?: number;
 }
@@ -219,7 +219,8 @@ export const useQuestStore = defineStore('quest', {
         }
       },
     getQuestsByStatus:
-      (state: QuestsState) => (status: quest_status_enum | string):QuestData[] =>
+      (state: QuestsState) =>
+      (status: quest_status_enum | string): QuestData[] =>
         Object.values(state.quests).filter(
           (quest: QuestData) => quest.status == status,
         ),
@@ -274,8 +275,7 @@ export const useQuestStore = defineStore('quest', {
     },
     async ensureAllQuests(): Promise<QuestData[] | undefined> {
       if (Object.keys(this.quests).length === 0 || !this.fullFetch) {
-        const quest: QuestData[] | undefined =
-          await this.fetchQuests();
+        const quest: QuestData[] | undefined = await this.fetchQuests();
         if (quest!.length > 0) return quest;
       } else return undefined;
     },
@@ -308,44 +308,12 @@ export const useQuestStore = defineStore('quest', {
     },
     //axios calls
     async fetchQuests(): Promise<QuestData[] | undefined> {
-      const userId = useMemberStore().getUserId;
-      const params = Object();
-      
-      if (userId) {
-        Object.assign(params, {
-          select:
-            '*,quest_membership!quest_id(*),casting!quest_id(*),game_play!quest_id(*)',
-          'quest_membership.member_id': `eq.${userId}`,
-          'casting.member_id': `eq.${userId}`,
-        });
-      } else {
-        params.select = '*,game_play!quest_id(*)';
-      }
-      const res: AxiosResponse<QuestData[]> = await api.get('/quests_data', {
-        params,
-      });
-      if (res.status == 200) {
-        const fullQuests = Object.values(this.quests).filter(
-          (quest: QuestData) => this.fullQuests![quest.id],
-        );
-        const quests = Object.fromEntries(
-          res.data.map((quest: QuestData) => [quest.id, quest]),
-        );
-        for (const quest of fullQuests) {
-          if (quests[quest.id]) {
-            quests[quest.id] = Object.assign(quests[quest.id], {
-              casting: quest.casting,
-              quest_membership: quest.quest_membership,
-            });
-          }
-        }
-        this.quests = quests;
-        this.fullFetch = true;
-        return res.data;
-      }
-      return undefined;
+      return await this.fetchQuestById(undefined, false);
     },
-    async fetchQuestById(id: number | number[] | undefined, full?: boolean) {
+    async fetchQuestById(
+      id: number | number[] | undefined,
+      full?: boolean,
+    ): Promise<QuestData[]> {
       const params = Object();
       if (Array.isArray(id)) {
         params.id = `in.(${id.join(',')})`;
@@ -365,15 +333,26 @@ export const useQuestStore = defineStore('quest', {
       } else {
         params.select = '*,game_play!quest_id(*)';
       }
-      const res: AxiosResponse<QuestData[]> = await api.get('/quests_data', {params});
+      const res: AxiosResponse<QuestData[]> = await api.get('/quests_data', {
+        params,
+      });
       if (res.status == 200) {
-        this.quests = {
-          ...this.quests,
-          ...Object.fromEntries(
-            res.data.map((quest: QuestData) => [quest.id, quest]),
-          ),
-        };
-        if (full) {
+        const quests = Object.fromEntries(
+          res.data.map((guild: QuestData) => [guild.id, guild]),
+        );
+        if (!full) {
+          for (const quest of Object.values(this.quests)) {
+            if (!this.fullQuests[quest.id]) {
+              continue;
+            }
+            if (quest.casting) {
+              quests[quest.id].casting = quest.casting;
+            }
+            if (quest.quest_membership) {
+              quests[quest.id].quest_membership = quest.quest_membership;
+            }
+          }
+        } else {
           this.fullQuests = {
             ...this.fullQuests,
             ...Object.fromEntries(
@@ -381,7 +360,14 @@ export const useQuestStore = defineStore('quest', {
             ),
           };
         }
+        this.quests = {
+          ...this.quests,
+          ...quests,
+        };
+        this.fullFetch = id === undefined;
+        return res.data;
       }
+      return [];
     },
     async addCasting(casting: Partial<Casting>) {
       const memberStore = useMemberStore();
@@ -536,7 +522,7 @@ export const useQuestStore = defineStore('quest', {
           quest,
         );
         this.quests = { ...this.quests, [quest.id]: questData };
-        this.fullQuests = { ...this.fullQuests!, [quest.id]: questData };
+        this.fullQuests = { ...this.fullQuests!, [quest.id]: true };
       }
     },
     async addQuestMembership(params: Partial<QuestMembership>) {
@@ -599,7 +585,7 @@ export const useQuestStore = defineStore('quest', {
         params,
       );
       if (res.status == 201) {
-        const game_play: GamePlay|undefined = res.data[0];
+        const game_play: GamePlay | undefined = res.data[0];
         let quest = this.quests[game_play!.quest_id!];
         if (quest) {
           const game_plays = quest.game_play || [] || undefined;
