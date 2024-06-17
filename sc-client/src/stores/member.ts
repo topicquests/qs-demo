@@ -147,9 +147,8 @@ export const useMemberStore = defineStore('member', {
       }
       return this.member;
     },
-    async renewToken(token: string | undefined | LocationQueryValue) {
+    async renewToken(token: string) {
       //const token = token_store.getToken();
-      if (!token) return;
       const res: AxiosResponse<string> = await api.post('/rpc/renew_token', {
         token,
       });

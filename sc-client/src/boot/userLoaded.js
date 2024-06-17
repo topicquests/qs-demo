@@ -25,7 +25,7 @@ export default boot(async ({ app }) => {
     const prevToken = window.localStorage.getItem('token');
     const interval = Math.max(0, prevTokenExpiry - Date.now() - 10000);
     window.setTimeout(function () {
-      memberStore.renewToken({ data: { token: prevToken } });
+      memberStore.renewToken(prevToken);
     }, interval);
   }
 

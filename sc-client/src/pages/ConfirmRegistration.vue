@@ -62,9 +62,9 @@ async function resend() {
   await memberStore.sendConfirmEmail(theEmail);
 }
 
-async function getNewToken(prevToken: string | null) {
+async function getNewToken(prevToken: string) {
   try {
-    await memberStore.renewToken();
+    await memberStore.renewToken(prevToken);
     await memberStore.fetchLoginUser();
     Notify.create({
       message: 'Email Verified. You are now signed in',
@@ -83,7 +83,9 @@ onBeforeMount(async () => {
   const tokenArg = route.query.token;
   if (tokenArg) {
     token = Array.isArray(tokenArg) ? tokenArg[0] : tokenArg;
-    await getNewToken(token);
+    if (token) {
+      await getNewToken(token);
+    }
   }
 });
 </script>

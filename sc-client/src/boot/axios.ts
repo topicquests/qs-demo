@@ -34,7 +34,7 @@ class TokenStore {
     this.token = token;
     this.tokenExpiry = tokenExpiry || Date.now() + TOKEN_EXPIRATION;
     window.localStorage.setItem('token', token);
-    window.localStorage.setItem('tokenExpiry', tokenExpiry!.toString());
+    window.localStorage.setItem('tokenExpiry', this.tokenExpiry.toString());
   }
   tokenIsValid() {
     // console.log('Date now', Date.now(), '  ', this.tokenExpiry);
