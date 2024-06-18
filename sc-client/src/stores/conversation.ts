@@ -100,7 +100,7 @@ export const useConversationStore = defineStore('conversation', {
       }
       return undefined;
     },
-    getNeighbourhood: (state: ConversationState): ConversationNode[] =>
+    getNeighbourhood: (state: ConversationState):Partial<QTreeNode[] | undefined> =>
       Object.values(state.neighbourhood!),
     getFocusNode: (state: ConversationState) => {
       if (state.neighbourhoodRoot && state.neighbourhood) {
@@ -249,22 +249,23 @@ export const useConversationStore = defineStore('conversation', {
     }) {
       if (
         node_id != this.neighbourhoodRoot ||
-        Object.keys(this.neighbourhood).length == 0
+        Object.keys(this.neighbourhood!).length == 0
       ) {
+        if(typeof guild == 'number')
         await this.fetchConversationNeighbourhood({
           node_id,
           guild,
         });
       }
     },
-    async ensureConversationSubtree({ node_id }: { node_id: number }) {
+    async ensureConversationSubtree(node_id: number) {
       if (
         node_id != this.neighbourhoodRoot ||
-        Object.keys(this.neighbourhood).length == 0
+        Object.keys(this.neighbourhood!).length == 0
       ) {
-        await this.fetchConversationSubtree({
+        await this.fetchConversationSubtree(
           node_id,
-        });
+        );
       }
     },
     resetConversation() {
@@ -359,9 +360,10 @@ export const useConversationStore = defineStore('conversation', {
         this.conversationRoot = root;
       }
     },
-    async fetchConversationSubtree(params: { node_id: number }) {
-      const res: AxiosResponse<ConversationNode[]> = await api.post(
-        `rpc/node_neighbourhood/${params}`,
+    async fetchConversationSubtree(node_id: number ) {
+      const res: AxiosResponse<ConversationNode[]> = await api.get(
+        'rpc/node_subtree',
+        {node_id},
       );
       if (res.status == 200) {
         const firstNode = res.data[0];

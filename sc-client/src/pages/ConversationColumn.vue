@@ -16,7 +16,14 @@
               <div class="row justify-left">
                 <div class="q-pb-sm ">
                   <h5>
-                    {{ currentQuest?.name }}
+                    {{ parent }}
+                  </h5>
+                </div>
+              </div>  
+              <div class="row justify-left">
+                <div class="q-pb-sm ">
+                  <h5>
+                    {{ node?.title }}
                   </h5>
                 </div>
               </div>    
@@ -26,7 +33,7 @@
                     <div class="content-container">
                       <div
                         class="content"
-                        v-html="currentQuest!.description"
+                        v-html="node!.description"
                       ></div>
                     </div>
                   </q-card>
@@ -67,7 +74,10 @@
                             <!-- Answer Data -->
                             <div v-if="filteredAnswers.length">
                               <div v-for="answer in filteredAnswers" :key="answer!.id">
-                              {{ answer!.title }}
+                                <a href="#" @click.prevent="updateNodeId(answer!.id)">
+                                  {{ answer!.title }}
+                                </a>
+    
                               </div>
                             </div>
                           </div>
@@ -167,6 +177,10 @@ import respondIcon from 'src/statics/images/respond_sm.png';
 import scoreboard from '../components/score-board.vue';
 import memberHandle from '../components/member-handle.vue';
 
+interface Answer {
+  id: number;
+  title: string;
+}
 // Stores
 const memberStore = useMemberStore();
 const questStore = useQuestStore();
@@ -178,10 +192,20 @@ const route = useRoute();
 
 // Reactive Variables
 const q = ref<Partial<QTreeNode[]> | undefined>(undefined);
+const nodeId = ref();
 const ready = ref(false);
+const answers = ref<Answer[]>([])
 
 // Computed Properties
 const currentQuest = computed(() => questStore.getCurrentQuest ?? null);
+const node = computed(() => conversationStore.getConversationNodeById(nodeId.value))
+const parent = computed(() => {
+  let nodeParent: Partial<QTreeNode> | null = null
+  if (node.value?.parent_id) {
+    nodeParent = conversationStore.getConversationNodeById(node.value.parent_id) || null
+  }
+  return nodeParent?.title
+})
 const isAuthenticated = computed(() => memberStore.member !== null);
 const filteredQuestions = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.question) || []);
 const filteredAnswers = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.answer) || []);
@@ -189,19 +213,24 @@ const filteredPro = computed(() => q.value?.filter(item => item!.node_type === i
 const filteredCon = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.con) || []);
 const filteredRef = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.reference) || []); 
 // Functions
-async function initialize(id: number | null = null) {
-  const nodeId = id || Number(route.params.id);
-  /*
-  if (typeof nodeId === 'number') {
-    console.info("Initialize", "ensuring data for", nodeId);
-    // Assuming fetch or store method to get the data
-    if (q.value) {
-      getImage();
-    } else {
-      console.error("Failed to load data for node", nodeId);
-    }
+function updateNodeId(id:number) {
+  nodeId.value = id;
+  initialize()
+}
+async function initialize() { 
+  await conversationStore.ensureConversationNeighbourhood({node_id: nodeId.value})
+  q.value = conversationStore.getNeighbourhood
+  const subTree = await conversationStore.ensureConversationSubtree(nodeId.value)
+  console.log("subTree ", subTree)
+  const conversation = conversationStore.getConversationNodeById(nodeId.value)
+  console.log("conversation ", conversation);
+  console.info("Initialize", "ensuring data for", nodeId);
+  // Assuming fetch or store method to get the data
+  if (q.value) {
+    getImage();
+  } else {
+    console.error("Failed to load data for node", nodeId);
   }
-  */
 }
 function getImage() {
   if (q.value && q.value[0]) {
@@ -214,21 +243,14 @@ function getImage() {
 
 // Lifecycle Hooks
 onMounted(() => {
-  initialize(null);
+  initialize();
 });
 
 onBeforeMount(async () => {
-  if (typeof route.params.quest_id === 'string') {
-    const questId = Number(route.params.quest_id);
-
+  if (typeof route.params.node_id === 'string') {
+    nodeId.value = Number(route.params.node_id);
     await waitUserLoaded();
-    await Promise.all([
-      questStore.setCurrentQuest(questId),
-      questStore.ensureQuest({ quest_id: questId }),
-      guildStore.ensureAllGuilds(),
-      conversationStore.ensureConversation(questId)
-    ]);
-   q.value = conversationStore.getConversation
+   
     ready.value = true;
   }
 });

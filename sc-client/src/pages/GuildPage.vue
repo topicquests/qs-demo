@@ -108,7 +108,7 @@
                               @click="
                                 router.push({
                                   name: 'conversation_column',
-                                  params: { quest_id: String(quest.id) },
+                                  params: { node_id: String(nodeId) },
                                 })
                               "
                             />
@@ -260,8 +260,10 @@ import { useConversationStore } from 'src/stores/conversation';
 import { useQuasar } from 'quasar';
 import { storeToRefs } from 'pinia';
 
+// Route
 const router = useRouter();
 const route = useRoute();
+// Stores
 const baseStore = useBaseStore();
 const guildStore = useGuildStore();
 const memberStore = useMemberStore();
@@ -270,19 +272,27 @@ const questStore = useQuestStore();
 const roleStore = useRoleStore();
 const channelStore = useChannelStore();
 const conversationStore = useConversationStore();
-let pastQuests: Quest[] = [];
+
+// Quasar
+const $q = useQuasar();
+
+//Reactive Variables
 const canRegisterToQuest = ref(false);
 const isMember = ref(false);
-let activeQuests: Quest[] = [];
 const prompt = ref(false);
 const guildId = ref<number | null>(null);
-const { member } = storeToRefs(memberStore);
-const allRoles = roleStore.role;
-let memberPlaysQuestInThisGuild = false;
-const $q = useQuasar();
-let guildGamePlays: GamePlay[] = [];
 const ready = ref(false);
+const { member } = storeToRefs(memberStore);
+
+//Non Reactive Variables
+const allRoles = roleStore.role;
+let activeQuests: Quest[] = [];
+let memberPlaysQuestInThisGuild = false;
+let guildGamePlays: GamePlay[] = [];
 let casting: Casting|undefined;
+let pastQuests: Quest[] = [];
+
+//Table Columns 
 const columns: QTableProps['columns'] = [
   {
     name: 'desc',
@@ -326,10 +336,12 @@ const columns: QTableProps['columns'] = [
   },
 ];
 
+//Computed Properties
 const currentQuestId = computed(() => questStore.currentQuest)
 const currentGuild = computed(() => guildStore.getCurrentGuild)
 const currentQuest = computed(() => questStore.getCurrentQuest)
 const currentGuildId = computed(() => guildStore.currentGuild)
+const nodeId = computed(() => conversationStore.neighbourhoodRoot)
 
 watchEffect(async() => {
   if (!currentQuest.value) {
@@ -360,6 +372,7 @@ watchEffect(async() => {
   }
   return 'success';
 });
+
 function castingRoles(): Role[] {
   const castingRoles =
     membersStore.castingRolesPerQuest(member!.value?.id, currentQuest.value!.id) ||
@@ -382,7 +395,6 @@ const getGuildMembers = computed((): PublicMember[] | undefined => {
   }
   return [];
 })
-
 async function initializeQuest() {
   var quest_id: number | undefined | null = questStore.currentQuest;
   if (
@@ -396,7 +408,6 @@ async function initializeQuest() {
     await questStore.setCurrentQuest(gamePlay.quest_id);
   }
 }
-
 async function joinToGuild() {
   if (typeof guildStore.currentGuild === 'number')
     await guildStore.addGuildMembership({
@@ -428,11 +439,9 @@ function checkPermissions() {
     );
   }
 }
-
 async function castingRoleAdded(role_id: number) {
   const guild_id = guildId.value;
   const quest_id: number | undefined = questStore.currentQuest;
-
   await questStore.addCastingRole({
     member_id: member!.value?.id,
     role_id,
@@ -440,7 +449,6 @@ async function castingRoleAdded(role_id: number) {
     quest_id,
   });
 }
-
 async function castingRoleRemoved(role_id: number) {
   const guild_id: number | null = guildId.value;
   const quest_id: number | undefined = questStore.currentQuest;
@@ -481,7 +489,6 @@ async function initializeStage2() {
   const confirmedPlayQuestIds = (guildGamePlays || []).map(
     (gp: GamePlay) => gp.quest_id,
   );
-
   pastQuests = questStore.getQuests.filter(
     (q: Quest) =>
       (q.status == quest_status_enum.finished ||
@@ -500,9 +507,10 @@ async function initializeStage2() {
     await initializeQuest();
   }
 }
+
+//Lifecycle Hooks
 onBeforeMount(async () => {
   await initialize();
-
 });
 </script>
 

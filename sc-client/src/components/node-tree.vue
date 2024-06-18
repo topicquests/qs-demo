@@ -85,6 +85,14 @@
             >&nbsp;{{ threats[prop.node.id] }}]</span
           >
           <q-btn
+            @click="
+              router.push({
+              name: 'conversation_column',
+              params: { quest_id: String(prop.node.id) },
+            }) "
+            >
+          </q-btn>
+          <q-btn
             size="xs"
             :flat="true"
             v-if="
@@ -182,6 +190,7 @@ import { useQuestStore } from 'src/stores/quests';
 import { computed, onBeforeMount, ref, shallowRef } from 'vue';
 import { useReadStatusStore } from 'src/stores/readStatus';
 import { useRoleStore } from 'src/stores/role';
+import { useRouter } from 'vue-router';
 
 
 const NodeTreeProps = defineProps<{
@@ -201,6 +210,7 @@ const questStore = useQuestStore();
 const readStatusStore = useReadStatusStore();
 const membersStore = useMembersStore();
 const roleStore = useRoleStore();
+const router = useRouter();
 const $q = useQuasar();
 const emit = defineEmits<{
   selectionChanged: [id: number]
