@@ -361,7 +361,7 @@ export const useConversationStore = defineStore('conversation', {
       }
     },
     async fetchConversationSubtree(node_id: number ) {
-      const res: AxiosResponse<ConversationNode[]> = await api.get(
+      const res: AxiosResponse<ConversationNode[]> = await api.post(
         'rpc/node_subtree',
         {node_id},
       );
@@ -375,7 +375,7 @@ export const useConversationStore = defineStore('conversation', {
         this.neighbourhood = Object.fromEntries(
           res.data.map((node: ConversationNode) => [node.id, node]),
         );
-        this.neighbourhoodRoot = params.node_id;
+        this.neighbourhoodRoot = node_id;
         const root = res.data.find(
           (node: ConversationNode) => node.parent_id == null,
         );
