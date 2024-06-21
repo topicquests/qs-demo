@@ -31,7 +31,9 @@
               class="col-4 q-pa-lg"
               style="width: 100%"
             >
-              <quest-table :quests="questStore.getQuests" :title="'Quests'" />
+              <quest-table 
+                :quests="questStore.getQuests" 
+                :title="'Quests'" />
             </div>
             <div v-else class="column items-center q-mt-md">
               <h4>There are no quests</h4>
@@ -46,9 +48,9 @@
 <script setup lang="ts">
 import scoreboard from '../components/score-board.vue';
 import questTable from '../components/quest-table.vue';
-//import member from '../components/member.vue';
+import member from '../components/member-handle.vue';
 
-import { userLoaded } from '../boot/userLoaded';
+import { waitUserLoaded } from '../app-access';
 import { useMemberStore } from 'src/stores/member';
 import { useQuestStore } from 'src/stores/quests';
 import { useGuildStore } from 'src/stores/guilds';
@@ -56,16 +58,18 @@ import { onBeforeMount, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import memberHandle from '../components/member-handle.vue';
 
+// Stores
 const memberStore = useMemberStore();
 const questStore = useQuestStore();
 const guildStore = useGuildStore();
 const router = useRouter();
 
-let ready = ref(false);
+// Reactive Variables
+const ready = ref(false);
 
+// Lifecycle Hooks
 onBeforeMount(async () => {
-  //await userLoaded;
-  // not using those yet?
+  await waitUserLoaded();
   await Promise.all([
     questStore.ensureAllQuests(),
     guildStore.setCurrentGuild(false),

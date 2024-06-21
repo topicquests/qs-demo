@@ -85,14 +85,6 @@
             >&nbsp;{{ threats[prop.node.id] }}]</span
           >
           <q-btn
-            @click="
-              router.push({
-              name: 'conversation_column',
-              params: { quest_id: String(prop.node.id) },
-            }) "
-            >
-          </q-btn>
-          <q-btn
             size="xs"
             :flat="true"
             v-if="
@@ -192,7 +184,7 @@ import { useReadStatusStore } from 'src/stores/readStatus';
 import { useRoleStore } from 'src/stores/role';
 import { useRouter } from 'vue-router';
 
-
+// Props
 const NodeTreeProps = defineProps<{
   currentQuestId: number | undefined;
   currentGuildId: number | undefined;
@@ -203,6 +195,7 @@ const NodeTreeProps = defineProps<{
   initialSelectedNodeId?: number | undefined;
 }>();
 
+// Stores
 const channelStore = useChannelStore();
 const conversationStore = useConversationStore();
 const guildStore = useGuildStore();
@@ -210,25 +203,25 @@ const questStore = useQuestStore();
 const readStatusStore = useReadStatusStore();
 const membersStore = useMembersStore();
 const roleStore = useRoleStore();
-const router = useRouter();
+
 const $q = useQuasar();
+
+// Emits
 const emit = defineEmits<{
   selectionChanged: [id: number]
-}>()
+}>();
+
+// Reactive Variables
 const showFocusNeighbourhood = ref(false);
 const showDraft = ref(true);
 const ready = ref(false);
 const showMeta = ref(true);
 const showObsolete = ref(false);
 const selectedNodeId = ref<number | null | undefined>(null);
-let baseNodePubStateConstraints: publication_state_type[];
-let addingChildToNodeId: number | null = null;
 const searchFilter = ref('');
-let listenerInstalled = false;
 const editingNodeId = ref<number | null>(null);
 const allowChangeMeta = ref(false);
-let selectedIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
-let childIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
+
 const newNode = ref<Partial<ConversationNode>>({});
 const tree = ref<QTree>();
 const nodeForms = shallowRef<Record<string, InstanceType<typeof NodeForm> | null>>({});
@@ -236,7 +229,15 @@ const nodeFormRef = computed(() => (nodeId: string | number) => (el: InstanceTyp
   nodeForms.value[`editForm_${nodeId}`] = el;
 });
 const form = ref<InstanceType<typeof NodeForm> | null>(null);
-const vnode= ref<Element|null>(null);
+
+// Variables  
+let baseNodePubStateConstraints: publication_state_type[];
+let addingChildToNodeId: number | null = null;
+let listenerInstalled = false;
+let selectedIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
+let childIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
+
+// Computed Properties
 const searchFilter_=computed(() => {
   return searchFilter.value + '_';
 });
@@ -255,6 +256,13 @@ const getMemberHandle = computed(() => (id: number) => {
   }
   return '';
 });
+const selectedNode = computed(() => (copy?: boolean) => {
+  let node = getNode(selectedNodeId.value!);
+  if (copy) {
+    node = { ...node! };
+  }
+  return node;
+})
 const nodesTree=computed((): QTreeNode[] => {
     if (NodeTreeProps.channelId)
       return channelStore.getChannelConversationTree(NodeTreeProps.channelId);
@@ -291,6 +299,15 @@ function checkIfExpanded(nodeId: QTreeNode):boolean {
   }
   return false;
 }
+const canEdit = computed(() => (nodeId: number): boolean => {
+  const quest = questStore.getQuestById(NodeTreeProps.currentQuestId!);
+  if (quest && (!quest.is_playing || quest.status == 'finished')) return false;
+  if (NodeTreeProps.channelId) {
+    return channelStore.canEdit(NodeTreeProps.channelId, nodeId);
+  } else {
+    return conversationStore.canEdit(nodeId);
+  }
+})
 /*
 function nodeMap(): ConversationMap {
   if (NodeTreeProps.channelId)
@@ -305,6 +322,7 @@ function nodeMap(): ConversationMap {
   );
 }
 */
+// Functions
 function calcPublicationConstraints(node: Partial<ConversationNode>) {
   if (!NodeTreeProps.currentGuildId) {
     baseNodePubStateConstraints = [
@@ -327,8 +345,8 @@ function calcPublicationConstraints(node: Partial<ConversationNode>) {
   }
   if (node.id) {
     const children_status = conversationStore
-      .getChildrenOf(node.id)
-      .map((n) => n.status);
+      .getChildrenOf(node.id)!
+      .map((n) => n!.status);
     if (children_status.length > 0) {
       children_status.sort(
         (a, b) =>
@@ -384,15 +402,7 @@ function filterMethod(node: Partial<ConversationNode>, filter_string: string) {
   }
   return true;
 }
-const canEdit = computed(() => (nodeId: number): boolean => {
-  const quest = questStore.getQuestById(NodeTreeProps.currentQuestId!);
-  if (quest && (!quest.is_playing || quest.status == 'finished')) return false;
-  if (NodeTreeProps.channelId) {
-    return channelStore.canEdit(NodeTreeProps.channelId, nodeId);
-  } else {
-    return conversationStore.canEdit(nodeId);
-  }
-})
+
 function canAddTo(nodeId: number): boolean {
   console.log("nodeId", nodeId)
   const quest = questStore.getQuestById(NodeTreeProps.currentQuestId!);
@@ -405,7 +415,7 @@ function canAddTo(nodeId: number): boolean {
   }
   return false;
 }
-function getNode(nodeId: number | null): ConversationNode {
+function getNode(nodeId: number | null): ConversationNode | undefined{
   if (NodeTreeProps.channelId) {
     return channelStore.getChannelNode(NodeTreeProps.channelId, nodeId!);
   } else {
@@ -419,16 +429,16 @@ function editNode(nodeId: number) {
       ...selectedNode,
     };
     addingChildToNodeId = null;
-    if (selectedNode.parent_id) {
-      const parent = getNode(selectedNode.parent_id);
-      selectedIbisTypes = ibis_child_types(parent.node_type);
+    if (selectedNode!.parent_id) {
+      const parent = getNode(selectedNode!.parent_id);
+      selectedIbisTypes = ibis_child_types(parent!.node_type);
       allowChangeMeta.value =
-        parent.meta == 'conversation' && conversationStore.canMakeMeta(nodeId!);
+        parent!.meta == 'conversation' && conversationStore.canMakeMeta(nodeId!);
     } else {
       selectedIbisTypes = ibis_node_type_list;
       allowChangeMeta.value = false;
     }
-    calcPublicationConstraints(selectedNode);
+    calcPublicationConstraints(selectedNode!);
     editingNodeId.value = nodeId;
   }
   setTimeout(() => {
@@ -443,16 +453,16 @@ function addChildToNode(nodeId: number | null) {
   
   editingNodeId.value = null;
   const parent = getNode(nodeId);
-  const parent_ibis_type = parent.node_type;
+  const parent_ibis_type = parent!.node_type;
   childIbisTypes = ibis_child_types(parent_ibis_type);
-  allowChangeMeta.value = parent.meta === 'conversation';
+  allowChangeMeta.value = parent!.meta === 'conversation';
   newNode.value = {
     status: 'private_draft',
     node_type: childIbisTypes[0],
     parent_id: nodeId!,
-    quest_id: parent.quest_id,
+    quest_id: parent!.quest_id,
     guild_id: guildStore.getCurrentGuild!.id,
-    meta: parent.meta,
+    meta: parent!.meta,
   };
   calcPublicationConstraints(newNode.value);
   addingChildToNodeId = nodeId;
@@ -467,13 +477,7 @@ function cancel() {
   addingChildToNodeId = null;
   newNode.value = {};
 }
-const selectedNode = computed(() => (copy?: boolean) => {
-  let node = getNode(selectedNodeId.value!);
-  if (copy) {
-    node = { ...node };
-  }
-  return node;
-})
+
 async function confirmAddChild(node: Partial<ConversationNode>) {
   // const parent = this.getNode(this.addingChildToNodeId);
   try {
@@ -614,7 +618,6 @@ function hiddenByCollapse(qnode: QTreeNode) {
   }
   return false;
 }
-
 function inSearchFilter(qnode: QTreeNode) {
   // assume searchFilter not empty
   if (filterMethod(qnode, searchFilter_.value)) return true;
@@ -623,7 +626,6 @@ function inSearchFilter(qnode: QTreeNode) {
   }
   return false;
 }
-
 function scrollToNode(id: number | null, later: number | null = null) {
   if (later !== null) {
     setTimeout(() => scrollToNode(id, null), later);
@@ -637,8 +639,6 @@ function scrollToNode(id: number | null, later: number | null = null) {
     }
   }
 }
-
-
 function selectPrevious() {
   const qtree = tree;
   const sequence = conversationStore.getTreeSequence;
@@ -650,13 +650,12 @@ function selectPrevious() {
       if (searchFilter.value.length > 0 && !inSearchFilter(qnode)) {
         continue;
       }
-      selectionChanged(qnode.id);
+      selectionChanged.value(qnode.id);
       scrollToNode(qnode.id, 10);
       return true;
     }
   }
 }
-
 function selectNext() {
   const qtree = tree;
   const sequence = conversationStore.getTreeSequence;
@@ -668,13 +667,12 @@ function selectNext() {
       if (searchFilter.value.length > 0 && !inSearchFilter(qnode)) {
         continue;
       }
-      selectionChanged(qnode.id);
+      selectionChanged.value(qnode.id);
       scrollToNode(qnode.id, 10);
       return true;
     }
   }
 }
-
 async function ensureData() {
   // not sure I want this much before each update
   let promises = [roleStore.ensureAllRoles()];
@@ -705,6 +703,7 @@ async function ensureData() {
   await Promise.all(promises);
 }
 
+// Lifecycle Hooks
 onBeforeMount(async () => {
   if (listenerInstalled) document.removeEventListener('keyup', keyResponder);
   if (!listenerInstalled) {

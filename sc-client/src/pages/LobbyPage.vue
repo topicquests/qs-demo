@@ -74,18 +74,21 @@ import member from '../components/member-handle.vue';
 import { useMembersStore } from 'src/stores/members';
 import { waitUserLoaded } from '../app-access';
 
+// Stores
 const memberStore = useMemberStore();
 const guildsStore = useGuildStore();
 const questsStore = useQuestStore();
 const membersStore = useMembersStore();
-let ready = ref(false);
 
+// Reactive Variables
+const ready = ref(false);
+
+// Computed Properties
 const quests = computed({
   get: () => questsStore.getQuests,
   set: () => {},
 });
-const getActiveQuests = computed(() => questsStore.getActiveQuests) 
-
+const getActiveQuests = computed(() => questsStore.getActiveQuests);
 const getOpenGuilds = computed((): GuildData[] =>
   guildsStore.getGuilds.filter(
     (guild: Guild) =>
@@ -94,6 +97,7 @@ const getOpenGuilds = computed((): GuildData[] =>
 );
 const myGuilds = computed((): GuildData[] => guildsStore.getMyGuilds);
 
+// Lifecycle Hooks
 onBeforeMount(async () => {
   await waitUserLoaded();
   // all guilds and quests
@@ -102,11 +106,10 @@ onBeforeMount(async () => {
   await Promise.all([
     questsStore.ensureAllQuests(),
     guildsStore.ensureAllGuilds(),
+    membersStore.ensureAllMembers()
   ]);
   ready.value = true;
 });
-
-onMounted(() => {});
 </script>
 
 <style>

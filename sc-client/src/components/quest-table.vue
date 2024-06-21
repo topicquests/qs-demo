@@ -63,7 +63,7 @@
             <span v-else-if="props.row.status == 'finished'">
               <router-link
                 :to="{
-                  name: 'quest_page',
+                  name: 'conversation_column',
                   params: { quest_id: props.row.id },
                 }"
               >
@@ -110,7 +110,7 @@
             <span v-else>
               <router-link
                 :to="{
-                  name: 'quest_page',
+                  name: 'conversation_column',
                   params: { quest_id: props.row.id },
                 }"
               >
@@ -133,7 +133,6 @@ import type { QTable } from 'quasar';
 import { QTableProps } from 'quasar';
 import {
   permission_enum,
-  quest_status_enum,
   quest_status_type,
 } from '../enums';
 import { GuildMembership, Quest, QuestData } from '../types';
@@ -141,18 +140,13 @@ import QuestDateTimeInterval from './quest-date-time-interval.vue';
 import { computed, onBeforeMount, ref } from 'vue';
 import { useMembersStore } from 'src/stores/members';
 
+// Props
 const QuestTableProps = defineProps<{
   quests: QuestData[];
   title: string;
 }>();
 
-const questStore = useQuestStore();
-const memberStore = useMemberStore();
-const membersStore = useMembersStore();
-const baseStore = useBaseStore();
-const questStatus = ref<quest_status_type | string>();
-let questStatusOptions: quest_status_type[];
-
+// Table Columns
 const columns: QTableProps['columns'] = [
   {
     name: 'info',
@@ -231,6 +225,16 @@ const columns: QTableProps['columns'] = [
   },
 ];
 
+// Stores
+const questStore = useQuestStore();
+const memberStore = useMemberStore();
+const baseStore = useBaseStore();
+
+// Reactive Variables
+const questStatus = ref<quest_status_type | string>();
+const questStatusOptions = ref<quest_status_type[]>([]);
+
+// Computed Properties
 const getFilteredQuests = computed(() => { 
   if (questStatus.value && questStatus.value != 'All') {
     return questStore.getQuestsByStatus(questStatus.value);
@@ -239,27 +243,6 @@ const getFilteredQuests = computed(() => {
       return QuestTableProps.quests;
   }
 })
-function refInterval(row: QuestData) {
-  const start: number = DateTime.fromISO(row.start).millisecond;
-  const end: number = DateTime.fromISO(row.end).millisecond;
-  const now = Date.now();
-  const refTime = start > now ? start : end;
-  return Math.abs(refTime - now);
-}
-
-function lastMoveRel(row: QuestData) {
-  return row.last_node_published_at
-    ? DateTime.fromISO(row.last_node_published_at).toRelative()
-    : '';
-}
-function lastMoveFull(row: QuestData) {
-  return row.last_node_published_at
-    ? DateTime.fromISO(row.last_node_published_at).toLocaleString(
-        DateTime.DATETIME_FULL,
-      )
-    : '';
-}
-
 const canAdminGuilds = computed((): boolean =>{
   return (
     baseStore.hasPermission(permission_enum.joinQuest) ||
@@ -275,12 +258,34 @@ const canAdminGuilds = computed((): boolean =>{
     ) != undefined
   );
 })
+// Functions
+function refInterval(row: QuestData) {
+  const start: number = DateTime.fromISO(row.start).millisecond;
+  const end: number = DateTime.fromISO(row.end).millisecond;
+  const now = Date.now();
+  const refTime = start > now ? start : end;
+  return Math.abs(refTime - now);
+}
+function lastMoveRel(row: QuestData) {
+  return row.last_node_published_at
+    ? DateTime.fromISO(row.last_node_published_at).toRelative()
+    : '';
+}
+function lastMoveFull(row: QuestData) {
+  return row.last_node_published_at
+    ? DateTime.fromISO(row.last_node_published_at).toLocaleString(
+        DateTime.DATETIME_FULL,
+      )
+    : '';
+}
+
+// Lifecycle Hooks
 onBeforeMount(async() => {
-  questStatusOptions = QuestTableProps.quests.map(
+  questStatusOptions.value = QuestTableProps.quests.map(
     (quest: Quest) => quest.status,
   );
-  questStatusOptions = questStatusOptions.filter(
-    (item, index) => questStatusOptions.indexOf(item) === index,
+  questStatusOptions.value = questStatusOptions.value.filter(
+    (item, index) => questStatusOptions.value.indexOf(item) === index,
   );
 });
 </script>

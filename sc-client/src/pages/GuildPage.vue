@@ -107,8 +107,8 @@
                               size="sm"
                               @click="
                                 router.push({
-                                  name: 'conversation_column',
-                                  params: { node_id: String(nodeId) },
+                                  name: 'quest_page',
+                                  params: { quest_id: String(quest.id) },
                                 })
                               "
                             />

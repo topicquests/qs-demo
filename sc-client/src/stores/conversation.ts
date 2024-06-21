@@ -92,7 +92,7 @@ export const useConversationStore = defineStore('conversation', {
   getters: {
     getConversation: (state: ConversationState):Partial<QTreeNode[] | undefined> =>
       Object.values(state.conversation),
-    getConversationNodeById: (state: ConversationState) => (id: number):Partial<QTreeNode | undefined> =>
+    getConversationNodeById: (state: ConversationState) => (id: number):QTreeNode | undefined =>
       state.conversation[id],
     getRootNode: (state: ConversationState): ConversationNode | undefined => {
       if (state.conversationRoot) {
@@ -179,7 +179,7 @@ export const useConversationStore = defineStore('conversation', {
       return guildScoreMap;
     },
     getNode: (state: ConversationState) => state.node,
-    getChildrenOf: (state: ConversationState) => (node_id: number) => {
+    getChildrenOf: (state: ConversationState) => (node_id: number):Partial<QTreeNode[] | undefined> => {
       return Object.values(state.conversation).filter(
         (n) => n.parent_id == node_id,
       );
@@ -232,7 +232,7 @@ export const useConversationStore = defineStore('conversation', {
     async ensureConversation(quest_id: number) {
       // maybe allow guildId, min status.
       if (quest_id != this.currentQuest || !this.full) {
-        await this.fetchConversation({ quest_id });
+        const res = await this.fetchConversation({ quest_id });
       }
     },
     async ensureRootNode(quest_id: number | undefined) {
@@ -251,21 +251,21 @@ export const useConversationStore = defineStore('conversation', {
         node_id != this.neighbourhoodRoot ||
         Object.keys(this.neighbourhood!).length == 0
       ) {
-        if(typeof guild == 'number')
         await this.fetchConversationNeighbourhood({
           node_id,
           guild,
         });
       }
     },
-    async ensureConversationSubtree(node_id: number) {
+    async ensureConversationSubtree({node_id}:{node_id: number}): Promise<ConversationNode[] | undefined> {
       if (
         node_id != this.neighbourhoodRoot ||
         Object.keys(this.neighbourhood!).length == 0
       ) {
-        await this.fetchConversationSubtree(
-          node_id,
+        const res = await this.fetchConversationSubtree({
+          node_id}
         );
+        return res
       }
     },
     resetConversation() {
@@ -337,11 +337,12 @@ export const useConversationStore = defineStore('conversation', {
     },
     async fetchConversationNeighbourhood(params: {
       node_id: number;
-      guild: number;
-    }) {
+      guild?: number;
+      }) {
       const res: AxiosResponse<ConversationNode[]> = await api.get(
         `rpc/node_neighbourhood?node_id=${params.node_id}&guild=${params.guild}`,
       );
+      if (res.status == 200) {
       const firstNode = res.data[0];
       if (this.currentQuest !== firstNode.quest_id) {
         this.currentQuest = firstNode.quest_id;
@@ -359,11 +360,11 @@ export const useConversationStore = defineStore('conversation', {
       if (root) {
         this.conversationRoot = root;
       }
+    }
     },
-    async fetchConversationSubtree(node_id: number ) {
-      const res: AxiosResponse<ConversationNode[]> = await api.post(
-        'rpc/node_subtree',
-        {node_id},
+    async fetchConversationSubtree(params: {node_id: number }):Promise<ConversationNode[] | undefined> {
+      const res: AxiosResponse<ConversationNode[]> = await api.get(
+        `rpc/node_subtree?node_id=${params.node_id}`
       );
       if (res.status == 200) {
         const firstNode = res.data[0];
@@ -375,7 +376,7 @@ export const useConversationStore = defineStore('conversation', {
         this.neighbourhood = Object.fromEntries(
           res.data.map((node: ConversationNode) => [node.id, node]),
         );
-        this.neighbourhoodRoot = node_id;
+        this.neighbourhoodRoot = params.node_id;
         const root = res.data.find(
           (node: ConversationNode) => node.parent_id == null,
         );
@@ -386,7 +387,9 @@ export const useConversationStore = defineStore('conversation', {
         if (root) {
           this.conversationRoot = root;
         }
+        return res.data
       }
+      return undefined
     },
     async createConversationNode(
       data: Partial<ConversationNode> | defaultNodeType,

@@ -15,15 +15,21 @@
             <q-card>
               <div class="row justify-left">
                 <div class="q-pb-sm ">
+                <div>
+                  <q-icon :name="parent?.icon" class="q-mr-sm" />
+                </div>
                   <h5>
-                    {{ parent }}
+                    {{ parent?.title }}
                   </h5>
                 </div>
               </div>  
               <div class="row justify-left">
                 <div class="q-pb-sm ">
+                  <div>
+                    <q-icon :name="node?.icon" class="q-mr-md"/>
+                  </div>
                   <h5>
-                    {{ node?.title }}
+                    {{node?.title }}
                   </h5>
                 </div>
               </div>    
@@ -56,11 +62,6 @@
                             <div v-for="question in filteredQuestions" :key="question!.id">
                               <span>{{ question!.title }}</span>
                             </div>
-                            <div class="row">
-                              <a v-if="isAuthenticated" title="Respond" :href="'/conversation/newquestion/' + currentQuest?.id" class="respond-link">
-                                <q-img :src="respondIcon" alt="Respond" class="icon" />
-                              </a>
-                            </div>
                           </div>              
                         </q-card>             
                         <q-card class="q-mr-md q-pl-sm" style="width: 17%"> 
@@ -80,12 +81,7 @@
     
                               </div>
                             </div>
-                          </div>
-                          <div class="row">           
-                          <a v-if="isAuthenticated" :href="'/conversation/newanswer/' + currentQuest?.id" class="respond-link">
-                            <q-img :src="respondIcon" alt="Respond" class="icon" />
-                          </a>
-                        </div>   
+                          </div>  
                         </q-card> 
                         <q-card class="q-mr-md q-pl-sm" style="width: 17%"> 
                           <!-- Header Nodes -->
@@ -100,12 +96,7 @@
                             <div v-for="pro in filteredPro" :key="pro!.id">
                             {{ pro!.title }}
                             </div>
-                          </div>
-                          <div class="row">
-                            <a v-if="isAuthenticated" :href="'/conversation/newpro/' + currentQuest?.id" class="respond-link">
-                              <q-img :src="respondIcon" alt="Respond" class="icon" />
-                            </a>
-                          </div>             
+                          </div>            
                         </q-card>
                         <q-card class="q-mr-md q-pl-sm" style="width: 17%"> 
                           <!-- Header Nodes -->
@@ -118,14 +109,11 @@
                           <!-- Con Data -->
                           <div v-if="filteredCon.length">
                             <div v-for="con in filteredCon" :key="con!.id">
-                            {{ con!.title }}
+                              <a href="#" @click.prevent="updateNodeId(con!.id)">
+                                {{ con!.title }}
+                              </a>
                             </div>
-                          </div>
-                          <div class="row">
-                            <a v-if="isAuthenticated" :href="'/conversation/newcon/' + currentQuest?.id" class="respond-link">
-                              <q-img :src="respondIcon" alt="Respond" class="icon" />
-                            </a>
-                          </div>             
+                          </div>           
                         </q-card>
                         <q-card class="q-mr-md q-pl-sm" style="width: 20%"> 
                           <!-- Header Nodes -->
@@ -140,12 +128,7 @@
                             <div v-for="ref in filteredRef" :key="ref!.id">
                               {{ ref!.title }}
                             </div>
-                          </div>
-                          <div class="row">
-                            <a v-if="isAuthenticated" :href="'/conversation/newref/' + currentQuest?.id" class="respond-link">
-                              <q-img :src="respondIcon" alt="Respond" class="icon" />
-                            </a>
-                          </div>             
+                          </div>            
                         </q-card>                   
                     </div>
                     </q-card>
@@ -164,7 +147,6 @@ import { useRoute } from "vue-router";
 import { waitUserLoaded } from '../app-access';
 import { useMemberStore } from "src/stores/member";
 import { useQuestStore } from "src/stores/quests";
-import { useGuildStore } from 'src/stores/guilds';
 import { useConversationStore } from "src/stores/conversation";
 import { QTreeNode } from 'src/types';
 import { ibis_node_type_enum } from 'src/enums';
@@ -173,18 +155,12 @@ import positionIcon from 'src/statics/images/ibis/position_sm.png'
 import proIcon from 'src/statics/images/ibis/plus_sm.png';
 import conIcon from 'src/statics/images/ibis/minus_sm.png';
 import refIcon from 'src/statics/images/ibis/reference_sm.png';
-import respondIcon from 'src/statics/images/respond_sm.png';
 import scoreboard from '../components/score-board.vue';
 import memberHandle from '../components/member-handle.vue';
 
-interface Answer {
-  id: number;
-  title: string;
-}
 // Stores
 const memberStore = useMemberStore();
 const questStore = useQuestStore();
-const guildStore = useGuildStore();
 const conversationStore = useConversationStore();
 
 // Route
@@ -193,66 +169,54 @@ const route = useRoute();
 // Reactive Variables
 const q = ref<Partial<QTreeNode[]> | undefined>(undefined);
 const nodeId = ref();
+const questId = ref<number | undefined>();
 const ready = ref(false);
-const answers = ref<Answer[]>([])
 
 // Computed Properties
 const currentQuest = computed(() => questStore.getCurrentQuest ?? null);
 const node = computed(() => conversationStore.getConversationNodeById(nodeId.value))
-const parent = computed(() => {
-  let nodeParent: Partial<QTreeNode> | null = null
-  if (node.value?.parent_id) {
-    nodeParent = conversationStore.getConversationNodeById(node.value.parent_id) || null
-  }
-  return nodeParent?.title
-})
-const isAuthenticated = computed(() => memberStore.member !== null);
+const parent = computed(() => 
+  conversationStore.getConversationNodeById(node.value!.parent_id!) || null)
 const filteredQuestions = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.question) || []);
-const filteredAnswers = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.answer) || []);
+const filteredAnswers = computed(() => filterNodesByType(q.value, ibis_node_type_enum.answer));
 const filteredPro = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.pro) || []);
-const filteredCon = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.con) || []);
+const filteredCon = computed(() => filterNodesByType(q.value, ibis_node_type_enum.con));
+
 const filteredRef = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.reference) || []); 
+
 // Functions
 function updateNodeId(id:number) {
   nodeId.value = id;
   initialize()
 }
-async function initialize() { 
-  await conversationStore.ensureConversationNeighbourhood({node_id: nodeId.value})
-  q.value = conversationStore.getNeighbourhood
-  const subTree = await conversationStore.ensureConversationSubtree(nodeId.value)
-  console.log("subTree ", subTree)
-  const conversation = conversationStore.getConversationNodeById(nodeId.value)
-  console.log("conversation ", conversation);
-  console.info("Initialize", "ensuring data for", nodeId);
-  // Assuming fetch or store method to get the data
-  if (q.value) {
-    getImage();
-  } else {
-    console.error("Failed to load data for node", nodeId);
+function filterNodesByType(nodes: Partial<QTreeNode[]> | undefined, type: ibis_node_type_enum): QTreeNode[] {
+  const result: QTreeNode[] = [];
+  if (!nodes) return result;
+  for (const node of nodes) {
+    if (node!.node_type === type) {
+      result.push(node!);
+    }
+    if (node!.children && node!.children.length > 0) {
+      result.push(...filterNodesByType(node!.children, type));
+    }
   }
+  return result;
 }
-function getImage() {
-  if (q.value && q.value[0]) {
-    const type = q.value[0].node_type;
-    const result = "icons/ibis/issue.png";
-    console.log("ICON", type, result);
-    // Handle the image logic based on type
-  }
+async function initialize() { 
+  q.value = await conversationStore.getChildrenOf(nodeId.value)
+  console.info("Initialize", "ensuring data for", nodeId);
 }
 
 // Lifecycle Hooks
-onMounted(() => {
-  initialize();
-});
-
 onBeforeMount(async () => {
-  if (typeof route.params.node_id === 'string') {
-    nodeId.value = Number(route.params.node_id);
-    await waitUserLoaded();
-   
-    ready.value = true;
-  }
+  if (typeof route.params.quest_id === 'string') 
+    questId.value = Number(route.params.quest_id);
+  await waitUserLoaded(); 
+  await conversationStore.ensureConversation(questId.value!)
+  const rootNode = await conversationStore.getRootNode;
+  nodeId.value = rootNode?.id;
+  initialize();  
+  ready.value = true;
 });
 </script>
 
