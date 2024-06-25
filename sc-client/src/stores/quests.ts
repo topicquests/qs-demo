@@ -46,6 +46,12 @@ const baseState: QuestsState = {
   quests: {},
   fullQuests: {},
 };
+const clearBaseState: QuestsState = {
+  currentQuest: undefined,
+  fullFetch: false,
+  quests: {},
+  fullQuests: {},
+}
 
 export const useQuestStore = defineStore('quest', {
   state: () => baseState,
@@ -304,7 +310,7 @@ export const useQuestStore = defineStore('quest', {
       getWSClient().setDefaultQuest(quest_id);
     },
     resetQuests() {
-      Object.assign(this, baseState);
+      Object.assign(this, clearBaseState);
     },
     //axios calls
     async fetchQuests(): Promise<QuestData[] | undefined> {

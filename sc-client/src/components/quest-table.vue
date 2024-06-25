@@ -235,7 +235,7 @@ const questStatus = ref<quest_status_type | string>();
 const questStatusOptions = ref<quest_status_type[]>([]);
 
 // Computed Properties
-const getFilteredQuests = computed(() => { 
+const getFilteredQuests = computed(():QuestData[] => { 
   if (questStatus.value && questStatus.value != 'All') {
     return questStore.getQuestsByStatus(questStatus.value);
   } else {

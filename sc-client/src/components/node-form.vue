@@ -6,7 +6,8 @@
         label="Node title" 
         ref="title" />
       <h3 class="q-ma-md">
-        <IbisButton :node_type="node!.node_type"></IbisButton>
+        <IbisButton 
+          :node_type="node!.node_type"></IbisButton>
         {{ node!.title }}
       </h3>
     </section>
@@ -66,7 +67,7 @@
       <q-select
         v-if="node!.status == 'role_draft'"
         v-model="node!.draft_for_role_id"
-        :options="NodeFormProps.roles"
+        :options="roles"
         option-label="name"
         option-value="id"
         :emit-value="true"
@@ -119,12 +120,11 @@
 import IbisButton from './ibis-btn.vue';
 import { ConversationNode, Role, defaultNodeType } from '../types';
 import {
-  ibis_node_type_list,
   ibis_node_type_type,
   publication_state_list,
   publication_state_type,
 } from '../enums';
-import { computed, onBeforeMount, ref, watchEffect } from 'vue';
+import { computed, ref } from 'vue';
 import { QInput } from 'quasar';
 
 const NodeFormProps = defineProps<{
@@ -137,10 +137,11 @@ const NodeFormProps = defineProps<{
 }>();
 const emit = defineEmits(['action', 'cancel']);
 const title = ref<QInput>();
-  const node = computed(() => {
-    return NodeFormProps.nodeInput;
+const node = computed(() => {
+  return NodeFormProps.nodeInput;
 });
 let pub_state_list: publication_state_type[] = publication_state_list;
+const roles = computed(() => NodeFormProps.roles)
 const description = computed<string>({
   get() {
     return NodeFormProps.nodeInput!.description || '';
@@ -174,9 +175,12 @@ function action() {
 function cancel() {
   emit('cancel');
 }
-function statusChanged() {
-  if (NodeFormProps.pubFn) pub_state_list = NodeFormProps.pubFn(node.value!);
-}
+const statusChanged = computed(() => {
+  if (NodeFormProps.pubFn) {
+    return pub_state_list = NodeFormProps.pubFn(node.value!);
+  }
+  return undefined
+})
 defineExpose({
   setFocus,
 });

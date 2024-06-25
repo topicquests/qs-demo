@@ -515,7 +515,7 @@ async function confirmEdit(node: Partial<ConversationNode>) {
   } catch (err) {
     console.log('there was an error in adding node ', err);
     $q.notify({
-      message: `There was an error adding node.`,
+      message: `There was an error updating node.`,
       color: 'negative',
     });
   }

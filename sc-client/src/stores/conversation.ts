@@ -86,6 +86,15 @@ const baseState: ConversationState = {
   neighbourhood: {},
   conversationRoot: null,
 };
+const clearBaseState: ConversationState = {
+  full: false,
+  node: null,
+  currentQuest: null,
+  conversation: {},
+  neighbourhoodRoot: undefined,
+  neighbourhood: {},
+  conversationRoot: null,
+}
 
 export const useConversationStore = defineStore('conversation', {
   state: () => baseState,
@@ -114,14 +123,14 @@ export const useConversationStore = defineStore('conversation', {
       ),
     getNeighbourhoodTree: (state: ConversationState) =>
       state.neighbourhood ? makeTree(Object.values(state.neighbourhood)) : null,
-    getConversationTree: (state: ConversationState) =>
+    getConversationTree: (state: ConversationState): Partial<QTreeNode[] | undefined> =>
       state.full
         ? makeTree(
             Object.values(state.conversation),
             publication_state_enum.published,
             false,
           )
-        : null,
+        : undefined,
 
     getTreeSequence: (state: ConversationState): number[] =>
       depthFirst(
@@ -269,7 +278,7 @@ export const useConversationStore = defineStore('conversation', {
       }
     },
     resetConversation() {
-      Object.assign(this, baseState);
+      Object.assign(this, clearBaseState);
     },
     async fetchConversationNode(params: { id: number }) {
       const res: AxiosResponse<ConversationNode[]> = await api.get(
@@ -303,7 +312,7 @@ export const useConversationStore = defineStore('conversation', {
       }
     },
     async fetchConversation(params: { quest_id: number }) {
-      const res: AxiosResponse = await api.get(
+      const res: AxiosResponse<QTreeNode[]> = await api.get(
         `/conversation_node?quest_id=eq.${params.quest_id}&meta=not.eq.channel`,
       );
       if (res.status == 200) {
@@ -313,11 +322,11 @@ export const useConversationStore = defineStore('conversation', {
           this.neighbourhoodRoot = null;
         }
         this.conversation = Object.fromEntries(
-          res.data.map((node: ConversationNode) => [node.id, node]),
+          res.data.map((node: QTreeNode) => [node.id, node]),
         );
         this.full = true;
         this.conversationRoot = res.data.find(
-          (node: ConversationNode) => node.parent_id === null,
+          (node: QTreeNode) => node.parent_id === null,
         );
       }
     },
@@ -404,13 +413,13 @@ export const useConversationStore = defineStore('conversation', {
       }
     },
     async updateConversationNode(
-      data: Partial<ConversationNode> | defaultNodeType,
+      data: Partial<ConversationNode>,
     ) {
       const params = Object();
       params.id = data.id;
       data = filterKeys(data, conversationNodePatchKeys);
       const res: AxiosResponse<ConversationNode[]> = await api.patch(
-        `/conversation_node/${params}`,
+        `/conversation_node?id=eq.${params.id}`,
         data,
       );
       const node = res.data[0];
@@ -418,7 +427,6 @@ export const useConversationStore = defineStore('conversation', {
     },
   },
 });
-
 export function ibis_node_icon(
   node_type: ibis_node_type_type,
   small_icon: boolean,

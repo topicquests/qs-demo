@@ -14,25 +14,24 @@
             </div>
             <q-card>
               <div class="row justify-left">
-                <div class="q-pb-sm ">
-                <div>
-                  <q-icon :name="parent?.icon" class="q-mr-sm" />
-                </div>
+               
+                <div v-if="parent">
+                  
+              
                   <h5>
+                    <q-icon :name="getIcon(parent!.id)" class="q-mr-sm" />
                     {{ parent?.title }}
                   </h5>
                 </div>
               </div>  
-              <div class="row justify-left">
-                <div class="q-pb-sm ">
-                  <div>
-                    <q-icon :name="node?.icon" class="q-mr-md"/>
-                  </div>
+              <div class="row justify-left">                                 
+                           
                   <h5>
+                    <q-icon :name="getIcon(node!.id)" style="width: 30px; height: 30px"/>           
                     {{node?.title }}
                   </h5>
                 </div>
-              </div>    
+                  
               <div class="row justify-center">
                 <div class="column; quest-description-col">
                   <q-card class="q-mb-md">
@@ -168,6 +167,7 @@ const route = useRoute();
 
 // Reactive Variables
 const q = ref<Partial<QTreeNode[]> | undefined>(undefined);
+const tree = ref<Partial<QTreeNode[]> | undefined>(undefined);
 const nodeId = ref();
 const questId = ref<number | undefined>();
 const ready = ref(false);
@@ -181,9 +181,11 @@ const filteredQuestions = computed(() => q.value?.filter(item => item!.node_type
 const filteredAnswers = computed(() => filterNodesByType(q.value, ibis_node_type_enum.answer));
 const filteredPro = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.pro) || []);
 const filteredCon = computed(() => filterNodesByType(q.value, ibis_node_type_enum.con));
-
 const filteredRef = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.reference) || []); 
-
+const getIcon = computed(() => (id: number) => {
+  const treeIcon = findNodeById(tree.value, id)
+  return treeIcon?.icon
+})
 // Functions
 function updateNodeId(id:number) {
   nodeId.value = id;
@@ -202,7 +204,21 @@ function filterNodesByType(nodes: Partial<QTreeNode[]> | undefined, type: ibis_n
   }
   return result;
 }
+function findNodeById(nodes: Partial<QTreeNode[]> | undefined, id: number): QTreeNode | null {
+  if (!nodes) return null; // Return null if nodes are undefined
+  for (const node of nodes) {
+    if (node!.id === id) {
+      return node as QTreeNode; // Return the node if the ID matches
+    }
+    if (node!.children && node!.children.length > 0) {
+      const found = findNodeById(node!.children, id);
+      if (found) return found; // Return the found node from recursion
+    }
+  }
+  return null; // Return null if the node with the ID is not found
+}
 async function initialize() { 
+  tree.value = conversationStore.getConversationTree;
   q.value = await conversationStore.getChildrenOf(nodeId.value)
   console.info("Initialize", "ensuring data for", nodeId);
 }

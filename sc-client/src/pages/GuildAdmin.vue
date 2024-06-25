@@ -308,15 +308,22 @@ import { useRoleStore } from 'src/stores/role';
 import { useQuestStore } from 'src/stores/quests';
 import { useMemberStore } from 'src/stores/member';
 
+// Stores
 const guildStore = useGuildStore();
 const membersStore = useMembersStore();
 const baseStore = useBaseStore();
 const roleStore = useRoleStore();
 const questStore = useQuestStore();
 const memberStore = useMemberStore();
+
+// Quasar
 const $q = useQuasar();
+
+// Routes
 const router = useRouter();
 const route = useRoute();
+
+// Reactive variables
 const guild = ref<Partial<Guild>>({
   name: '',
   handle: '',
@@ -325,21 +332,19 @@ const guild = ref<Partial<Guild>>({
   default_role_id: null,
 });
 const ready = ref(false);
-const member = computed(() => memberStore.member);
 const currentGuildId = ref<number | undefined>();
-let availableRolesByMember = ref<{ [key: number]: number[] | undefined }>({});
+const availableRolesByMember = ref<{ [key: number]: number[] | undefined }>({});
 const isAdmin = ref(false);
+
+// Variables
 let guildId: number | null = null;
 let confirmedPlayQuestId: number[] | GamePlay[] = [];
+
+// Computed Properties
+const member = computed(() => memberStore.member);
 const quest = computed(() => questStore.getQuests);
 const description = computed(() => {
   return currentGuild.value.description!;
-});
-const guildMembers = computed(() => {
-  if (currentGuild.value) {
-    return guildStore.getMembersOfCurrentGuild;
-  }
-  return [];
 });
 const currentGuild = computed({
   get: () => guildStore.getCurrentGuild!,
@@ -384,26 +389,48 @@ const confirmedPlayQuestIds = computed((): GamePlay[] | number[] => {
 const getGuildMembers = computed((): PublicMember[] => {
   return guildStore.getMembersOfCurrentGuild!;
 });
-/*
-function pastQuests() {
-  questStore.getQuests.filter(
-    (q: Quest) =>
-    (q.status == quest_status_enum.finished ||
-     q.status == quest_status_enum.scoring) &&
-      playQuestIds()
-  );
-}
+const doRegister = computed(() => async (quest_Id: number) => {
+  try {
+    const questId = quest_Id;
+    const regQuest = questStore.getQuestById(questId);
+    if (
+      (
+        [
+          quest_status_enum.ongoing,
+          quest_status_enum.registration,
+        ] as quest_status_type[]
+      ).indexOf(regQuest.status) < 0
+    ) {
+      throw `Can not register quest in ${regQuest.status} status`;
+    }
+    if (typeof guildId === 'number') {
+      let payload: Partial<GamePlay> = {
+        guild_id: guildId,
+        quest_id: questId,
+      };
+      await questStore.addGamePlay(payload);
+    }
+    $q.notify({
+      type: 'positive',
+      message: 'You have registered to Quest ',
+    });
+  } catch (err) {
+    $q.notify({
+      type: 'negative',
+      message: `${err}`,
+    });
+    console.log('error registering to quest: ', err);
+  }
+});
+const findPlayOfGuild = computed(() => (gamePlays: GamePlay[]) => {
+  if (gamePlays) {
+    return gamePlays.find(
+      (gp: GamePlay) => gp.guild_id == currentGuildId.value,
+    );
+  } else return undefined;
+});
 
-function playQuestIds() {
- guild.value!.game_play.map((gp: GamePlay) => gp.quest_id);
-}
-
-function getCastingRole() {
-  const roles: CastingRole[] = membersStore.castingRolesPerQuest(quest);
-  const rolesName = roles.map((cr) => allRoles[cr.role_id].name);
-  return rolesName;
-}
-*/
+// Functions
 async function addGuildAdmin(id: number) {
   if (!isGuildAdmin(id)) {
     const guildMembership = guildStore.getGuildMembershipById(id);
@@ -424,7 +451,6 @@ async function addGuildAdmin(id: number) {
         perm.splice(i, 1);
       }
     }
-
     const guildMembership = guildStore.getGuildMembershipById(id);
     if (guildMembership) {
       guildMembership.permissions = perm;
@@ -475,52 +501,6 @@ function isGuildAdmin(id: number) {
   }
   return false;
 }
-const doRegister = computed(() => async (quest_Id: number) => {
-  try {
-    const questId = quest_Id;
-    const regQuest = questStore.getQuestById(questId);
-    if (
-      (
-        [
-          quest_status_enum.ongoing,
-          quest_status_enum.registration,
-        ] as quest_status_type[]
-      ).indexOf(regQuest.status) < 0
-    ) {
-      throw `Can not register quest in ${regQuest.status} status`;
-    }
-    if (typeof guildId === 'number') {
-      let payload: Partial<GamePlay> = {
-        guild_id: guildId,
-        quest_id: questId,
-      };
-      await questStore.addGamePlay(payload);
-    }
-    $q.notify({
-      type: 'positive',
-      message: 'You have registered to Quest ',
-    });
-  } catch (err) {
-    $q.notify({
-      type: 'negative',
-      message: `${err}`,
-    });
-    console.log('error registering to quest: ', err);
-  }
-});
-const findPlayOfGuild = computed(() => (gamePlays: GamePlay[]) => {
-  if (gamePlays) {
-    return gamePlays.find(
-      (gp: GamePlay) => gp.guild_id == currentGuildId.value,
-    );
-  } else return undefined;
-});
-/*
-  function playingAsGuildId(member_id:number) {
-    return questStore.castingInQuest(null, member_id)?.guild_id;
-  }
-*/
-
 async function roleAdded(member_id: number, role_id: number) {
   const guild_id = guildId;
   if (guild_id)
@@ -530,7 +510,6 @@ async function roleAdded(member_id: number, role_id: number) {
       role_id,
     });
 }
-
 async function roleRemoved(member_id: number, role_id: number) {
   const guild_id: number | null = guildId;
   if (typeof guild_id == 'number')
@@ -540,24 +519,6 @@ async function roleRemoved(member_id: number, role_id: number) {
       role_id,
     });
 }
-/*
-  async function castingRoleAdded(member_id: number, role_id: number) {
-    const guild_id = guildId;
-    const quest_id: number = currentQuestId;
-    await addCastingRole({
-      data: { member_id, guild_id, role_id, quest_id },
-    });
-  }
-
-  async function castingRoleRemoved(member_id: number, role_id: number) {
-    const guild_id: number|null = guildId;
-    const quest_id: number|undefined = currentQuestId;
-    await roleStore.deleteCastingRole({
-      params: { member_id, role_id, guild_id, quest_id },
-      data: {},
-    });
-  }
-  */
 async function doSubmit() {
   try {
     if (currentGuild.value) await guildStore.updateGuild(currentGuild.value);
@@ -575,6 +536,7 @@ async function doSubmit() {
   }
 }
 
+// Lifecycle Hooks
 onBeforeMount(async () => {
   if (typeof route.params.guild_id === 'string') {
     guildId = Number.parseInt(route.params.guild_id);
@@ -588,7 +550,6 @@ onBeforeMount(async () => {
   ]);
   await guildStore.setCurrentGuild(guildId!);
   currentGuild.value = await guildStore.getGuildById(guildId!);
-
   availableRolesByMember.value = Object.fromEntries(
     guildStore.getMembersOfCurrentGuild!.map((m: PublicMember) => [
       m.id,
@@ -620,7 +581,6 @@ onBeforeMount(async () => {
 .guild-admin-card {
   width: 60%;
 }
-
 .quest-section {
   background-color: gainsboro;
   padding-bottom: 5em;
