@@ -127,7 +127,7 @@
               {{ prop.node.url }}
             </a>
           </div>
-          <div class="node-description" v-html="prop.node.description"></div>
+          <div class="scrollable-div" v-html="prop.node.description"></div>
         </div>
         <node-form
           :ref="nodeFormRef(prop.node.id)"
@@ -148,7 +148,7 @@
           :nodeInput="newNode"
           :allowAddChild="false"
           :ibisTypes="childIbisTypes"
-          :editing="true"
+          :editing="false"
           :roles="roleStore.getRoles"
           :allowChangeMeta="allowChangeMeta"
           :pubFn="calcSpecificPubConstraints"
@@ -179,7 +179,7 @@ import { useConversationStore } from '../stores/conversation';
 import { useGuildStore } from 'src/stores/guilds';
 import { useMembersStore } from 'src/stores/members';
 import { useQuestStore } from 'src/stores/quests';
-import { computed, onBeforeMount, ref, shallowRef } from 'vue';
+import { computed, nextTick, onBeforeMount, ref, shallowRef } from 'vue';
 import { useReadStatusStore } from 'src/stores/readStatus';
 import { useRoleStore } from 'src/stores/role';
 import { useRouter } from 'vue-router';
@@ -270,7 +270,7 @@ const nodesTree=computed((): QTreeNode[] => {
       return conversationStore.getNeighbourhoodTree!;
     if (NodeTreeProps.currentGuildId)
       return conversationStore.getPrivateConversationTree;
-    return conversationStore.getConversationTree!;
+      return conversationStore.getConversationTree!;
 });
 const threats = computed((): ThreatMap | undefined => {
   if (NodeTreeProps.channelId) return undefined;
@@ -404,7 +404,6 @@ function filterMethod(node: Partial<ConversationNode>, filter_string: string) {
 }
 
 function canAddTo(nodeId: number): boolean {
-  console.log("nodeId", nodeId)
   const quest = questStore.getQuestById(NodeTreeProps.currentQuestId!);
   if (quest) {
     return (
@@ -520,10 +519,10 @@ async function confirmEdit(node: Partial<ConversationNode>) {
     });
   }
 }
-const selectionChanged = computed(() => (id:number) => {
+function selectionChanged(id: number) {
   selectedNodeId.value = id;
   emit('selectionChanged', id);
-})
+}
 async function changeNeighbourhood() {
   ready.value = false;
   await treePromise();
@@ -610,7 +609,6 @@ function keyResponder(evt:KeyboardEvent) {
 }
 function hiddenByCollapse(qnode: QTreeNode) {
   const qtree = tree.value ;
-  console.log(qtree);
   while (qnode) {
     qnode = qnode.parent!;
     if (!qnode) break;
@@ -626,17 +624,24 @@ function inSearchFilter(qnode: QTreeNode) {
   }
   return false;
 }
-function scrollToNode(id: number | null, later: number | null = null) {
+
+function scrollToNode(id: number | null, later: number | null = null): void {
+  if (id === null) {
+    console.warn('scrollToNode called with null id.');
+    return;
+  }
+
   if (later !== null) {
     setTimeout(() => scrollToNode(id, null), later);
   } else {
-    // Query the DOM for the element with id `node_${id}`
-    const element = document.querySelector<HTMLElement>(`#node_${id}`);
-    if (element) {
-      element.scrollIntoView({ block: 'center' });
-    } else {
-      console.warn(`Element with id "node_${id}" not found.`);
-    }
+    nextTick(() => {
+      const element = document.querySelector<HTMLElement>(`[ref="node_${id}"]`);
+      if (element) {
+        element.scrollIntoView({ block: 'center' });
+      } else {
+        console.warn(`Element with ref "node_${id}" not found.`);
+      }
+    });
   }
 }
 function selectPrevious() {
@@ -783,5 +788,9 @@ onBeforeMount(async () => {
 }
 .score-neg.other-score {
   color: orange;
+}
+.scrollable-div {
+  max-height: 200px;
+  overflow-y: scroll;
 }
 </style>

@@ -34,6 +34,12 @@ const baseState: GuildsState = {
   fullFetch: false,
   fullGuilds: {},
 };
+const clearBaseState: GuildsState = {
+  currentGuild: 0,
+  guilds: {},
+  fullFetch: false,
+  fullGuilds: {},
+}
 export const useGuildStore = defineStore('guild', {
   state: () => baseState,
 
@@ -218,7 +224,7 @@ export const useGuildStore = defineStore('guild', {
       }
     },
     resetGuilds() {
-      Object.assign(this, baseState);
+      Object.assign(this, clearBaseState);
     },
     async fetchGuildsById(
       id: number | number[] | undefined,
