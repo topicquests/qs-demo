@@ -42,8 +42,9 @@
 <script setup lang="ts">
 import { useMemberStore } from 'src/stores/member';
 import { Role } from '../types';
-import { watchEffect } from 'vue';
+import { ref, watchEffect } from 'vue';
 
+// Props
 const CastingRoleEditProps = defineProps<{
   availableRoles: Role[];
   castingRoles: Role[];
@@ -51,18 +52,24 @@ const CastingRoleEditProps = defineProps<{
   guildId: number | undefined;
 }>();
 
-const memberStore = useMemberStore();
-let cr: Role[] = [];
+// Emits
 const emit = defineEmits(['castingRoleAdd', 'castingRoleRemove']);
 
+// Stores
+const memberStore = useMemberStore();
+
+// Non Reactive Variables
+const cr=ref<Role[]>([]);
+
+// Watches
 watchEffect(() => {
-  cr = [...CastingRoleEditProps.castingRoles];
+  cr.value = [...CastingRoleEditProps.castingRoles];
 });
 
+// FUnctions
 function castingRoleAdd(role_id: number) {
   emit('castingRoleAdd', role_id);
 }
-
 function castingRoleRemove(role: Role) {
   emit('castingRoleRemove', role.id);
 }

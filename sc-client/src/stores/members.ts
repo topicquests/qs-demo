@@ -118,7 +118,7 @@ export const useMembersStore = defineStore('members', {
       guildId,
       full = true,
     }: {
-      guildId: number | null;
+      guildId: number | undefined;
       full?: boolean;
     }) {
       const guildStore = useGuildStore();
