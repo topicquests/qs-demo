@@ -105,6 +105,7 @@ interface GuildRow extends GuildData {
   numPlayers?: number;
 }
 
+// Props
 const GuildsTableProp = defineProps<{
   title?: string;
   guilds: GuildData[];
@@ -115,13 +116,18 @@ const GuildsTableProp = defineProps<{
   extra_columns?: [];
 }>();
 
+// Stores
 const questStore = useQuestStore();
 const guildStore = useGuildStore();
 const baseStore = useBaseStore();
 const memberStore = useMemberStore();
+
+// Non Reactive Variables
 const extra = GuildsTableProp.extra_columns || [];
 const guildPermission = ref(false);
 const selectedGuild = ref<GuildRow[]>([]);
+
+// Columns
 const columns: QTableProps['columns'] = [
   {
     name: 'info',
@@ -190,39 +196,22 @@ const columns: QTableProps['columns'] = [
   },
   ...extra,
 ];
+
+// Computed Properties
 const currentQuest = computed({
   get: () => questStore.getCurrentQuest,
   set: () => {}
-})
-
+});
 const hasGuildAdminPermission = computed(() => (id: number) => {
   guildPermission.value = baseStore.hasPermission(
     permission_enum.guildAdmin,
     id,
   );
-  return guildPermission;
+  return guildPermission.value;
 });
-
 const guildData = computed((): Partial<GuildData[]> => {
   return GuildsTableProp.guilds.map((guild: GuildData) => guildRow(guild));
 });
-
-function numPlayers(guild: Guild) {
-  if (GuildsTableProp.showPlayers) {
-    const quest = questStore.getCurrentQuest;
-    return (quest!.casting || []).filter((c: Casting) => c.guild_id == guild.id)
-      .length;
-  }
-  return (guild.guild_membership || []).length;
-}
-
-function guildIfPlaying(quest_id: number) {
-  const casting: Casting = memberStore.castingPerQuest[quest_id];
-  if (casting) {
-    return casting.guild_id;
-  }
-}
-
 const selectionChanged = computed(
   () =>
     (rowEvent: {
@@ -239,6 +228,21 @@ const selectionChanged = computed(
     },
 );
 
+// Functions
+function numPlayers(guild: Guild) {
+  if (GuildsTableProp.showPlayers) {
+    const quest = questStore.getCurrentQuest;
+    return (quest!.casting || []).filter((c: Casting) => c.guild_id == guild.id)
+      .length;
+  }
+  return (guild.guild_membership || []).length;
+};
+function guildIfPlaying(quest_id: number) {
+  const casting: Casting = memberStore.castingPerQuest[quest_id];
+  if (casting) {
+    return casting.guild_id;
+  }
+};
 function guildRow(guild: GuildData): GuildRow {
   return {
     ...guild,
@@ -250,21 +254,21 @@ function guildRow(guild: GuildData): GuildRow {
     numPlayers: numPlayers(guild),
     //score: this.scores ? this.scores[guild.id] : null,
   };
-}
-
+};
 function lastMoveRel(row: GuildData) {
   return row.last_node_published_at
     ? DateTime.fromISO(row.last_node_published_at).toRelative()
     : '';
-}
+};
 function lastMoveFull(row: GuildData) {
   return row.last_node_published_at
     ? DateTime.fromISO(row.last_node_published_at).toLocaleString(
         DateTime.DATETIME_FULL,
       )
     : '';
-}
+};
 
+// Lifecycle Hooks
 onBeforeMount(async () => {
   if (GuildsTableProp.selectable) {
     let guild = guildStore.getCurrentGuild;

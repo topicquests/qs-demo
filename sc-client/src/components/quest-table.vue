@@ -258,6 +258,7 @@ const canAdminGuilds = computed((): boolean =>{
     ) != undefined
   );
 })
+
 // Functions
 function refInterval(row: QuestData) {
   const start: number = DateTime.fromISO(row.start).millisecond;
