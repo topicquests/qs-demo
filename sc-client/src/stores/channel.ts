@@ -31,6 +31,12 @@ const baseState: ChannelState = {
   channelData: {},
   currentChannel: undefined,
 };
+const clearBaseState: ChannelState = {
+  currentGuild: undefined,
+  channels: {},
+  channelData: {},
+  currentChannel: undefined,
+};
 
 export const useChannelStore = defineStore('channel', {
   state: () => baseState,
@@ -126,7 +132,7 @@ export const useChannelStore = defineStore('channel', {
       }
     },
     resetChannel() {
-      Object.assign(this, baseState);
+      Object.assign(this, clearBaseState);
     },
     addToState(node: ConversationNode) {
       const channel_id = Number.parseInt(node.ancestry.split('.')[0]);

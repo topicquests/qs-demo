@@ -57,7 +57,7 @@
                   <div class="content-container">
                     <div
                       class="content"
-                      v-html="currentGuild!.description"
+                      v-html="currentGuild?.description"
                     ></div>
                   </div>
                 </q-card>
@@ -164,6 +164,7 @@
             <div class="row justify-center">
               <div class="col-12 q-mb-md q-mt-md">
                 <guild-members
+                  v-if="currentGuild"
                   :guild="currentGuild!"
                   :quest="currentQuest"
                   :members="getGuildMembers"
@@ -239,7 +240,7 @@ import {
   quest_status_enum,
   permission_enum,
 } from '../enums';
-import { Quest, GamePlay, Casting, Role, PublicMember } from '../types';
+import { Quest, GamePlay, Casting, Role, PublicMember, GuildData } from '../types';
 import { computed, ref, watch, watchEffect } from 'vue';
 import castingRoleEdit from '../components/casting_role_edit.vue';
 import guildMembers from '../components/guild-members.vue';
@@ -276,7 +277,6 @@ const conversationStore = useConversationStore();
 const $q = useQuasar();
 
 //Reactive Variables
-const canRegisterToQuest = ref(false);
 const isMember = ref(false);
 const prompt = ref(false);
 const guildId = ref<number | undefined>();
@@ -340,7 +340,7 @@ const allRoles = computed(() => roleStore.role);
 const currentQuestId = computed(() => questStore.currentQuest)
 const currentGuild = computed(() => guildStore.getCurrentGuild)
 const currentQuest = computed(() => questStore.getCurrentQuest)
-const currentGuildId = computed(() => guildStore.currentGuild)
+const currentGuildId = computed<number>(() => guildStore.currentGuild)
 const playingQuestInQuild = computed(() => questStore.isPlayingQuestInGuild(currentQuest.value!.id, currentGuild.value!.id,))
 const availableRoles = computed<Role[]>(()  => {
   if (!member || !member.value?.id || !guildId.value) {
@@ -356,6 +356,10 @@ const getGuildMembers = computed((): PublicMember[] | undefined => {
   }
   return [];
 });
+const canRegisterToQuest = computed(() =>  baseStore.hasPermission(
+      permission_enum.joinQuest,
+      currentGuildId.value, )
+);
 
 // Watches
 watchEffect(async() => {
@@ -392,15 +396,18 @@ watchEffect(() => {
     return
   }
 })
-watch([member, currentQuest, guildId], () => {
+watch([member!.value, currentQuest, guildId, castingRoles.value], () => {
   getCastingRoles();
 }, { immediate: true });
 
+
 // Functions
 async function getCastingRoles() {
-  const castingRolesData =
-    await membersStore.castingRolesPerQuest(member!.value?.id, currentQuest.value?.id) || [];
-  castingRoles.value = castingRolesData.map((cr) => allRoles.value[cr.role_id]);
+  if(member!.value) {
+    const castingRolesData =
+      await membersStore.castingRolesPerQuest(member!.value.id, currentQuest.value?.id) || [];
+    castingRoles.value = castingRolesData.map((cr) => allRoles.value[cr.role_id]);
+  }
 }
 async function initializeQuest() {
   var quest_id: number | undefined | null = questStore.currentQuest;
@@ -439,17 +446,14 @@ function findPlayOfGuild(gamePlays: GamePlay[]|undefined): Partial<GamePlay | un
 function checkPermissions() {
   if (typeof guildStore.currentGuild === 'number') {
     isMember.value = !!guildStore.isGuildMember(guildStore.currentGuild);
-    canRegisterToQuest.value = baseStore.hasPermission(
-      permission_enum.joinQuest,
-      guildStore.currentGuild,
-    );
+    canRegisterToQuest.value 
   }
 };
 async function castingRoleAdded(role_id: number) {
   const guild_id = guildId.value;
   const quest_id: number | undefined = questStore.currentQuest;
   await questStore.addCastingRole({
-    member_id: member!.value?.id,
+    member_id: member!.value!.id,
     role_id,
     guild_id: guild_id!,
     quest_id,
@@ -458,13 +462,14 @@ async function castingRoleAdded(role_id: number) {
 async function castingRoleRemoved(role_id: number) {
   const guild_id: number | undefined = guildId.value;
   const quest_id: number | undefined = questStore.currentQuest;
+  const member_id = member!.value!.id
   if (!member || !member.value?.id) {
     return [];
   }
   await questStore.deleteCastingRole(
-    member.value.id,
-    role_id,
+    member_id,    
     guild_id!,
+    role_id,
     quest_id,
   );
 };

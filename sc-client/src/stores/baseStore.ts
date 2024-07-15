@@ -11,6 +11,8 @@ import {
   GuildMembership,
   Casting,
   CastingRole,
+  KeyArray,
+  Role,
 } from '../types';
 import { useMemberStore } from './member';
 import { useMembersStore } from './members';
@@ -56,8 +58,8 @@ export const useBaseStore = defineStore('base', {
         if (!member) return false;
         if (member.permissions.indexOf(permission) >= 0) return true;
         if (member.permissions.indexOf('superadmin') >= 0) return true;
-        let guild: Guild;
-        let quest: Quest;
+        let guild: Partial<Guild> | undefined = undefined;
+        let quest: Partial<Quest> | undefined = undefined;
         if (guildN) {
           guild =
             typeof guildN == 'number'
@@ -69,10 +71,10 @@ export const useBaseStore = defineStore('base', {
                 m.member_id == member.id &&
                 m.status == registration_status_enum.confirmed,
             );
-            if (membership?.permissions?.indexOf(permission) >= 0) return true;
+            if (membership!.permissions?.indexOf(permission) >= 0) return true;
             // TODO: check that permission is a guild permission
             if (
-              membership?.permissions?.indexOf(permission_enum.guildAdmin) >= 0
+              membership!.permissions?.indexOf(permission_enum.guildAdmin) >= 0
             )
               return true;
           }
@@ -86,7 +88,7 @@ export const useBaseStore = defineStore('base', {
             const membership = (quest.quest_membership || []).find(
               (m: QuestMembership) => m.member_id == member.id && m.confirmed,
             );
-            if (membership?.permissions?.indexOf(permission) >= 0) return true;
+            if (membership!.permissions?.indexOf(permission) >= 0) return true;
             // TODO: check that permission is a quest permission
             // if (membership.permissions.indexOf(permission_enum.questAdmin) >= 0) return true;
           }
@@ -95,7 +97,7 @@ export const useBaseStore = defineStore('base', {
           const casting = (member.casting || []).find(
             (c: Casting) => c.guild_id == guild.id && c.quest_id == quest.id,
           );
-          if (casting?.permissions?.indexOf(permission) >= 0) return true;
+          if (casting!.permissions?.indexOf(permission) >= 0) return true;
           const roles = (member.casting_role || [])
             .filter(
               (cr: CastingRole) =>
@@ -103,12 +105,12 @@ export const useBaseStore = defineStore('base', {
             )
             .map((cr: CastingRole) => useRoleStore().getRoleById(cr.role_id));
           for (const role of roles) {
-            if (role?.permissions?.indexOf(permission) >= 0) return true;
+            if (role!.permissions!.indexOf(permission) >= 0) return true;
             if (nodeType) {
-              const rnc = (role?.role_node_constraint || []).find(
+              const rnc: Partial<Role> | undefined = (role?.role_node_constraint || []).find(
                 (rnc) => rnc.node_type == nodeType,
               );
-              if (rnc?.permissions?.indexOf(permission) >= 0) return true;
+              if (rnc!.permissions!.indexOf(permission) >= 0) return true;
             }
           }
         }

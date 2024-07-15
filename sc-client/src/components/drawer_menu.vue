@@ -62,16 +62,26 @@
 </template>
 
 <script setup lang="ts">
+// Imports
 import { ref } from 'vue';
 import { permission_enum } from '../enums';
 import { useBaseStore } from 'src/stores/baseStore';
 import { useMemberStore } from 'src/stores/member';
 
+// Emits
+const emit = defineEmits(['onLogout']);
+
+// Stores
 const baseStore = useBaseStore();
 const memberStore = useMemberStore();
+
+// Reactive Variables
 const isAuthenticated = ref(false);
+
+// Non Reactive Vasriables
 let hasPermission: boolean = false;
-const emit = defineEmits(['onLogout']);
+
+// Functions
 function checkForPermission(permission_enum: permission_enum): boolean {
   hasPermission = baseStore.hasPermission(permission_enum);
   if (hasPermission == true) {

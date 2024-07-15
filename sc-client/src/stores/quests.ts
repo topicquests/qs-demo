@@ -405,7 +405,7 @@ export const useQuestStore = defineStore('quest', {
         '/casting_role',
         castingRole,
       );
-      if (res.status == 200) {
+      if (res.status == 201) {
         const castingRole = res.data[0];
         if ((castingRole.member_id = memberStore.getUserId)) {
           if (memberStore.member) {

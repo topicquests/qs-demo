@@ -5,6 +5,7 @@
         <div>
           <member></member>
         </div>
+
         <div class="row justify-center q-mt-lg">
           <h3 class="q-mt-md">
             {{ currentQuest.name }}
@@ -141,6 +142,16 @@
             <router-link :to="{ name: 'guild_list' }">a guild</router-link>
             which could be interested in this quest?
           </span>
+        </div>
+        <div class="row justify-center q-mt-lg">
+          <router-link
+          :to="{
+            name: 'conversation_column',
+            params: { quest_id: questId },
+          }"
+          >
+          Card View
+          </router-link>
         </div>
         <div class="row justify-center q-mt-lg">
           <div class="col-11 q-md q-mr-lg">

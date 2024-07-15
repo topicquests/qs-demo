@@ -44,7 +44,7 @@ import { useMembersStore } from 'src/stores/members';
 import { useRoleStore } from 'src/stores/role';
 
 const GuildMembersProps = defineProps<{
-  guild: Guild;
+  guild?: Guild;
   quest?: Quest;
   members: PublicMember[] | undefined;
   playersOnly?: boolean;

@@ -23,7 +23,7 @@ interface GuildMap {
 }
 export interface GuildsState {
   guilds: GuildMap;
-  currentGuild: number | boolean;
+  currentGuild: number;
   fullFetch: boolean;
   fullGuilds: { [key: number]: boolean };
 }

@@ -11,7 +11,7 @@
           </div>
         </div>
         <div class="column items-center">
-          <h4 v-if="guild">
+          <h4 v-if="guild && currentGuild">
             <router-link
               :to="{
                 name: 'guild',
@@ -147,6 +147,7 @@
                 >
               </div>
               <q-select
+                v-if="member"
                 class="q-pl-lg"
                 style="width: 50%"
                 :multiple="true"
@@ -343,8 +344,13 @@ let confirmedPlayQuestId: number[] | GamePlay[] = [];
 // Computed Properties
 const member = computed(() => memberStore.member);
 const quest = computed(() => questStore.getQuests);
-const description = computed(() => {
-  return currentGuild.value.description!;
+const description = computed<string>({
+  get() {
+    return currentGuild.value?.description ?? '';
+  },
+  set(value) {
+   currentGuild.value.description = value;
+  },
 });
 const currentGuild = computed({
   get: () => guildStore.getCurrentGuild!,
@@ -352,12 +358,14 @@ const currentGuild = computed({
 });
 const activeQuests = computed((): Partial<QuestData[]> => {
   const active_quests = questStore.getQuests.filter((q: QuestData) => {
+    if (typeof q.id === 'number')
     return (
       (q.status == quest_status_enum.ongoing ||
         q.status == quest_status_enum.paused ||
         q.status == quest_status_enum.registration) &&
       confirmedPlayQuestId.includes(q.id)
     );
+    
   });
   if (active_quests && active_quests.length > 0) {
     return active_quests;

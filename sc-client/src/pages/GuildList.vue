@@ -10,11 +10,12 @@
             <scoreboard></scoreboard>
           </div>
         </div>
-
         <div class="column items-center">
           <div class="col-6" style="width: 100%">
-            <div v-if="guildStore.getGuilds.length">
-              <guilds-table :guilds="guildStore.getGuilds" :title="'Guilds'">
+            <div v-if="guilds.length">
+              <guilds-table 
+                :guilds="guilds" 
+                :title="'Guilds'">
               </guilds-table>
             </div>
             <h3 v-else>There currently are no guilds</h3>
@@ -28,21 +29,27 @@
 <script setup lang="ts">
 import scoreboard from '../components/score-board.vue';
 import member from '../components/member-handle.vue';
-import { userLoaded } from '../boot/userLoaded';
+import { waitUserLoaded } from '../app-access';
 import GuildsTable from '../components/guilds-table.vue';
 import { useGuildStore } from '../stores/guilds';
-import { Guild } from '../types';
-import { onBeforeMount, ref } from 'vue';
+import { computed, onBeforeMount, ref } from 'vue';
 import { useRoleStore } from 'src/stores/role';
 import { useQuestStore } from 'src/stores/quests';
 
-const ready = ref(false);
+// Stores
 const guildStore = useGuildStore();
 const roleStore = useRoleStore();
 const questStore = useQuestStore();
 
+// Reactive Variables
+const ready = ref(false);
+
+// Computed Properties
+const guilds = computed(() => guildStore.getGuilds)
+
+// Lifecycle Hooks
 onBeforeMount(async () => {
-  //await userLoaded;
+  await waitUserLoaded();
   await Promise.all([
     guildStore.ensureAllGuilds(),
     await roleStore.ensureAllRoles(),
