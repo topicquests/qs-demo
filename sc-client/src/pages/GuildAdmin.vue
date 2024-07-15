@@ -276,6 +276,7 @@
 </template>
 
 <script setup lang="ts">
+// Imports
 import { waitUserLoaded } from '../app-access';
 import {
   registration_status_enum,
@@ -338,7 +339,7 @@ const availableRolesByMember = ref<{ [key: number]: number[] | undefined }>({});
 const isAdmin = ref(false);
 
 // Variables
-let guildId: number | null = null;
+let guildId: number | undefined = undefined;
 let confirmedPlayQuestId: number[] | GamePlay[] = [];
 
 // Computed Properties
@@ -519,7 +520,7 @@ async function roleAdded(member_id: number, role_id: number) {
     });
 }
 async function roleRemoved(member_id: number, role_id: number) {
-  const guild_id: number | null = guildId;
+  const guild_id: number | undefined = guildId;
   if (typeof guild_id == 'number')
     await guildStore.deleteGuildMemberAvailableRole({
       member_id,
