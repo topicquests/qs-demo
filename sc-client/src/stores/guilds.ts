@@ -39,7 +39,7 @@ const clearBaseState: GuildsState = {
   guilds: {},
   fullFetch: false,
   fullGuilds: {},
-}
+};
 export const useGuildStore = defineStore('guild', {
   state: () => baseState,
 
@@ -316,13 +316,11 @@ export const useGuildStore = defineStore('guild', {
       });
     },
     async updateGuild(data: Partial<Guild>) {
-      const params = Object();
-      params.id = data!.id;
       data = filterKeys(data, guildPatchKeys);
-      const res: AxiosResponse<GuildData[]> = await api.patch(
-        `/guilds?id=eq.${params.id}`,
-        data,
-      );
+      const res: AxiosResponse<GuildData[]> = await api.patch('guilds', data, {
+        params: { id: `eq.${data.id}` },
+      });
+
       if (res.status == 200) {
         const guild = res.data[0];
         const guildData: GuildData = Object.assign(
@@ -350,15 +348,12 @@ export const useGuildStore = defineStore('guild', {
     },
     async doUpdateGuildMembership(data: Partial<GuildMembership>) {
       const memberStore = useMemberStore();
-      const params = Object();
-      params.member_id = data.member_id;
-      params.guild_id = data.guild_id;
-      const res: AxiosResponse<GuildMembership[]> = await api.patch(
-        'guild_membership',
-        {
-          params,
+      const res: AxiosResponse<GuildMembership[]> = await api.patch('guild_membership', data, {
+        params: {
+          member_id: `eq.${data.member_id}`,
+          guild_id: `eq.${data.guild_id}`,
         },
-      );
+      });
       if (res.status == 200) {
         const membership = res.data[0];
         const guild = this.guilds[membership.guild_id];
