@@ -2,6 +2,15 @@
   "extends": "@quasar/app-vite/tsconfig-preset",
   "compilerOptions": {
     "target": "es6",
+    "strict": false,
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "types": ["jest", "quasar"],
     "baseUrl": "."
+  },
+  "vueCompilerOptions": {
+    "target": 3.4
   }
 }
