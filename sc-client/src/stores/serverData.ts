@@ -9,6 +9,9 @@ export interface ServerDataState {
 const baseState: ServerDataState = {
   serverData: undefined,
 };
+const clearBaseState: ServerDataState = {
+  serverData: undefined,
+};
 export const useServerDataStore = defineStore('serverData', {
   state: () => baseState,
 
@@ -29,7 +32,9 @@ export const useServerDataStore = defineStore('serverData', {
         return this.serverData;
       }
     },
-
+    resetServer() {
+      Object.assign(this, clearBaseState)
+    },
     async fetchServerData(): Promise<ServerData> {
       const res: AxiosResponse<ServerData[]> = await api.get('/server_data');
       if (res.status == 200) {

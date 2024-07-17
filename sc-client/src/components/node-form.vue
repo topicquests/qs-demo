@@ -2,13 +2,13 @@
   <q-card class="node-card q-pa-md">
     <section class="node-card-title">
       <q-input 
-        v-model="NodeFormProps.nodeInput!.title" 
+        v-model="node.title" 
         label="Node title" 
         ref="title" 
       >
       <template v-slot:prepend>
         <IbisButton 
-          :node_type="node!.node_type"></IbisButton>
+          :node_type="node!.node_type as ibis_node_type_type"></IbisButton>
       </template>
       </q-input>
     </section>
@@ -45,7 +45,7 @@
     <section v-if="NodeFormProps.editing">
       <div class="row justify-start">
         <ibis-button
-          :node_type="node!.node_type"
+          :node_type="node!.node_type as ibis_node_type_type"
           :small="true"
           style="box-align: center; margin-top: 3ex; margin-right: 1ex"
         />
@@ -131,7 +131,7 @@ import { QInput } from 'quasar';
 
 // Props
 const NodeFormProps = defineProps<{
-  nodeInput?: Partial<ConversationNode>;
+  nodeInput?: Partial<ConversationNode> | defaultNodeType;
   editing: boolean;
   ibisTypes: ibis_node_type_type[];
   allowChangeMeta?: boolean;
@@ -143,16 +143,15 @@ const NodeFormProps = defineProps<{
 const emit = defineEmits(['action', 'cancel']);
 
 // Reactive Variables
-const nodeInput = ref<Partial<ConversationNode>>(NodeFormProps.nodeInput ?? {});
 const selectedNode = ref<string | undefined>(NodeFormProps.nodeInput?.node_type)
 const selectedStatus = ref<string | undefined>(NodeFormProps.nodeInput?.status)
+const title = ref<QInput>();
+const node = ref<Partial<ConversationNode> | defaultNodeType>({});
 
 // Non Reactive Variables
 let pub_state_list: publication_state_type[] = publication_state_list;
 
 // Computed Properties
-const title = ref<QInput>();
-const node = ref<Partial<ConversationNode>>({});
 const selectedNodeType = computed(() => {
   if (selectedNode.value && isValidNodeType(selectedNode.value)) {  
     return selectedNode.value

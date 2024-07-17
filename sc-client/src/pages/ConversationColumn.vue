@@ -45,7 +45,7 @@
                 </div>
               </div> 
               <div class="row justify-center items-center">   
-                <div class="col-4 q-pa-sm" style="width: 98%">
+                <div class="col-4 q-pa-sm" style="width: 100%">
                   <q-card class="q-ma-md">
                     <div class="row q-pb-lg q-pt-lg">
                         <q-card class="q-mr-md q-pl-sm q-ml-xl" style="width: 17%"> 

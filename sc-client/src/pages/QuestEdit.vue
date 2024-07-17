@@ -33,10 +33,10 @@
           <div
             class="column items-center"
             style="width: 75%"
-            v-if="questStore.getCurrentQuest"
+            v-if="currentQuest"
           >
             <quest-card
-              :thisQuest="questStore.getCurrentQuest"
+              :thisQuest="currentQuest"
               :edit="true"
               :create="false"
               v-on:doUpdateQuest="doSubmitQuest"
@@ -76,12 +76,14 @@
 </template>
 
 <script setup lang="ts">
+
+// Imports
 import scoreboard from '../components/score-board.vue';
 import memberHandle from '../components/member-handle.vue';
 import nodeForm from '../components/node-form.vue';
 import questCard from '../components/quest-edit-card.vue';
 import { waitUserLoaded } from '../app-access';
-import { ref } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import { useQuestStore } from 'src/stores/quests';
 import { useConversationStore } from 'src/stores/conversation';
 import { useQuasar } from 'quasar';
@@ -90,14 +92,22 @@ import { onBeforeMount } from 'vue';
 import { useRoute } from 'vue-router';
 import { ConversationNode, Quest, QuestData, defaultNodeType } from 'src/types';
 
-const $q = useQuasar();
+// Stores
 const questStore = useQuestStore();
 const conversationStore = useConversationStore();
-let quest_id = ref<number | null>(null);
-const base_ibis_types = [ibis_node_type_enum.question];
-const ready = ref(false);
-const isAdmin = true;
+
+// Routes
 const route = useRoute();
+
+// Quasar
+const $q = useQuasar();
+
+// Reactive Variables
+const quest_id = ref<number | null>(null);
+const ready = ref(false);
+
+// Non Reactive Variables
+const base_ibis_types = [ibis_node_type_enum.question];
 const defaultNode: defaultNodeType = {
   quest_id: undefined,
   title: '',
@@ -105,12 +115,24 @@ const defaultNode: defaultNodeType = {
   status: 'private_draft',
   node_type: 'question',
 };
-let node = getNode();
+
+// Computed Properties
+const currentQuest = computed(() => questStore.getCurrentQuest)
+
+const node = computed(() => getNode());
+
+// Watches
+watchEffect(() => {
+  if(quest_id.value) {
+    return
+  }
+})
+
+// Functions
 function getNode(): Partial<ConversationNode> | defaultNodeType {
   const rootNode = conversationStore.getRootNode;
   return rootNode || defaultNode;
 }
-
 function quest(): QuestData | undefined {
   return questStore.getCurrentQuest;
 }
@@ -184,6 +206,8 @@ async function doSubmitQuest(quest: Partial<Quest>) {
     });
   }
 }
+
+// Lifecycle Hooks
 onBeforeMount(async () => {
   if (typeof route.params.quest_id === 'string') {
     quest_id.value = Number.parseInt(route.params.quest_id);
@@ -194,7 +218,7 @@ onBeforeMount(async () => {
     await questStore.setCurrentQuest(questId);
     await questStore.ensureQuest({ quest_id: questId });
     await conversationStore.ensureConversation(questId);
-    if (conversationStore.getConversation.length > 0) {
+    if (conversationStore.getConversation!.length > 0) {
       await conversationStore.fetchRootNode({ quest_id: questId });
     }
   }

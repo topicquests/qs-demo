@@ -63,7 +63,7 @@ export function ibis_child_types(
 }
 
 export interface ConversationMap {
-  [key: number]: ConversationNode;
+  [key: number]: QTreeNode;
 }
 
 export interface ConversationState {
@@ -135,7 +135,7 @@ export const useConversationStore = defineStore('conversation', {
     getTreeSequence: (state: ConversationState): number[] =>
       depthFirst(
         makeTree(Object.values(state.conversation || state.neighbourhood))[0],
-      ),
+    ),
     getThreatMap() {
       const tree = this.getConversationTree;
       if (tree && tree.length > 0) {
@@ -208,7 +208,7 @@ export const useConversationStore = defineStore('conversation', {
               permission_enum.publishGameMove,
               node.guild_id,
               node.quest_id,
-              node.node_type,
+              node.node_type as ibis_node_type_enum,
             ))
         )
       ) {
@@ -220,7 +220,7 @@ export const useConversationStore = defineStore('conversation', {
           permission_enum.editConversationNode,
           node.guild_id,
           node.quest_id,
-          node.node_type,
+          node.node_type as ibis_node_type_enum,
         );
       }
       return false;

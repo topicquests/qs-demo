@@ -312,6 +312,7 @@ export const useQuestStore = defineStore('quest', {
     resetQuests() {
       Object.assign(this, clearBaseState);
     },
+    
     //axios calls
     async fetchQuests(): Promise<QuestData[] | undefined> {
       return await this.fetchQuestById(undefined, false);

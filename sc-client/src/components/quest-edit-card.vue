@@ -268,14 +268,34 @@
 </template>
 
 <script setup lang="ts">
-import { Quest, QuestData } from '../types';
+import { QuestData } from '../types';
 import { public_private_bool, quest_status_type } from '../enums';
 import { DateTime } from 'luxon';
 import { useQuestStore } from 'src/stores/quests';
 import { useQuasar } from 'quasar';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
-const turn_based_bool = [
+// Props
+const QuestCardProps = defineProps<{
+  thisQuest: Partial<QuestData>;
+  edit: boolean;
+  create: boolean;
+}>();
+
+// Stores
+const questStore = useQuestStore();
+
+// Quasar
+const $q = useQuasar();
+
+// Emits
+const emit = defineEmits(['doUpdateQuest']);
+
+// Reactive Variables
+const quest = ref<Partial<QuestData>>({});
+
+// Non Reactive Variables
+  const turn_based_bool = [
   {
     label: 'Continuous',
     value: true,
@@ -286,23 +306,21 @@ const turn_based_bool = [
   },
 ];
 
-const QuestCardProps = defineProps<{
-  thisQuest: Partial<QuestData>;
-  edit: boolean;
-  create: boolean;
-}>();
-const questStore = useQuestStore();
-const quest = ref<Partial<Quest>>(QuestCardProps.thisQuest);
-const $q = useQuasar();
-const emit = defineEmits(['doUpdateQuest']);
-
 const description = computed({
-  get: () => quest.value?.description,
-  set: (value) => {
-    if (quest.value) quest.value.description = value;
+  get() {
+    return quest.value.description || ''
   },
-});
+  set(value) {
+    quest.value.description = value
+  }
+})
 
+// Watches
+watch(() => QuestCardProps.thisQuest, (newQuest) => {
+  quest.value = {...newQuest}
+})
+
+// Functions
 async function doEndTurn() {
   try {
     await questStore.endTurn({ quest_id: quest.value.id! });
@@ -345,7 +363,6 @@ function doUpdateQuest() {
   font-size: 11pt;
   width: 90%;
 }
-
 #quest-card {
   width: 90%;
 }

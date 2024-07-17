@@ -38,7 +38,7 @@ export const useBaseStore = defineStore('base', {
       useQuestStore().resetQuests();
       useGuildStore().resetGuilds();
       useRoleStore().resetRole();
-      useServerDataStore().resetServerData();
+      useServerDataStore().resetServer();
       useReadStatusStore().resetReadStatus();
       useChannelStore().resetChannel();
     },

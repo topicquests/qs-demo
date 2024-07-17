@@ -93,13 +93,14 @@
 </template>
 
 <script setup lang="ts">
+// Imports
 import memberHandle from '../components/member-handle.vue';
 import scoreboard from '../components/score-board.vue';
 import roleTable from '../components/role-table.vue';
 import serverDataCard from '../components/server-data-card.vue';
 import type { Member, PublicMember } from '../types';
-import { userLoaded } from '../boot/userLoaded';
-import { ref, computed, watch } from 'vue';
+import { waitUserLoaded } from '../app-access';
+import { ref, computed, watch, watchEffect } from 'vue';
 import { permission_enum } from '../enums';
 import { useMembersStore } from '../stores/members';
 import { useMemberStore } from '../stores/member';
@@ -109,20 +110,67 @@ import { useServerDataStore } from '../stores/serverData';
 import { onBeforeMount } from 'vue';
 import { useQuasar } from 'quasar';
 
-const ready = ref(false);
-const userIsSuperAdmin = ref(false);
+// Stores
 const membersStore = useMembersStore();
 const memberStore = useMemberStore();
 const baseStore = useBaseStore();
 const roleStore = useRoleStore();
 const serverDataStore = useServerDataStore();
+
+// Quasar
 const $q = useQuasar();
+
+// Reactive Variables
+const ready = ref(false);
+const userIsSuperAdmin = ref(false);
 const member_id = ref<number | undefined>(undefined);
-const members = membersStore.getMembers;
-const member = ref<PublicMember | undefined>(
+
+// Computed Properties
+const members = computed(() => membersStore.getMembers)
+const superAdmin = computed({
+  get() {
+    return member.value?.permissions.includes('superadmin');
+  },
+  set(value) {
+    ensure(member.value!.permissions, permission_enum.superadmin, value!);
+  },
+});
+const createQuest = computed({
+  get() {
+    return member.value?.permissions.includes('createQuest');
+  },
+  set(val) {
+    ensure(member.value!.permissions, permission_enum.createQuest, val!);
+  },
+});
+const createGuild = computed({
+  get() {
+    return member.value?.permissions.includes('createGuild');
+  },
+  set(val) {
+    ensure(member.value!.permissions, permission_enum.createGuild, val!);
+  },
+});
+const member = computed(() => 
   membersStore.getMemberById(member_id.value!),
 );
+watchEffect(() => {
+  if (member_id.value)
+    return
+  }
+);
 
+// Functions
+async function ensureData() {
+  const promises = [
+    membersStore.ensureAllMembers(),
+    roleStore.ensureAllRoles(),
+  ];
+  if (baseStore.hasPermission(permission_enum.superadmin)) {
+    promises.push(serverDataStore.ensureServerData());
+  }
+  await Promise.all(promises);
+}
 function ensure(array: string[], value: permission_enum, present: boolean) {
   if (!array) return;
   if (present) {
@@ -135,47 +183,6 @@ function ensure(array: string[], value: permission_enum, present: boolean) {
     }
   }
 }
-const superAdmin = computed({
-  get() {
-    return member.value?.permissions.includes('superadmin');
-  },
-  set(value) {
-    ensure(member.value?.permissions, permission_enum.superadmin, value);
-  },
-});
-const createQuest = computed({
-  get() {
-    return member.value?.permissions.includes('createQuest');
-  },
-  set(val) {
-    ensure(member.value?.permissions, permission_enum.createQuest, val);
-  },
-});
-const createGuild = computed({
-  get() {
-    return member.value?.permissions.includes('createGuild');
-  },
-  set(val) {
-    ensure(member.value?.permissions, permission_enum.createGuild, val);
-  },
-});
-watch(member_id, (newVal, oldVal) => {
-  // Handle member selection change here
-  member.value = membersStore.getMemberById(member_id.value);
-  console.log('Selected member ID:', newVal);
-});
-
-async function ensureData() {
-  const promises = [
-    membersStore.ensureAllMembers(),
-    roleStore.ensureAllRoles(),
-  ];
-  if (baseStore.hasPermission(permission_enum.superadmin)) {
-    promises.push(serverDataStore.ensureServerData());
-  }
-  await Promise.all(promises);
-}
-
 async function updatePermissions() {
   try {
     await membersStore.updateMember({
@@ -195,7 +202,7 @@ async function updatePermissions() {
   }
 }
 onBeforeMount(async () => {
-  //await userLoaded;
+  await waitUserLoaded();
   member_id.value = await memberStore.getUserId;
   userIsSuperAdmin.value = baseStore.hasPermission(permission_enum.superadmin);
   await ensureData();

@@ -83,16 +83,22 @@
 </template>
 
 <script setup lang="ts">
-import { QuestData, Member, ConversationNode } from '../types';
+// Imports
+import { QTreeNode } from 'quasar';
+import { QuestData } from '../types';
 import { useConversationStore, ibis_node_icon } from 'src/stores/conversation';
 
+// Props
 const QuestCardProps = defineProps<{
   currentQuest: QuestData;
   creator?: object;
   showQuestInfo?: boolean;
 }>();
+
+// Stores
 const conversationStore = useConversationStore();
 
+// Functions
 function getDate(dte: string) {
   if (dte) {
     let date: Date = new Date(dte);
@@ -103,10 +109,10 @@ function getDate(dte: string) {
 function getLastActivity() {
   let date: Date = new Date();
   let newestDate;
-  var dateArray: ConversationNode[] = [];
-  const neighbourhood: ConversationNode[] = conversationStore.getNeighbourhood;
-  if (neighbourhood.length) {
-    neighbourhood.forEach((pub) => {
+  var dateArray: QTreeNode[] = [];
+  const neighbourhood: Partial<QTreeNode> | undefined  = conversationStore.getNeighbourhood;
+  if (neighbourhood!.length) {
+    neighbourhood!.forEach((pub: Partial<QTreeNode>) => {
       if (pub.status == 'published') {
         date = new Date(pub.updated_at);
         pub.updated_at = new Intl.DateTimeFormat('en-US').format(date);
