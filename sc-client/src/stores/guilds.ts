@@ -348,12 +348,16 @@ export const useGuildStore = defineStore('guild', {
     },
     async doUpdateGuildMembership(data: Partial<GuildMembership>) {
       const memberStore = useMemberStore();
-      const res: AxiosResponse<GuildMembership[]> = await api.patch('guild_membership', data, {
-        params: {
-          member_id: `eq.${data.member_id}`,
-          guild_id: `eq.${data.guild_id}`,
+      const res: AxiosResponse<GuildMembership[]> = await api.patch(
+        'guild_membership',
+        data,
+        {
+          params: {
+            member_id: `eq.${data.member_id}`,
+            guild_id: `eq.${data.guild_id}`,
+          },
         },
-      });
+      );
       if (res.status == 200) {
         const membership = res.data[0];
         const guild = this.guilds[membership.guild_id];

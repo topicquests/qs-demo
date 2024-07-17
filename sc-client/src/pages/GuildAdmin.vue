@@ -151,7 +151,7 @@
                 class="q-pl-lg"
                 style="width: 50%"
                 :multiple="true"
-                v-model="member!.handle"
+                :model-value="getGuildAdmins"
                 @add="
                   (details) => {
                     addGuildAdmin(details.value);
@@ -166,21 +166,9 @@
                 :options="getGuildMembers"
                 option-label="handle"
                 option-value="id"
-                emit-value
-                map-options
+                color="blue"
               >
               </q-select>
-              <div v-for="member in getGuildMembers" :key="member.id">
-                <div class="row">
-                  <span
-                    v-if="isGuildAdmin(member.id)"
-                    class="q-pl-md q-pt-md"
-                    style="width: 25%"
-                  >
-                    {{ member.handle }}
-                  </span>
-                </div>
-              </div>
             </q-card>
 
             <guild-card
@@ -288,6 +276,7 @@ import {
   Quest,
   GamePlay,
   GuildMemberAvailableRole,
+  GuildMembership,
   QuestData,
   PublicMember,
   Guild,
@@ -350,7 +339,7 @@ const description = computed<string>({
     return currentGuild.value?.description ?? '';
   },
   set(value) {
-   currentGuild.value.description = value;
+    currentGuild.value.description = value;
   },
 });
 const currentGuild = computed({
@@ -360,13 +349,12 @@ const currentGuild = computed({
 const activeQuests = computed((): Partial<QuestData[]> => {
   const active_quests = questStore.getQuests.filter((q: QuestData) => {
     if (typeof q.id === 'number')
-    return (
-      (q.status == quest_status_enum.ongoing ||
-        q.status == quest_status_enum.paused ||
-        q.status == quest_status_enum.registration) &&
-      confirmedPlayQuestId.includes(q.id)
-    );
-    
+      return (
+        (q.status == quest_status_enum.ongoing ||
+          q.status == quest_status_enum.paused ||
+          q.status == quest_status_enum.registration) &&
+        confirmedPlayQuestId.includes(q.id)
+      );
   });
   if (active_quests && active_quests.length > 0) {
     return active_quests;
@@ -398,6 +386,15 @@ const confirmedPlayQuestIds = computed((): GamePlay[] | number[] => {
 const getGuildMembers = computed((): PublicMember[] => {
   return guildStore.getMembersOfCurrentGuild!;
 });
+const getGuildAdmins = computed((): PublicMember[] =>
+  membersStore.getMembersByIds(
+    (currentGuild.value?.guild_membership || [])
+      .filter((gm: GuildMembership) =>
+        gm.permissions.includes(permission_enum.guildAdmin),
+      )
+      .map((gm: GuildMembership) => gm.member_id),
+  ),
+);
 const doRegister = computed(() => async (quest_Id: number) => {
   try {
     const questId = quest_Id;
@@ -440,12 +437,18 @@ const findPlayOfGuild = computed(() => (gamePlays: GamePlay[]) => {
 });
 
 // Functions
-async function addGuildAdmin(id: number) {
-  if (!isGuildAdmin(id)) {
-    const guildMembership = guildStore.getGuildMembershipById(id);
-    if (guildMembership) {
-      guildMembership.permissions.push('guildAdmin');
-    }
+async function addGuildAdmin(member: PublicMember) {
+  const id = member.id;
+  const guildMembership = guildStore.getGuildMembershipById(id);
+  if (guildMembership.permissions.includes(permission_enum.guildAdmin)) {
+    console.error(`adding admin permissions to ${id} who already has them`);
+    return;
+  }
+  guildMembership.permissions = [
+    ...guildMembership.permissions,
+    permission_enum.guildAdmin,
+  ];
+  try {
     await guildStore.updateGuildMembership(guildMembership!);
     $q.notify({
       type: 'positive',
@@ -453,55 +456,43 @@ async function addGuildAdmin(id: number) {
         'Guild admin added to ' +
         (await membersStore.getMemberById(id)?.handle),
     });
-  } else if (isGuildAdmin(id)) {
-    const perm = guildStore.getGuildMembershipById(id)!.permissions;
-    for (var i = 0; i < perm.length; i++) {
-      if (perm[i] == 'guildAdmin') {
-        perm.splice(i, 1);
-      }
-    }
-    const guildMembership = guildStore.getGuildMembershipById(id);
-    if (guildMembership) {
-      guildMembership.permissions = perm;
-      await guildStore.updateGuildMembership(guildMembership);
-      $q.notify({
-        type: 'positive',
-        message:
-          'Guild admin removed from ' +
-          (await membersStore.getMemberById(id)?.handle),
-      });
-    }
+  } catch (error) {
+    guildMembership.permissions.pop();
+    $q.notify({
+      type: 'negative',
+      message: 'Could not add guild admin: ' + error.response.data.message,
+    });
   }
 }
-async function removeGuildAdmin(id: number) {
-  if (!isGuildAdmin(id)) {
-    const guildMembership = guildStore.getGuildMembershipById(id);
-    if (guildMembership) {
-      guildMembership.permissions.push('guildAdmin');
-      await guildStore.updateGuildMembership(guildMembership);
-      $q.notify({
-        type: 'positive',
-        message:
-          'Guild admin added to  ' +
-          (await membersStore.getMemberById(id)?.handle),
-      });
-    } else if (isGuildAdmin(id) && guildStore.getGuildMembershipById(id)) {
-      const perm = guildStore.getGuildMembershipById(id)!.permissions;
-      for (var i = 0; i < perm.length; i++) {
-        if (perm[i] == 'guildAdmin') {
-          perm.splice(i, 1);
-        }
-      }
-    }
-  }
+async function removeGuildAdmin(member: PublicMember) {
+  const id = member.id;
+
   const guildMembership = guildStore.getGuildMembershipById(id);
-  await guildStore.updateGuildMembership(guildMembership!);
-  $q.notify({
-    type: 'positive',
-    message:
-      'Guild admin removed from  ' +
-      (await membersStore.getMemberById(id)?.handle),
-  });
+  const perm = guildMembership.permissions;
+  const loc = perm.indexOf(permission_enum.guildAdmin);
+  if (loc < 0) {
+    console.error(
+      `Asking to remove admin permission from ${id} who is not an admin???`,
+    );
+    return;
+  }
+  perm.splice(loc, 1);
+  guildMembership.permissions = perm;
+  try {
+    await guildStore.updateGuildMembership(guildMembership!);
+    $q.notify({
+      type: 'positive',
+      message:
+        'Guild admin removed from  ' +
+        (await membersStore.getMemberById(id)?.handle),
+    });
+  } catch (error) {
+    guildMembership.permissions.push(permission_enum.guildAdmin);
+    $q.notify({
+      type: 'negative',
+      message: 'Could not remove guild admin: ' + error.response.data.message,
+    });
+  }
 }
 function isGuildAdmin(id: number) {
   const perm = guildStore.getGuildMembershipById(id)?.permissions;
@@ -551,14 +542,16 @@ onBeforeMount(async () => {
     guildId = Number.parseInt(route.params.guild_id);
   }
   await waitUserLoaded();
+  currentGuildId.value = guildId!;
   await Promise.all([
-    guildStore.ensureGuild(guildId!),
+    guildStore.setCurrentGuild(guildId!),
+    guildStore.ensureGuild(guildId!, true),
     questStore.ensureAllQuests(),
     roleStore.ensureAllRoles(),
     membersStore.ensureMembersOfGuild({ guildId }),
   ]);
-  await guildStore.setCurrentGuild(guildId!);
   currentGuild.value = await guildStore.getGuildById(guildId!);
+  console.log(guildStore);
   availableRolesByMember.value = Object.fromEntries(
     guildStore.getMembersOfCurrentGuild!.map((m: PublicMember) => [
       m.id,

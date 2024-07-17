@@ -47,6 +47,8 @@ export const useMembersStore = defineStore('members', {
       // may also be in member
       if (loggedIn?.id == id) return loggedIn;
     },
+    getMembersByIds: (state: MembersState) => (ids: number[]) =>
+      ids.map((id) => state.members[id]),
     getMemberByHandle: (state: MembersState) => (handle: string) =>
       Object.values(state.members).find(
         (member: PublicMember) => member.handle == handle,
