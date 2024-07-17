@@ -144,13 +144,13 @@
               <div
                 v-if="
                 currentQuest &&
-                playingQuestInQuild  
+                playingQuestInGuild  
                 "
                 class="col-12"
               >
                 <castingRoleEdit
                   class="casting-role"
-                  v-if="availableRoles.length"
+                  v-if="currentQuest.status !== 'ongoing' && availableRoles.length"
                   :availableRoles="availableRoles"
                   :castingRoles="castingRoles"
                   :guildId="guildId"
@@ -341,7 +341,7 @@ const currentQuestId = computed(() => questStore.currentQuest)
 const currentGuild = computed(() => guildStore.getCurrentGuild)
 const currentQuest = computed(() => questStore.getCurrentQuest)
 const currentGuildId = computed<number>(() => guildStore.currentGuild)
-const playingQuestInQuild = computed(() => questStore.isPlayingQuestInGuild(currentQuest.value!.id, currentGuild.value!.id,))
+const playingQuestInGuild = computed(() => questStore.isPlayingQuestInGuild(currentQuest.value!.id, currentGuild.value!.id,))
 const availableRoles = computed<Role[]>(()  => {
   if (!member || !member.value?.id || !guildId.value) {
     return [];

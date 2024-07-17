@@ -70,9 +70,9 @@ function getCastingRoleNamesForQuest(memberId: number) {
   const roles = castingRoles.map((cr) => roleStore.role[cr.role_id]);
   return roles;
 }
-function getAllCastingRoleNames(memberId: number) {
+function getAllCastingRoleNames(memberId: number):string {
   const roles = getCastingRoleNamesForQuest(memberId);
-  const rolesName = roles.map((cr) => cr.name).join(',');
+  const rolesName: string = roles.map((cr) => cr.name).join(',');
   return rolesName;
 }
 </script>
