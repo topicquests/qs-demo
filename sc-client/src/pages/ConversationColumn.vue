@@ -22,14 +22,14 @@
               </router-link>
             </div>
             <q-card>
-              <div class="row justify-left">               
-                <div v-if="parent">          
+              <div class="row justify-left q-mb-xl">               
+                <div >          
                   <h5>
-                    <q-icon :name="getIcon(parent!.id)" class="q-mr-sm" />
-                    {{ parent?.title }}
+                    <q-icon :name="getIcon(node!.id)" class="q-mr-sm" />
+                    {{ node?.title }}
                   </h5>
                 </div>
-              </div>                    
+              </div>                   
               <div class="row justify-center">
                 <div class="column; quest-description-col">
                   <q-card class="q-mb-md">
@@ -48,14 +48,13 @@
                     <div 
                       class="row justify-center items-center q-pb-lg q-pt-lg" 
                       style="flex-wrap: wrap;">
-                        <q-card v-if="parent" class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;"> 
+                      <q-card v-if="parent" class="q-pl-sm q-ml-md q-mb-md" style="min-width: 200px; height: 100px; display: flex; flex-direction: column; justify-content: center; align-items: center;"> 
                           <span>Parent Node</span>
                           <div>
-                          <q-icon :name="getIcon(parent!.id)" style="width: 30px; height: 30px"/>           
-                            {{parent?.title }}  
+                          <q-icon :name="getIcon(parent!.id)" style="width: 30px; height: 30px" class="q-mb-md"/>           
                           </div>
                           <div>
-                            <a href="#" @click.prevent="updateNodeId(parent.id)">
+                            <a class="q-ml-md q-mr-md" href="#" @click.prevent="updateNodeId(parent.id)">
                               {{ parent!.title }}
                             </a>    
                           </div>            
@@ -163,7 +162,6 @@
 import { computed, onBeforeMount, ref } from "vue";
 import { useRoute } from "vue-router";
 import { waitUserLoaded } from '../app-access';
-import { useQuestStore } from "src/stores/quests";
 import { useConversationStore } from "src/stores/conversation";
 import { QTreeNode } from 'src/types';
 import { ibis_node_type_enum } from 'src/enums';
@@ -176,7 +174,6 @@ import scoreboard from '../components/score-board.vue';
 import memberHandle from '../components/member-handle.vue';
 
 // Stores
-const questStore = useQuestStore();
 const conversationStore = useConversationStore();
 
 // Route
@@ -190,7 +187,6 @@ const questId = ref<number | undefined>();
 const ready = ref(false);
 
 // Computed Properties
-const currentQuest = computed(() => questStore.getCurrentQuest ?? null);
 const node = computed(() => conversationStore.getConversationNodeById(nodeId.value))
 const parent = computed(():QTreeNode => {
   if (node.value.parent_id && node.value.parent_id) {
