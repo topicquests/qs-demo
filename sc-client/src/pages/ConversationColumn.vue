@@ -2,7 +2,6 @@
     <q-page class="bg-secondary" v-if="ready">
       <div class="row justify-center">
         <q-card class="node-card q-mt-md q-pa-md">
-          <div class="col-12 justify-center">
             <q-card class="q-mt-md q-pa-md">        
               <div class="row justify-end" style="width: 92%">
                 <member-handle></member-handle>
@@ -12,26 +11,25 @@
                 <scoreboard></scoreboard>
               </div>
             </div>
+            <div class="row justify-center q-mt-lg">
+              <router-link
+              :to="{
+                name: 'quest_page',
+                params: { quest_id: questId },
+              }"
+              >
+              Quest Play Page
+              </router-link>
+            </div>
             <q-card>
-              <div class="row justify-left">
-               
-                <div v-if="parent">
-                  
-              
+              <div class="row justify-left">               
+                <div v-if="parent">          
                   <h5>
                     <q-icon :name="getIcon(parent!.id)" class="q-mr-sm" />
                     {{ parent?.title }}
                   </h5>
                 </div>
-              </div>  
-              <div class="row justify-left">                                 
-                           
-                  <h5>
-                    <q-icon :name="getIcon(node!.id)" style="width: 30px; height: 30px"/>           
-                    {{node?.title }}
-                  </h5>
-                </div>
-                  
+              </div>                    
               <div class="row justify-center">
                 <div class="column; quest-description-col">
                   <q-card class="q-mb-md">
@@ -47,8 +45,30 @@
               <div class="row justify-center items-center">   
                 <div class="col-4 q-pa-sm" style="width: 100%">
                   <q-card class="q-ma-md">
-                    <div class="row q-pb-lg q-pt-lg">
-                        <q-card class="q-mr-md q-pl-sm q-ml-xl" style="width: 17%"> 
+                    <div 
+                      class="row justify-center items-center q-pb-lg q-pt-lg" 
+                      style="flex-wrap: wrap;">
+                        <q-card v-if="parent" class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;"> 
+                          <span>Parent Node</span>
+                          <div>
+                          <q-icon :name="getIcon(parent!.id)" style="width: 30px; height: 30px"/>           
+                            {{parent?.title }}  
+                          </div>
+                          <div>
+                            <a href="#" @click.prevent="updateNodeId(parent.id)">
+                              {{ parent!.title }}
+                            </a>    
+                          </div>            
+                        </q-card>                        
+                    </div>
+                  </q-card>
+                </div> 
+              </div>
+              <div class="row justify-center items-center">   
+                <div class="col-4 q-pa-sm" style="width: 100%">
+                  <q-card class="q-ma-md">
+                    <div class="row justify-center items-center q-pb-lg q-pt-lg" style="flex-wrap: wrap;">
+                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;"> 
                           <!-- Header Nodes -->
                           <div class="row">                  
                               <q-img :src="issueIcon" alt="Issue Icon" class="icon" />                  
@@ -63,7 +83,7 @@
                             </div>
                           </div>              
                         </q-card>             
-                        <q-card class="q-mr-md q-pl-sm" style="width: 17%"> 
+                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;"> 
                           <div class="row">      
                             <q-img :src="positionIcon" alt="Position Icon" class="icon" />
                           </div>   
@@ -76,13 +96,12 @@
                               <div v-for="answer in filteredAnswers" :key="answer!.id">
                                 <a href="#" @click.prevent="updateNodeId(answer!.id)">
                                   {{ answer!.title }}
-                                </a>
-    
+                                </a>    
                               </div>
                             </div>
                           </div>  
                         </q-card> 
-                        <q-card class="q-mr-md q-pl-sm" style="width: 17%"> 
+                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;"> 
                           <!-- Header Nodes -->
                           <div class="row">                  
                               <q-img :src="proIcon" alt="Pro Icon" class="icon" />                  
@@ -97,7 +116,7 @@
                             </div>
                           </div>            
                         </q-card>
-                        <q-card class="q-mr-md q-pl-sm" style="width: 17%"> 
+                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;"> 
                           <!-- Header Nodes -->
                           <div class="row">                  
                               <q-img :src="conIcon" alt="Pro Icon" class="icon" />                  
@@ -114,7 +133,7 @@
                             </div>
                           </div>           
                         </q-card>
-                        <q-card class="q-mr-md q-pl-sm" style="width: 20%"> 
+                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;"> 
                           <!-- Header Nodes -->
                           <div class="row">                  
                               <q-img :src="refIcon" alt="Ref Icon" class="icon" />                  
@@ -130,21 +149,20 @@
                           </div>            
                         </q-card>                   
                     </div>
-                    </q-card>
-                  </div> 
-                </div>
-              </q-card>
-            </q-card> 
-          </div>
+                  </q-card>
+                </div> 
+              </div>
+            </q-card>
+          </q-card>         
         </q-card>
       </div>
     </q-page>
 </template>
 <script setup lang="ts">
-import { computed, onBeforeMount, onMounted, ref, toValue } from "vue";
+// Imports
+import { computed, onBeforeMount, ref } from "vue";
 import { useRoute } from "vue-router";
 import { waitUserLoaded } from '../app-access';
-import { useMemberStore } from "src/stores/member";
 import { useQuestStore } from "src/stores/quests";
 import { useConversationStore } from "src/stores/conversation";
 import { QTreeNode } from 'src/types';
@@ -158,7 +176,6 @@ import scoreboard from '../components/score-board.vue';
 import memberHandle from '../components/member-handle.vue';
 
 // Stores
-const memberStore = useMemberStore();
 const questStore = useQuestStore();
 const conversationStore = useConversationStore();
 
@@ -175,17 +192,22 @@ const ready = ref(false);
 // Computed Properties
 const currentQuest = computed(() => questStore.getCurrentQuest ?? null);
 const node = computed(() => conversationStore.getConversationNodeById(nodeId.value))
-const parent = computed(() => 
-  conversationStore.getConversationNodeById(node.value!.parent_id!) || null)
+const parent = computed(():QTreeNode => {
+  if (node.value.parent_id && node.value.parent_id) {
+    return conversationStore.getConversationNodeById(node.value.parent_id);
+  }
+  return null;
+});
 const filteredQuestions = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.question) || []);
 const filteredAnswers = computed(() => filterNodesByType(q.value, ibis_node_type_enum.answer));
 const filteredPro = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.pro) || []);
 const filteredCon = computed(() => filterNodesByType(q.value, ibis_node_type_enum.con));
 const filteredRef = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.reference) || []); 
-const getIcon = computed(() => (id: number) => {
+function getIcon(id: number)  {
   const treeIcon = findNodeById(tree.value, id)
   return treeIcon?.icon
-})
+}
+
 // Functions
 function updateNodeId(id:number) {
   nodeId.value = id;
@@ -205,22 +227,21 @@ function filterNodesByType(nodes: Partial<QTreeNode[]> | undefined, type: ibis_n
   return result;
 }
 function findNodeById(nodes: Partial<QTreeNode[]> | undefined, id: number): QTreeNode | null {
-  if (!nodes) return null; // Return null if nodes are undefined
+  if (!nodes) return null; 
   for (const node of nodes) {
     if (node!.id === id) {
-      return node as QTreeNode; // Return the node if the ID matches
+      return node as QTreeNode; 
     }
     if (node!.children && node!.children.length > 0) {
       const found = findNodeById(node!.children, id);
-      if (found) return found; // Return the found node from recursion
+      if (found) return found; 
     }
   }
-  return null; // Return null if the node with the ID is not found
+  return null; 
 }
 async function initialize() { 
-  tree.value = conversationStore.getConversationTree;
+  tree.value = conversationStore.getNeighbourhoodTree;
   q.value = await conversationStore.getChildrenOf(nodeId.value)
-  console.info("Initialize", "ensuring data for", nodeId);
 }
 
 // Lifecycle Hooks
