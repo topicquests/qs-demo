@@ -57,9 +57,10 @@
     "jest-mock-axios": "~4.7",
     "prettier": "~3.3",
     "selenium-webdriver": "~4.22",
-    "ts-node": "11.0.0-beta.1",
     "ts-jest": "~29",
-    "typescript": "~5.5"
+    "ts-node": "11.0.0-beta.1",
+    "typescript": "~5.5",
+    "vue-cli-plugin-component": "~1.12.2"
   },
   "engines": {
     "node": "^20 || ^18 || ^16 || ^14.19",

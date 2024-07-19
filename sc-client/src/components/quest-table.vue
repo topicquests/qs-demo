@@ -138,7 +138,6 @@ import {
 import { GuildMembership, Quest, QuestData } from '../types';
 import QuestDateTimeInterval from './quest-date-time-interval.vue';
 import { computed, onBeforeMount, ref } from 'vue';
-import { useMembersStore } from 'src/stores/members';
 
 // Props
 const QuestTableProps = defineProps<{

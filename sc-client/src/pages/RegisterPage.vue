@@ -10,101 +10,8 @@
               Sign Up
             </h4>
           </q-card-section>
-          <q-card-section>
-            <q-form>
-              <div class="q-mb-sm">
-                <q-input
-                  square
-                  clearable
-                  filled
-                  v-model="formdata.email"
-                  type="email"
-                  name="email"
-                  label="Email"
-                  tabindex="1"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="email" tabindex="-1" />
-                  </template>
-                </q-input>
-              </div>
-              <div class="q-mb-sm">
-                <q-input
-                  square
-                  clearable
-                  filled
-                  v-model="formdata.name"
-                  type="text"
-                  label="Name"
-                  name="name"
-                  tabindex="2"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="person" tabindex="-1" />
-                  </template>
-                </q-input>
-              </div>
-              <div class="q-mb-sm">
-                <q-input
-                  square
-                  clearable
-                  filled
-                  v-model="formdata.handle"
-                  type="text"
-                  name="handle"
-                  label="Handle"
-                  tabindex="3"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="person" tabindex="-1" />
-                  </template>
-                </q-input>
-              </div>
-              <div class="q-mb-sm">
-                <q-input
-                  sqaure
-                  clearable
-                  v-model="formdata.password"
-                  filled
-                  :type="isPwd ? 'password' : 'text'"
-                  name="password"
-                  label="Password"
-                  tabindex="4"
-                  v-on:keyup.enter="doRegister"
-                >
-                  <template v-slot:append>
-                    <q-icon
-                      :name="isPwd ? 'visibility_off' : 'visibility'"
-                      @click="isPwd = !isPwd"
-                      tabindex="-1"
-                    />
-                  </template>
-                  <template v-slot:prepend>
-                    <q-icon name="lock" tabindex="-1" />
-                  </template>
-                </q-input>
-              </div>
-            </q-form>
-          </q-card-section>
-          <q-card-section>
-            <q-card-actions>
-              <q-btn
-                unelevated
-                size="lg"
-                color="purple-4"
-                class="text-white"
-                label="Get Started"
-                style="width: 100%"
-                name="registerButton"
-                @click="doRegister"
-              />
-            </q-card-actions>
-          </q-card-section>
-          <q-card-section class="text-center q-pa-sm">
-            <router-link to="/signin" class="text-grey-6"
-              >Existing user?</router-link
-            >
-          </q-card-section>
+            <registration-form
+            v-on:doRegister="doRegister"></registration-form>        
         </q-card>
       </div>
     </div>
@@ -112,11 +19,11 @@
 </template>
 
 <script setup lang="ts">
-import { useQuasar, Notify } from 'quasar';
+import { Notify, QNotifyCreateOptions } from 'quasar';
+import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useMemberStore } from 'src/stores/member';
-import axios from 'axios';
-import { ref } from 'vue';
+import registrationForm from '../components/registration-form.vue'
 
 interface FormData {
   email?: string;
@@ -125,89 +32,73 @@ interface FormData {
   password?: string;
 }
 
-const router = useRouter();
+// Stores
 const memberStore = useMemberStore();
-const formdata = ref<FormData>({
-  email: undefined,
-  handle: undefined,
-  name: undefined,
-  password: undefined,
-});
-const $q = useQuasar();
-let isPwd = ref(true);
 
-function doRegister() {
+// Router
+const router = useRouter();
+
+// Functionsw
+function validate(formData: FormData) {
+  const theEmail = formData.email;
+  const theHandle = formData.handle;
+  const theName = formData.name;  
+  if (!theEmail) {
+    Notify.create({ 
+      type: 'negative', 
+      message: 'Missing Email',
+      color: 'negative' });
+    throw new Error('Validation error: Missing Email');
+  }  
+  if (!theHandle) {
+    Notify.create({ 
+      type: 'negative', 
+      message: 'Missing Handle',
+      color: 'negative' });
+    throw new Error('Validation error: Missing Handle');
+  }  
+  if (!theName) {
+    Notify.create({ 
+      type: 'negative', 
+      message: 'Missing Name field',
+      color: 'negative' });
+    throw new Error('Validation error: Missing Name field');
+  }  
+  if (!formData.password) {
+    Notify.create({ 
+      type: 'negative', 
+      message: 'Missing Password',
+      color: 'negative'
+     });
+    throw new Error('Validation error: Missing Password');
+  }
+}
+async function doRegister(formData: FormData) {
   try {
-    const theEmail: undefined | string = formdata.value.email;
-    const theHandle = formdata.value.handle;
-    const theName = formdata.value.name;
-    if (!theEmail) {
-      $q.notify({ type: 'negative', message: 'Missing Email' });
-      return;
-    }
-    if (!theHandle) {
-      $q.notify({ type: 'negative', message: 'Missing Handle' });
-      return;
-    }
-    if (!theName) {
-      $q.notify({ type: 'negative', message: 'Missingname field' });
-      return;
-    }
-    if (!formdata.value.password) {
-      $q.notify({ type: 'negative', message: 'Missing Password' });
-      return;
-    }
-    // TODO: the domain can benormalized to LC, but case can be significant in the handle
-    formdata.value.email = theEmail.toLowerCase();
-    memberStore.registerUser(formdata.value);
+    validate(formData);    
+    if (formData.email) {
+      formData.email = formData.email.toLowerCase();
+    }    
+    await memberStore.registerUser(formData);    
     Notify.create({
-      message:
-        'Account created successfully. Please check your email for a confirmation link.',
+      message: 'Account created successfully. Please check your email for a confirmation link.',
       color: 'positive',
-    });
+    });    
     router.push({ name: 'confirm_registration' });
-  } catch (error: unknown) {
+  } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.log(error.status);
-      $q.notify({
+      console.error('Axios error:', error);
+      Notify.create({
         message: 'There was an error creating new member.',
         color: 'negative',
       });
     } else {
-      console.log('there was an error in creating member ', error);
-      $q.notify({
-        message:
-          'There was an error creating your account. If this issue persists, contact support.',
+      console.error('Unexpected error:', error);
+      Notify.create({
+        message: 'There was an error creating your account. If this issue persists, contact support.',
         color: 'negative',
       });
     }
   }
 }
-function goHome() {
-  router.push({ name: 'home' });
-}
 </script>
-<style>
-input[type='email'] {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 14px;
-  box-sizing: border-box;
-  border: none;
-
-  width: 100%;
-}
-input[type='password'] {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 14px;
-  box-sizing: border-box;
-  border: none;
-  width: 100%;
-}
-input[type='text'] {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 14px;
-  box-sizing: border-box;
-  border: none;
-  width: 100%;
-}
-</style>
