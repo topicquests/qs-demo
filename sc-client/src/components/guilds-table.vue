@@ -52,7 +52,7 @@
                 <span v-else>View</span>
               </router-link>
               <router-link
-                v-if="hasGuildAdminPermission(props.row.id)"
+              v-if="props.row && props.row.id && hasGuildAdminPermission(props.row.id)"
                 :to="{
                   name: 'guild_admin',
                   params: { guild_id: props.row.id },
@@ -124,6 +124,8 @@ const memberStore = useMemberStore();
 
 // Non Reactive Variables
 const extra = GuildsTableProp.extra_columns || [];
+
+// Reactive Variables
 const guildPermission = ref(false);
 const selectedGuild = ref<GuildRow[]>([]);
 
@@ -202,13 +204,16 @@ const currentQuest = computed({
   get: () => questStore.getCurrentQuest,
   set: () => {}
 });
-const hasGuildAdminPermission = computed(() => (id: number) => {
-  guildPermission.value = baseStore.hasPermission(
-    permission_enum.guildAdmin,
-    id,
-  );
-  return guildPermission.value;
+const hasGuildAdminPermission = computed(() => (id) => {
+  if (!id) {
+    console.warn('Guild ID is undefined or invalid:', id);
+    return false;
+  }
+
+  const guildPermission = baseStore.hasPermission(permission_enum.guildAdmin, id);
+  return guildPermission || false;
 });
+
 const guildData = computed((): Partial<GuildData[]> => {
   return GuildsTableProp.guilds.map((guild: GuildData) => guildRow(guild));
 });
