@@ -267,6 +267,8 @@ BEGIN
   END IF;
   -- status cannot be higher than parent_status
   status := least(status, parent_status);
+  -- TODO: Forbid to downgrade a node below the minimum child's status.
+  -- Auto-publish submitted nodes if the quest is not turn-based.
   IF status = 'submitted' THEN
     IF NOT (is_guild_id_leader(guild_id) OR is_superadmin())  THEN
       RAISE EXCEPTION 'permission guildAdmin,publishGameMove';
