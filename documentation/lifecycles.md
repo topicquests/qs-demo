@@ -53,3 +53,12 @@ Column `public.conversation_node.status` of type `public.publication_state`. No 
 Note that transitioning between publication nodes is subjected to a maximum status according to the role permissions in that game. Role permissions can apply to all nodes or to specific node types.
 
 Channel nodes are not subject to role restrictions.
+
+## Game turns
+
+There are currently two modes for quests: real-time and turn-based.
+In real-time games, sumbmitted conversation nodes are instantenously published, i.e. become visible to other guilds who can play against them.
+In turn-based mode, all guilds submit their conversation nodes during the turn, but they stay submitted (hidden) until the end of turn. At end of turn, all guild's moves become simultaneously published (visible), and the guilds can start a new turn playing against the other guild's moves.
+We do not currently have a system where each guild plays in turn (and I am not sure this is of value.)
+We do not yet have a system where there would be limitations on the number and types of moves that a guild can make in a turn. That could definitely be interesting, forcing guilds to be strategic. We could also use this as a game dynamic (eg restrict criticism to one guild each term.)
+We need a dynamic that requires each guild to score the other guild's moves, and this could happen at the end of each turn (in a distinct phase before the next turn starts); or at the end of the whole quest in a real-time game. This is high on the priority list.
