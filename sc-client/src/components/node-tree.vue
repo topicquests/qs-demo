@@ -1,5 +1,5 @@
 <template>
-  <div class="tree-container" v-if="ready">
+  <div class=" q-pb-xl" v-if="ready">
     <div class="row justify-end">
       <q-btn icon="menu" :flat="true" :dense="true">
         <q-menu>
@@ -71,6 +71,7 @@
           &nbsp;-&nbsp;<span class="node-creator">{{
             getMemberHandle(prop.node.creator_id)
           }}</span>
+
           <span class="threat-status" v-if="threats && threats[prop.node.id]"
             >&nbsp;[<span
               v-if="scores && scores[prop.node.id]"
@@ -116,6 +117,11 @@
             :isRead="readStatus(prop.node.id)"
           ></read-status-counter-button>
         </div>
+        <div class="row q-mt-md q-ml-lg">
+
+            <span class="node-status">{{ prop.node.status }}</span>
+
+        </div>
       </template>
       <template v-slot:default-body="prop">
         <div
@@ -148,7 +154,7 @@
           :nodeInput="newNode"
           :allowAddChild="false"
           :ibisTypes="childIbisTypes"
-          :editing="false"
+          :editing="true"
           :roles="roleStore.getRoles"
           :allowChangeMeta="allowChangeMeta"
           :pubFn="calcSpecificPubConstraints"
@@ -179,10 +185,10 @@ import { useConversationStore } from '../stores/conversation';
 import { useGuildStore } from 'src/stores/guilds';
 import { useMembersStore } from 'src/stores/members';
 import { useQuestStore } from 'src/stores/quests';
-import { computed, nextTick, onBeforeMount, ref, shallowRef } from 'vue';
+import { computed, nextTick, onBeforeMount, ref, shallowRef, watch } from 'vue';
 import { useReadStatusStore } from 'src/stores/readStatus';
 import { useRoleStore } from 'src/stores/role';
-import { useRouter } from 'vue-router';
+
 
 // Props
 const NodeTreeProps = defineProps<{
@@ -220,6 +226,7 @@ const showObsolete = ref(false);
 const selectedNodeId = ref<number | null | undefined>(null);
 const searchFilter = ref('');
 const editingNodeId = ref<number | null>(null);
+const addingChildToNodeId = ref<number | null>(null);
 const allowChangeMeta = ref(false);
 
 const newNode = ref<Partial<ConversationNode>>({});
@@ -230,9 +237,8 @@ const nodeFormRef = computed(() => (nodeId: string | number) => (el: InstanceTyp
 });
 const form = ref<InstanceType<typeof NodeForm> | null>(null);
 
-// Variables  
+// Variables
 let baseNodePubStateConstraints: publication_state_type[];
-let addingChildToNodeId: number | null = null;
 let listenerInstalled = false;
 let selectedIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
 let childIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
@@ -263,15 +269,6 @@ const selectedNode = computed(() => (copy?: boolean) => {
   }
   return node;
 })
-const nodesTree=computed((): QTreeNode[] => {
-    if (NodeTreeProps.channelId)
-      return channelStore.getChannelConversationTree(NodeTreeProps.channelId);
-    if (showFocusNeighbourhood.value)
-      return conversationStore.getNeighbourhoodTree!;
-    if (NodeTreeProps.currentGuildId)
-      return conversationStore.getPrivateConversationTree;
-      return conversationStore.getConversationTree!;
-});
 const threats = computed((): ThreatMap | undefined => {
   if (NodeTreeProps.channelId) return undefined;
   if (NodeTreeProps.currentGuildId && showDraft.value)
@@ -284,8 +281,32 @@ const scores = computed((): ScoreMap | undefined => {
     return conversationStore.getPrivateScoreMap;
   return conversationStore.getScoreMap;
 });
-const readStatus = computed(() => (id: number) => 
+const readStatus = computed(() => (id: number) =>
   readStatusStore.getNodeReadStatus(id))
+
+  const getNodesTree = () => {
+  if (NodeTreeProps.channelId) {
+    return channelStore.getChannelConversationTree(NodeTreeProps.channelId);
+  }
+  if (showFocusNeighbourhood.value) {
+    return conversationStore.getNeighbourhoodTree;
+  }
+  if (NodeTreeProps.currentGuildId) {
+    return conversationStore.getPrivateConversationTree;
+  }
+  return conversationStore.getConversationTree;
+};
+
+const nodesTree = ref(getNodesTree());
+
+watch(
+  [NodeTreeProps, showFocusNeighbourhood, () => conversationStore.getConversationTree],
+  () => {
+    nodesTree.value = getNodesTree();
+  },
+  { deep: true }
+);
+
 function checkIfExpanded(nodeId: QTreeNode):boolean {
   const qtree = tree.value;
   if (qtree) {
@@ -427,7 +448,7 @@ function editNode(nodeId: number) {
     newNode.value = {
       ...selectedNode,
     };
-    addingChildToNodeId = null;
+    addingChildToNodeId.value = null;
     if (selectedNode!.parent_id) {
       const parent = getNode(selectedNode!.parent_id);
       selectedIbisTypes = ibis_child_types(parent!.node_type);
@@ -443,13 +464,13 @@ function editNode(nodeId: number) {
   setTimeout(() => {
     const formKey = `editForm_${nodeId}`;
     form.value = nodeForms.value[formKey]
-    if (form.value?.setFocus) 
+    if (form.value?.setFocus)
       form.value.setFocus();
   }, 0);
 }
 function addChildToNode(nodeId: number | null) {
   const formKey = `addChildForm_${nodeId}`;
-  
+
   editingNodeId.value = null;
   const parent = getNode(nodeId);
   const parent_ibis_type = parent!.node_type;
@@ -464,16 +485,16 @@ function addChildToNode(nodeId: number | null) {
     meta: parent!.meta,
   };
   calcPublicationConstraints(newNode.value);
-  addingChildToNodeId = nodeId;
+  addingChildToNodeId.value = nodeId;
   setTimeout(() => {
     form.value = nodeForms.value[formKey]
-    if (form.value) 
+    if (form.value)
       form.value!.setFocus;
   }, 0);
 }
 function cancel() {
   editingNodeId.value = null;
-  addingChildToNodeId = null;
+  addingChildToNodeId.value = null;
   newNode.value = {};
 }
 
@@ -485,7 +506,7 @@ async function confirmAddChild(node: Partial<ConversationNode>) {
     } else {
       await conversationStore.createConversationNode(node );
     }
-    addingChildToNodeId = null;
+    addingChildToNodeId.value = null;
     newNode.value = {};
     $q.notify({
       message: `Added node to conversation`,
@@ -520,6 +541,9 @@ async function confirmEdit(node: Partial<ConversationNode>) {
   }
 }
 function selectionChanged(id: number) {
+  if(id === null) {
+    return
+  }
   selectedNodeId.value = id;
   emit('selectionChanged', id);
 }
@@ -556,15 +580,15 @@ async function treePromise() {
 function keyResponder(evt:KeyboardEvent) {
   const qtree = tree.value;
   const targetElement = evt.target as HTMLElement | null;
-  if (!(selectedNodeId.value || addingChildToNodeId)) return;  
-  if (!qtree) return; 
+  if (!(selectedNodeId.value || addingChildToNodeId)) return;
+  if (!qtree) return;
   if (!targetElement) return;
   const nodeName = targetElement.nodeName;
   const inField = !(nodeName == 'BODY' || nodeName == 'DIV');
   if (editingNodeId.value || addingChildToNodeId) {
     if (evt.key == 'Escape' || (evt.key == 'Enter' && nodeName == 'BODY')) {
       editingNodeId.value = null;
-      addingChildToNodeId = null;
+      addingChildToNodeId.value = null;
       evt.preventDefault();
     }
     return;
@@ -590,7 +614,7 @@ function keyResponder(evt:KeyboardEvent) {
         NodeTreeProps.editable &&
         conversationStore.canEdit(selectedNodeId.value!) &&
         !editingNodeId.value &&
-        !addingChildToNodeId
+        !addingChildToNodeId.value
       ) {
         editNode(selectedNodeId.value!);
         evt.preventDefault();
@@ -600,7 +624,7 @@ function keyResponder(evt:KeyboardEvent) {
       if (
         NodeTreeProps.editable &&
         !editingNodeId.value &&
-        !addingChildToNodeId
+        !addingChildToNodeId.value
       ) {
         addChildToNode(selectedNodeId.value!);
         evt.preventDefault();
@@ -655,7 +679,7 @@ function selectPrevious() {
       if (searchFilter.value.length > 0 && !inSearchFilter(qnode)) {
         continue;
       }
-      selectionChanged.value(qnode.id);
+      selectionChanged(qnode.id);
       scrollToNode(qnode.id, 10);
       return true;
     }
@@ -672,7 +696,7 @@ function selectNext() {
       if (searchFilter.value.length > 0 && !inSearchFilter(qnode)) {
         continue;
       }
-      selectionChanged.value(qnode.id);
+      selectionChanged(qnode.id);
       scrollToNode(qnode.id, 10);
       return true;
     }
@@ -732,6 +756,11 @@ onBeforeMount(async () => {
 });
 </script>
 <style>
+.node-status {
+  display: block;
+  font-size: 0.9em;
+  color: gray;
+}
 .node-title {
   font-family: 'Times New Roman', Times, serif;
   font-size: 1.2em;
@@ -791,6 +820,10 @@ onBeforeMount(async () => {
 }
 .scrollable-div {
   max-height: 200px;
+  width: 75%;
   overflow-y: scroll;
+  border: 1px solid grey;
+  padding:1em;
+  color:grey
 }
 </style>

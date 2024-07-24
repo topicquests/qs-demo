@@ -2,7 +2,7 @@
     <q-page class="bg-secondary" v-if="ready">
       <div class="row justify-center">
         <q-card class="node-card q-mt-md q-pa-md">
-            <q-card class="q-mt-md q-pa-md">        
+            <q-card class="q-mt-md q-pa-md">
               <div class="row justify-end" style="width: 92%">
                 <member-handle></member-handle>
               </div>
@@ -22,14 +22,14 @@
               </router-link>
             </div>
             <q-card>
-              <div class="row justify-left q-mb-xl">               
-                <div >          
+              <div class="row justify-left q-mb-xl">
+                <div >
                   <h5>
                     <q-icon :name="getIcon(node!.id)" class="q-mr-sm" />
                     {{ node?.title }}
                   </h5>
                 </div>
-              </div>                   
+              </div>
               <div class="row justify-center">
                 <div class="column; quest-description-col">
                   <q-card class="q-mb-md">
@@ -41,51 +41,53 @@
                     </div>
                   </q-card>
                 </div>
-              </div> 
-              <div class="row justify-center items-center">   
+              </div>
+              <div class="row justify-center items-center">
                 <div class="col-4 q-pa-sm" style="width: 100%">
                   <q-card class="q-ma-md">
-                    <div 
-                      class="row justify-center items-center q-pb-lg q-pt-lg" 
+                    <div
+                      class="row justify-center items-center q-pb-lg q-pt-lg"
                       style="flex-wrap: wrap;">
-                      <q-card v-if="parent" class="q-pl-sm q-ml-md q-mb-md" style="min-width: 200px; height: 100px; display: flex; flex-direction: column; justify-content: center; align-items: center;"> 
+                      <q-card v-if="parent" class="q-pl-sm q-ml-md q-mb-md" style="min-width: 200px; height: 100px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
                           <span>Parent Node</span>
                           <div>
-                          <q-icon :name="getIcon(parent!.id)" style="width: 30px; height: 30px" class="q-mb-md"/>           
+                          <q-icon :name="getIcon(parent!.id)" style="width: 30px; height: 30px" class="q-mb-md"/>
                           </div>
                           <div>
                             <a class="q-ml-md q-mr-md" href="#" @click.prevent="updateNodeId(parent.id)">
                               {{ parent!.title }}
-                            </a>    
-                          </div>            
-                        </q-card>                        
+                            </a>
+                          </div>
+                        </q-card>
                     </div>
                   </q-card>
-                </div> 
+                </div>
               </div>
-              <div class="row justify-center items-center">   
+              <div class="row justify-center items-center">
                 <div class="col-4 q-pa-sm" style="width: 100%">
                   <q-card class="q-ma-md">
                     <div class="row justify-center items-center q-pb-lg q-pt-lg" style="flex-wrap: wrap;">
-                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;"> 
+                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;">
                           <!-- Header Nodes -->
-                          <div class="row">                  
-                              <q-img :src="issueIcon" alt="Issue Icon" class="icon" />                  
+                          <div class="row">
+                              <q-img :src="issueIcon" alt="Issue Icon" class="icon" />
                           </div>
                           <div class="row">
                             <span>Question</span>
-                          </div>                
+                          </div>
                           <!-- Question Data -->
                           <div v-if="filteredQuestions.length">
                             <div v-for="question in filteredQuestions" :key="question!.id">
-                              <span>{{ question!.title }}</span>
+                              <a href="#" @click.prevent="updateNodeId(question!.id)">
+                                {{ question!.title }}
+                              </a>
                             </div>
-                          </div>              
-                        </q-card>             
-                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;"> 
-                          <div class="row">      
+                          </div>
+                        </q-card>
+                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;">
+                          <div class="row">
                             <q-img :src="positionIcon" alt="Position Icon" class="icon" />
-                          </div>   
+                          </div>
                           <div class="row">
                             <span>Answer</span>
                           </div>
@@ -95,34 +97,36 @@
                               <div v-for="answer in filteredAnswers" :key="answer!.id">
                                 <a href="#" @click.prevent="updateNodeId(answer!.id)">
                                   {{ answer!.title }}
-                                </a>    
+                                </a>
                               </div>
                             </div>
-                          </div>  
-                        </q-card> 
-                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;"> 
+                          </div>
+                        </q-card>
+                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;">
                           <!-- Header Nodes -->
-                          <div class="row">                  
-                              <q-img :src="proIcon" alt="Pro Icon" class="icon" />                  
+                          <div class="row">
+                              <q-img :src="proIcon" alt="Pro Icon" class="icon" />
                           </div>
                           <div class="row">
                             <span>Pro</span>
-                          </div>                
+                          </div>
                           <!-- Pro Data -->
                           <div v-if="filteredPro.length">
                             <div v-for="pro in filteredPro" :key="pro!.id">
-                            {{ pro!.title }}
+                              <a href="#" @click.prevent="updateNodeId(pro!.id)">
+                                {{ pro!.title }}
+                              </a>
                             </div>
-                          </div>            
+                          </div>
                         </q-card>
-                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;"> 
+                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;">
                           <!-- Header Nodes -->
-                          <div class="row">                  
-                              <q-img :src="conIcon" alt="Pro Icon" class="icon" />                  
+                          <div class="row">
+                              <q-img :src="conIcon" alt="Pro Icon" class="icon" />
                           </div>
                           <div class="row">
                             <span>Con</span>
-                          </div>                
+                          </div>
                           <!-- Con Data -->
                           <div v-if="filteredCon.length">
                             <div v-for="con in filteredCon" :key="con!.id">
@@ -130,29 +134,31 @@
                                 {{ con!.title }}
                               </a>
                             </div>
-                          </div>           
+                          </div>
                         </q-card>
-                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;"> 
+                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;">
                           <!-- Header Nodes -->
-                          <div class="row">                  
-                              <q-img :src="refIcon" alt="Ref Icon" class="icon" />                  
+                          <div class="row">
+                              <q-img :src="refIcon" alt="Ref Icon" class="icon" />
                           </div>
                           <div class="row">
                             <span>Ref</span>
-                          </div>                
+                          </div>
                           <!-- Ref Data -->
                           <div v-if="filteredRef.length">
                             <div v-for="ref in filteredRef" :key="ref!.id">
-                              {{ ref!.title }}
+                              <a href="#" @click.prevent="updateNodeId(ref!.id)">
+                                {{ ref!.title }}
+                              </a>
                             </div>
-                          </div>            
-                        </q-card>                   
+                          </div>
+                        </q-card>
                     </div>
                   </q-card>
-                </div> 
+                </div>
               </div>
             </q-card>
-          </q-card>         
+          </q-card>
         </q-card>
       </div>
     </q-page>
@@ -198,7 +204,7 @@ const filteredQuestions = computed(() => q.value?.filter(item => item!.node_type
 const filteredAnswers = computed(() => filterNodesByType(q.value, ibis_node_type_enum.answer));
 const filteredPro = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.pro) || []);
 const filteredCon = computed(() => filterNodesByType(q.value, ibis_node_type_enum.con));
-const filteredRef = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.reference) || []); 
+const filteredRef = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.reference) || []);
 function getIcon(id: number)  {
   const treeIcon = findNodeById(tree.value, id)
   return treeIcon?.icon
@@ -223,32 +229,32 @@ function filterNodesByType(nodes: Partial<QTreeNode[]> | undefined, type: ibis_n
   return result;
 }
 function findNodeById(nodes: Partial<QTreeNode[]> | undefined, id: number): QTreeNode | null {
-  if (!nodes) return null; 
+  if (!nodes) return null;
   for (const node of nodes) {
     if (node!.id === id) {
-      return node as QTreeNode; 
+      return node as QTreeNode;
     }
     if (node!.children && node!.children.length > 0) {
       const found = findNodeById(node!.children, id);
-      if (found) return found; 
+      if (found) return found;
     }
   }
-  return null; 
+  return null;
 }
-async function initialize() { 
+async function initialize() {
   tree.value = conversationStore.getNeighbourhoodTree;
   q.value = await conversationStore.getChildrenOf(nodeId.value)
 }
 
 // Lifecycle Hooks
 onBeforeMount(async () => {
-  if (typeof route.params.quest_id === 'string') 
+  if (typeof route.params.quest_id === 'string')
     questId.value = Number(route.params.quest_id);
-  await waitUserLoaded(); 
+  await waitUserLoaded();
   await conversationStore.ensureConversation(questId.value!)
   const rootNode = await conversationStore.getRootNode;
   nodeId.value = rootNode?.id;
-  initialize();  
+  initialize();
   ready.value = true;
 });
 </script>
@@ -289,7 +295,6 @@ onBeforeMount(async () => {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10pt;
   width: 100%;
-  box-shadow: 0 60px 20px 0 rgb(151, 146, 146);
 }
 #node-description {
   padding: 1em;
@@ -297,15 +302,15 @@ onBeforeMount(async () => {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 12pt;
   width: 100%;
-  box-shadow: 0 60px 20px 0 rgb(151, 146, 146);
 }
+
 .content {
   padding: 1em;
   margin-bottom: 1em;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 14pt;
   width: 100%;
-  box-shadow: 0 60px 20px 0 rgb(151, 146, 146);
+
 }
 .quest-description-col {
   width: 100%;

@@ -407,7 +407,7 @@ export const useConversationStore = defineStore('conversation', {
         '/conversation_node',
         data,
       );
-      if (res.status == 200) {
+      if (res.status == 201) {
         const node = res.data[0];
         this.addToState(node);
       }

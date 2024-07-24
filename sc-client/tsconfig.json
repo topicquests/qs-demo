@@ -7,10 +7,11 @@
     "experimentalDecorators": true,
     "baseUrl": ".",
     "esModuleInterop": true,
-    "types": ["jest", "quasar"],
-    "baseUrl": "."
+    "types": ["vite", "quasar", "node"],
+    "lib": ["esnext", "dom"],
   },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "tests/**/*.ts", "tests/**/*.tsx", "test/setup.ts"], // Include your test files
   "vueCompilerOptions": {
-    "target": 3.4
+    "target": 3.3
   }
 }

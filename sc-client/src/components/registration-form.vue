@@ -1,4 +1,5 @@
 <template>
+  <div>
     <q-card-section>
         <q-form>
           <div class="q-mb-sm">
@@ -93,13 +94,14 @@
             >
           </q-card-section>
         </q-form>
-      </q-card-section>  
+      </q-card-section>
+  </div>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-  interface FormData {
+  export interface FormData {
     email?: string;
     handle?: string;
     name?: string;
@@ -120,6 +122,12 @@ import { useRouter } from 'vue-router';
   function doRegister() {
     emit('doRegister', formdata.value)
   }
+
+  function getFormData() {
+  return formdata.value;
+}
+
+defineExpose({ getFormData });
 </script>
 <style>
 input[type='email'] {
