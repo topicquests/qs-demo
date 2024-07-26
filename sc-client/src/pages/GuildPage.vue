@@ -391,10 +391,10 @@ watch(
       node_id = conversationStore.conversationRoot?.id;
     }
     if (node_id && typeof currentGuildId.value === 'number') {
-      await conversationStore.ensureConversationNeighbourhood({
+      await conversationStore.ensureConversationNeighbourhood(
         node_id,
-        guild: currentGuildId.value,
-      });
+        currentGuildId.value,
+      );
     } else {
       // ill-constructed quest
       await conversationStore.resetConversation();

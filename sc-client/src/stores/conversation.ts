@@ -257,13 +257,7 @@ export const useConversationStore = defineStore('conversation', {
         await this.fetchRootNode({ quest_id });
       }
     },
-    async ensureConversationNeighbourhood({
-      node_id,
-      guild,
-    }: {
-      node_id: number;
-      guild?: number;
-    }) {
+    async ensureConversationNeighbourhood(node_id: number, guild?: number) {
       if (
         node_id != this.neighbourhoodRoot ||
         Object.keys(this.neighbourhood!).length == 0

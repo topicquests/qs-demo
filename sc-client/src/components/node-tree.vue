@@ -565,10 +565,10 @@ async function treePromise() {
         node_id = conversationStore.getRootNode?.id;
       }
       if (!NodeTreeProps.initialSelectedNodeId) selectedNodeId.value = node_id;
-      return await conversationStore.ensureConversationNeighbourhood({
-        node_id: node_id!,
-        guild: NodeTreeProps.currentGuildId,
-      });
+      return await conversationStore.ensureConversationNeighbourhood(
+        node_id!,
+        NodeTreeProps.currentGuildId,
+      );
     }
   }
   if (NodeTreeProps.channelId) {
