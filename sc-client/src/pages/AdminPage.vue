@@ -100,7 +100,7 @@ import roleTable from '../components/role-table.vue';
 import serverDataCard from '../components/server-data-card.vue';
 import type { Member, PublicMember } from '../types';
 import { waitUserLoaded } from '../app-access';
-import { ref, computed, watch, watchEffect } from 'vue';
+import { ref, computed } from 'vue';
 import { permission_enum } from '../enums';
 import { useMembersStore } from '../stores/members';
 import { useMemberStore } from '../stores/member';
@@ -126,7 +126,7 @@ const userIsSuperAdmin = ref(false);
 const member_id = ref<number | undefined>(undefined);
 
 // Computed Properties
-const members = computed(() => membersStore.getMembers)
+const members = computed(() => membersStore.getMembers);
 const superAdmin = computed({
   get() {
     return member.value?.permissions.includes('superadmin');
@@ -151,14 +151,7 @@ const createGuild = computed({
     ensure(member.value!.permissions, permission_enum.createGuild, val!);
   },
 });
-const member = computed(() => 
-  membersStore.getMemberById(member_id.value!),
-);
-watchEffect(() => {
-  if (member_id.value)
-    return
-  }
-);
+const member = computed(() => membersStore.getMemberById(member_id.value!));
 
 // Functions
 async function ensureData() {

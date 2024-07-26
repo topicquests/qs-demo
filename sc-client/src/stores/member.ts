@@ -182,10 +182,7 @@ export const useMemberStore = defineStore('member', {
         data,
       );
       if (res.status == 200) {
-        membersStore.ensureMemberById({
-          id: res.data.id,
-          full: false,
-        });
+        await membersStore.ensureMemberById(res.data.id, false);
       }
       return res.data;
     },

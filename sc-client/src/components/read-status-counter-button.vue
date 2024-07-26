@@ -69,8 +69,7 @@
       <q-btn
         round
         v-else-if="
-        getChildren(readStatusProps.node_id).length > 0 &&
-          isExpanded
+          getChildren(readStatusProps.node_id).length > 0 && isExpanded
         "
         size="9px"
         :color="localRead ? 'transparent' : 'blue'"
@@ -92,9 +91,9 @@
 </template>
 
 <script setup lang="ts">
-import { useChannelStore } from 'src/stores/channel';
-import { useConversationStore } from 'src/stores/conversation';
-import { useReadStatusStore } from 'src/stores/readStatus';
+import { useChannelStore } from '../stores/channel';
+import { useConversationStore } from '../stores/conversation';
+import { useReadStatusStore } from '../stores/readStatus';
 import { computed } from 'vue';
 
 const readStatusStore = useReadStatusStore();
@@ -117,7 +116,7 @@ const getChannelUnreadCount = computed(() => (nodeId: number) => {
   return 0;
 });
 
-const getUnreadCount=computed(() => (nodeId: number) => {
+const getUnreadCount = computed(() => (nodeId: number) => {
   if (
     conversationStore.getConversationNodeById(nodeId) &&
     conversationStore.getChildrenOf(nodeId).length > 0
@@ -127,7 +126,7 @@ const getUnreadCount=computed(() => (nodeId: number) => {
   return 0;
 });
 
-const getNodeCount=computed(() => (nodeId: number) => {
+const getNodeCount = computed(() => (nodeId: number) => {
   if (readStatusProps.isChannel) {
     if (
       channelStore.getChannelById(nodeId) &&
@@ -145,8 +144,9 @@ const getNodeCount=computed(() => (nodeId: number) => {
   }
   return 0;
 });
-const getChildren = computed(() => (id: number) => 
-  conversationStore.getChildrenOf(id))
+const getChildren = computed(
+  () => (id: number) => conversationStore.getChildrenOf(id),
+);
 async function toggleReadStatus() {
   localRead = !localRead;
   await readStatusStore.CreateOrUpdateReadStatus({

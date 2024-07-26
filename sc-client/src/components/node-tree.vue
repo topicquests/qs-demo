@@ -1,5 +1,5 @@
 <template>
-  <div class=" q-pb-xl" v-if="ready">
+  <div class="q-pb-xl" v-if="ready">
     <div class="row justify-end">
       <q-btn icon="menu" :flat="true" :dense="true">
         <q-menu>
@@ -11,21 +11,27 @@
                 v-model="searchFilter"
               ></q-input>
             </q-item>
-            <q-item v-if="NodeTreeProps.currentGuildId && !NodeTreeProps.channelId">
+            <q-item
+              v-if="NodeTreeProps.currentGuildId && !NodeTreeProps.channelId"
+            >
               <q-checkbox
                 v-model="showDraft"
                 label="Draft nodes"
                 :dense="true"
               ></q-checkbox>
             </q-item>
-            <q-item v-if="NodeTreeProps.currentGuildId && !NodeTreeProps.channelId">
+            <q-item
+              v-if="NodeTreeProps.currentGuildId && !NodeTreeProps.channelId"
+            >
               <q-checkbox
                 v-model="showMeta"
                 label="Meta nodes"
                 :dense="true"
               ></q-checkbox>
             </q-item>
-            <q-item v-if="NodeTreeProps.currentGuildId && !NodeTreeProps.channelId">
+            <q-item
+              v-if="NodeTreeProps.currentGuildId && !NodeTreeProps.channelId"
+            >
               <q-checkbox
                 v-model="showFocusNeighbourhood"
                 label="Focus neighbourhood"
@@ -68,7 +74,7 @@
           >
             {{ prop.node.label }}</span
           >
-         <span class="node-creator">{{
+          <span class="node-creator">{{
             getMemberHandle(prop.node.creator_id)
           }}</span>
 
@@ -118,9 +124,7 @@
           ></read-status-counter-button>
         </div>
         <div class="row q-mt-md q-ml-lg">
-
-            <span class="node-status">{{ prop.node.status }}</span>
-
+          <span class="node-status">{{ prop.node.status }}</span>
         </div>
       </template>
       <template v-slot:default-body="prop">
@@ -134,7 +138,10 @@
             </a>
           </div>
         </div>
-          <div class="scrollable-div q-pt-md q-pb-md" v-html="prop.node.description"></div>
+        <div
+          class="scrollable-div q-pt-md q-pb-md"
+          v-html="prop.node.description"
+        ></div>
         <node-form
           :ref="nodeFormRef(prop.node.id)"
           v-if="editable && prop.node.id == editingNodeId"
@@ -168,7 +175,7 @@
 
 <script setup lang="ts">
 import { ConversationNode, QTreeNode } from '../types';
-import NodeForm  from './node-form.vue';
+import NodeForm from './node-form.vue';
 import ReadStatusCounterButton from './read-status-counter-button.vue';
 import { ibis_child_types } from '../stores/conversation';
 import { QTree, useQuasar } from 'quasar';
@@ -182,13 +189,12 @@ import {
 import { ThreatMap, ScoreMap } from '../scoring';
 import { useChannelStore } from '../stores/channel';
 import { useConversationStore } from '../stores/conversation';
-import { useGuildStore } from 'src/stores/guilds';
-import { useMembersStore } from 'src/stores/members';
-import { useQuestStore } from 'src/stores/quests';
+import { useGuildStore } from '../stores/guilds';
+import { useMembersStore } from '../stores/members';
+import { useQuestStore } from '../stores/quests';
 import { computed, nextTick, onBeforeMount, ref, shallowRef, watch } from 'vue';
-import { useReadStatusStore } from 'src/stores/readStatus';
-import { useRoleStore } from 'src/stores/role';
-
+import { useReadStatusStore } from '../stores/readStatus';
+import { useRoleStore } from '../stores/role';
 
 // Props
 const NodeTreeProps = defineProps<{
@@ -214,7 +220,7 @@ const $q = useQuasar();
 
 // Emits
 const emit = defineEmits<{
-  selectionChanged: [id: number]
+  selectionChanged: [id: number];
 }>();
 
 // Reactive Variables
@@ -231,10 +237,16 @@ const allowChangeMeta = ref(false);
 
 const newNode = ref<Partial<ConversationNode>>({});
 const tree = ref<QTree>();
-const nodeForms = shallowRef<Record<string, InstanceType<typeof NodeForm> | null>>({});
-const nodeFormRef = computed(() => (nodeId: string | number) => (el: InstanceType<typeof NodeForm> | null) => {
-  nodeForms.value[`editForm_${nodeId}`] = el;
-});
+const nodeForms = shallowRef<
+  Record<string, InstanceType<typeof NodeForm> | null>
+>({});
+const nodeFormRef = computed(
+  () =>
+    (nodeId: string | number) =>
+    (el: InstanceType<typeof NodeForm> | null) => {
+      nodeForms.value[`editForm_${nodeId}`] = el;
+    },
+);
 const form = ref<InstanceType<typeof NodeForm> | null>(null);
 
 // Variables
@@ -244,7 +256,7 @@ let selectedIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
 let childIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
 
 // Computed Properties
-const searchFilter_=computed(() => {
+const searchFilter_ = computed(() => {
   return searchFilter.value + '_';
 });
 const getMemberHandle = computed(() => (id: number) => {
@@ -268,7 +280,7 @@ const selectedNode = computed(() => (copy?: boolean) => {
     node = { ...node! };
   }
   return node;
-})
+});
 const threats = computed((): ThreatMap | undefined => {
   if (NodeTreeProps.channelId) return undefined;
   if (NodeTreeProps.currentGuildId && showDraft.value)
@@ -281,10 +293,11 @@ const scores = computed((): ScoreMap | undefined => {
     return conversationStore.getPrivateScoreMap;
   return conversationStore.getScoreMap;
 });
-const readStatus = computed(() => (id: number) =>
-  readStatusStore.getNodeReadStatus(id))
+const readStatus = computed(
+  () => (id: number) => readStatusStore.getNodeReadStatus(id),
+);
 
-  const getNodesTree = () => {
+const getNodesTree = () => {
   if (NodeTreeProps.channelId) {
     return channelStore.getChannelConversationTree(NodeTreeProps.channelId);
   }
@@ -299,9 +312,7 @@ const readStatus = computed(() => (id: number) =>
 
 const nodesTree = ref(getNodesTree());
 
-
-
-function checkIfExpanded(nodeId: QTreeNode):boolean {
+function checkIfExpanded(nodeId: QTreeNode): boolean {
   const qtree = tree.value;
   if (qtree) {
     // For example, you can check if a node is expanded
@@ -322,14 +333,18 @@ const canEdit = computed(() => (nodeId: number): boolean => {
   } else {
     return conversationStore.canEdit(nodeId);
   }
-})
+});
 // Watches
 watch(
-  [NodeTreeProps, showFocusNeighbourhood, () => conversationStore.getConversationTree],
+  [
+    NodeTreeProps,
+    showFocusNeighbourhood,
+    () => conversationStore.getConversationTree,
+  ],
   () => {
     nodesTree.value = getNodesTree();
   },
-  { deep: true }
+  { deep: true },
 );
 
 // Functions
@@ -424,7 +439,7 @@ function canAddTo(nodeId: number): boolean {
   }
   return false;
 }
-function getNode(nodeId: number | null): ConversationNode | undefined{
+function getNode(nodeId: number | null): ConversationNode | undefined {
   if (NodeTreeProps.channelId) {
     return channelStore.getChannelNode(NodeTreeProps.channelId, nodeId!);
   } else {
@@ -432,7 +447,7 @@ function getNode(nodeId: number | null): ConversationNode | undefined{
   }
 }
 function editNode(nodeId: number) {
-  if (typeof nodeId == 'number' ) {
+  if (typeof nodeId == 'number') {
     const selectedNode = getNode(nodeId);
     newNode.value = {
       ...selectedNode,
@@ -442,7 +457,8 @@ function editNode(nodeId: number) {
       const parent = getNode(selectedNode!.parent_id);
       selectedIbisTypes = ibis_child_types(parent!.node_type);
       allowChangeMeta.value =
-        parent!.meta == 'conversation' && conversationStore.canMakeMeta(nodeId!);
+        parent!.meta == 'conversation' &&
+        conversationStore.canMakeMeta(nodeId!);
     } else {
       selectedIbisTypes = ibis_node_type_list;
       allowChangeMeta.value = false;
@@ -452,9 +468,8 @@ function editNode(nodeId: number) {
   }
   setTimeout(() => {
     const formKey = `editForm_${nodeId}`;
-    form.value = nodeForms.value[formKey]
-    if (form.value?.setFocus)
-      form.value.setFocus();
+    form.value = nodeForms.value[formKey];
+    if (form.value?.setFocus) form.value.setFocus();
   }, 0);
 }
 function addChildToNode(nodeId: number | null) {
@@ -476,9 +491,8 @@ function addChildToNode(nodeId: number | null) {
   calcPublicationConstraints(newNode.value);
   addingChildToNodeId.value = nodeId;
   setTimeout(() => {
-    form.value = nodeForms.value[formKey]
-    if (form.value)
-      form.value!.setFocus;
+    form.value = nodeForms.value[formKey];
+    if (form.value) form.value!.setFocus;
   }, 0);
 }
 function cancel() {
@@ -493,7 +507,7 @@ async function confirmAddChild(node: Partial<ConversationNode>) {
     if (NodeTreeProps.channelId) {
       await channelStore.createChannelNode(node);
     } else {
-      await conversationStore.createConversationNode(node );
+      await conversationStore.createConversationNode(node);
     }
     addingChildToNodeId.value = null;
     newNode.value = {};
@@ -530,8 +544,8 @@ async function confirmEdit(node: Partial<ConversationNode>) {
   }
 }
 function selectionChanged(id: number) {
-  if(id === null) {
-    return
+  if (id === null) {
+    return;
   }
   selectedNodeId.value = id;
   emit('selectionChanged', id);
@@ -551,8 +565,9 @@ async function treePromise() {
         node_id = conversationStore.getRootNode?.id;
       }
       if (!NodeTreeProps.initialSelectedNodeId) selectedNodeId.value = node_id;
-        return await conversationStore.ensureConversationNeighbourhood({
-          node_id: node_id!, guild: NodeTreeProps.currentGuildId,
+      return await conversationStore.ensureConversationNeighbourhood({
+        node_id: node_id!,
+        guild: NodeTreeProps.currentGuildId,
       });
     }
   }
@@ -560,13 +575,14 @@ async function treePromise() {
     return await channelStore.ensureChannelConversation(
       NodeTreeProps.channelId,
       NodeTreeProps.currentGuildId!,
-  )};
+    );
+  }
   return await conversationStore.ensureConversation(
     NodeTreeProps.currentQuestId!,
   );
 }
 
-function keyResponder(evt:KeyboardEvent) {
+function keyResponder(evt: KeyboardEvent) {
   const qtree = tree.value;
   const targetElement = evt.target as HTMLElement | null;
   if (!(selectedNodeId.value || addingChildToNodeId)) return;
@@ -621,7 +637,7 @@ function keyResponder(evt:KeyboardEvent) {
   }
 }
 function hiddenByCollapse(qnode: QTreeNode) {
-  const qtree = tree.value ;
+  const qtree = tree.value;
   while (qnode) {
     qnode = qnode.parent!;
     if (!qnode) break;
@@ -698,9 +714,7 @@ async function ensureData() {
     promises = [
       ...promises,
       questStore.ensureQuest({ quest_id: NodeTreeProps.currentQuestId }),
-      membersStore.ensurePlayersOfQuest(
-        NodeTreeProps.currentQuestId,
-      ),
+      membersStore.ensurePlayersOfQuest(NodeTreeProps.currentQuestId),
     ];
   }
   if (NodeTreeProps.currentGuildId) {
@@ -716,7 +730,7 @@ async function ensureData() {
   promises = [treePromise()];
   if (NodeTreeProps.currentQuestId)
     promises.push(
-      membersStore.ensureMemberById({ id: questStore.getCurrentQuest!.creator }),
+      membersStore.ensureMemberById(questStore.getCurrentQuest!.creator),
     );
   await Promise.all(promises);
 }
@@ -756,8 +770,8 @@ onBeforeMount(async () => {
 }
 .node-creator {
   color: black;
-  font-size:10pt;
-  margin-left:1em;
+  font-size: 10pt;
+  margin-left: 1em;
   margin-right: 1em;
 }
 .score {
@@ -814,7 +828,7 @@ onBeforeMount(async () => {
   width: 75%;
   overflow-y: scroll;
   border: 1px solid grey;
-  padding:1em;
-  color:grey
+  padding: 1em;
+  color: grey;
 }
 </style>

@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { useGuildStore } from 'src/stores/guilds';
+import { useGuildStore } from '../stores/guilds';
 import { GuildData } from '../types';
 
 const GuildsMembershipIndicatorProp = defineProps<{

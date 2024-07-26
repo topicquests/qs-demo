@@ -271,7 +271,7 @@
 import { QuestData } from '../types';
 import { public_private_bool, quest_status_type } from '../enums';
 import { DateTime } from 'luxon';
-import { useQuestStore } from 'src/stores/quests';
+import { useQuestStore } from '../stores/quests';
 import { useQuasar } from 'quasar';
 import { computed, ref, watch } from 'vue';
 
@@ -295,7 +295,7 @@ const emit = defineEmits(['doUpdateQuest']);
 const quest = ref<Partial<QuestData>>({});
 
 // Non Reactive Variables
-  const turn_based_bool = [
+const turn_based_bool = [
   {
     label: 'Continuous',
     value: true,
@@ -308,17 +308,20 @@ const quest = ref<Partial<QuestData>>({});
 
 const description = computed({
   get() {
-    return quest.value.description || ''
+    return quest.value.description || '';
   },
   set(value) {
-    quest.value.description = value
-  }
-})
+    quest.value.description = value;
+  },
+});
 
 // Watches
-watch(() => QuestCardProps.thisQuest, (newQuest) => {
-  quest.value = {...newQuest}
-})
+watch(
+  () => QuestCardProps.thisQuest,
+  (newQuest) => {
+    quest.value = { ...newQuest };
+  },
+);
 
 // Functions
 async function doEndTurn() {

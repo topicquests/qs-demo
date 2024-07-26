@@ -290,14 +290,14 @@ import QuestTable from '../components/quest-table.vue';
 import scoreboard from '../components/score-board.vue';
 import memberHandle from '../components/member-handle.vue';
 import { onBeforeMount } from 'vue';
-import { useGuildStore } from 'src/stores/guilds';
+import { useGuildStore } from '../stores/guilds';
 import { useQuasar } from 'quasar';
-import { useBaseStore } from 'src/stores/baseStore';
+import { useBaseStore } from '../stores/baseStore';
 import { useRoute, useRouter } from 'vue-router';
-import { useMembersStore } from 'src/stores/members';
-import { useRoleStore } from 'src/stores/role';
-import { useQuestStore } from 'src/stores/quests';
-import { useMemberStore } from 'src/stores/member';
+import { useMembersStore } from '../stores/members';
+import { useRoleStore } from '../stores/role';
+import { useQuestStore } from '../stores/quests';
+import { useMemberStore } from '../stores/member';
 
 // Stores
 const guildStore = useGuildStore();

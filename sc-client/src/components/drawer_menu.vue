@@ -49,14 +49,14 @@
         <q-item-section>Registration</q-item-section>
       </q-item>
       <q-item-section></q-item-section>
-      <q-item 
-        v-if="checkIfAuthenticated()" 
+      <q-item
+        v-if="checkIfAuthenticated()"
         class="lt-md"
-        clickable @click="onLogout"
-        >
+        clickable
+        @click="onLogout"
+      >
         <q-item-section>logoff</q-item-section>
       </q-item>
-     
     </q-list>
   </div>
 </template>
@@ -65,8 +65,8 @@
 // Imports
 import { ref } from 'vue';
 import { permission_enum } from '../enums';
-import { useBaseStore } from 'src/stores/baseStore';
-import { useMemberStore } from 'src/stores/member';
+import { useBaseStore } from '../stores/baseStore';
+import { useMemberStore } from '../stores/member';
 
 // Emits
 const emit = defineEmits(['onLogout']);

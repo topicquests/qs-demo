@@ -44,7 +44,7 @@
 import { Notify, useQuasar } from 'quasar';
 import { useRoute, useRouter } from 'vue-router';
 import { onBeforeMount } from 'vue';
-import { useMemberStore } from 'src/stores/member';
+import { useMemberStore } from '../stores/member';
 
 let email: string | null = null;
 let token: string | null = null;

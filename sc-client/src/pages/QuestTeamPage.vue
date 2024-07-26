@@ -15,9 +15,7 @@
         <div class="row justify-center">
           <div class="column quest-card-col">
             <div class="col-12 q-mb-md">
-              <questCard 
-                :currentQuest="currentQuest">
-              </questCard>
+              <questCard :currentQuest="currentQuest"> </questCard>
             </div>
           </div>
         </div>
@@ -46,11 +44,7 @@
                 <span v-if="currentQuest!.is_playing">
                   <!-- already playing -->
                 </span>
-                <span
-                  v-else-if="
-                    currentQuest!.status != 'registration'
-                  "
-                >
+                <span v-else-if="currentQuest!.status != 'registration'">
                   <!-- not in registration phase -->
                 </span>
                 <span v-else-if="slotProps.guild.is_member">
@@ -101,11 +95,11 @@ import scoreboard from '../components/score-board.vue';
 import member from '../components/member-handle.vue';
 import GuildsTable from '../components/guilds-table.vue';
 import GuildMembers from '../components/guild-members.vue';
-import { useGuildStore } from 'src/stores/guilds';
-import { useQuestStore } from 'src/stores/quests';
-import { useConversationStore } from 'src/stores/conversation';
-import { useMembersStore } from 'src/stores/members';
-import { useRoleStore } from 'src/stores/role';
+import { useGuildStore } from '../stores/guilds';
+import { useQuestStore } from '../stores/quests';
+import { useConversationStore } from '../stores/conversation';
+import { useMembersStore } from '../stores/members';
+import { useRoleStore } from '../stores/role';
 import { useRoute } from 'vue-router';
 import { QuestData } from 'src/types';
 
@@ -118,13 +112,13 @@ const ready = ref(false);
 let questId: number;
 const route = useRoute();
 const currentQuest = computed<QuestData>({
-  get: () =>  questStore.getCurrentQuest!, 
-  set: () => {}
-})
+  get: () => questStore.getCurrentQuest!,
+  set: () => {},
+});
 const guildsPlayingCurrentQuest = computed({
   get: () => guildStore.getGuildsPlayingCurrentQuest,
-  set: () => {}
-})
+  set: () => {},
+});
 
 async function initialize() {
   if (typeof route.params.quest_id === 'string') {
@@ -136,8 +130,7 @@ async function initialize() {
     questStore.ensureCurrentQuest(questId),
     conversationStore.ensureConversation(questId),
   ]);
-  await guildStore.ensureGuildsPlayingQuest({quest_id: questId});
- 
+  await guildStore.ensureGuildsPlayingQuest({ quest_id: questId });
 }
 onBeforeMount(async () => {
   await initialize();

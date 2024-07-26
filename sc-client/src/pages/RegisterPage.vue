@@ -10,8 +10,7 @@
               Sign Up
             </h4>
           </q-card-section>
-            <registration-form
-            v-on:doRegister="doRegister"></registration-form>        
+          <registration-form v-on:doRegister="doRegister"></registration-form>
         </q-card>
       </div>
     </div>
@@ -22,8 +21,8 @@
 import { Notify, QNotifyCreateOptions } from 'quasar';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
-import { useMemberStore } from 'src/stores/member';
-import registrationForm from '../components/registration-form.vue'
+import { useMemberStore } from '../stores/member';
+import registrationForm from '../components/registration-form.vue';
 
 interface FormData {
   email?: string;
@@ -42,48 +41,52 @@ const router = useRouter();
 function validate(formData: FormData) {
   const theEmail = formData.email;
   const theHandle = formData.handle;
-  const theName = formData.name;  
+  const theName = formData.name;
   if (!theEmail) {
-    Notify.create({ 
-      type: 'negative', 
+    Notify.create({
+      type: 'negative',
       message: 'Missing Email',
-      color: 'negative' });
+      color: 'negative',
+    });
     throw new Error('Validation error: Missing Email');
-  }  
+  }
   if (!theHandle) {
-    Notify.create({ 
-      type: 'negative', 
+    Notify.create({
+      type: 'negative',
       message: 'Missing Handle',
-      color: 'negative' });
+      color: 'negative',
+    });
     throw new Error('Validation error: Missing Handle');
-  }  
+  }
   if (!theName) {
-    Notify.create({ 
-      type: 'negative', 
+    Notify.create({
+      type: 'negative',
       message: 'Missing Name field',
-      color: 'negative' });
+      color: 'negative',
+    });
     throw new Error('Validation error: Missing Name field');
-  }  
+  }
   if (!formData.password) {
-    Notify.create({ 
-      type: 'negative', 
+    Notify.create({
+      type: 'negative',
       message: 'Missing Password',
-      color: 'negative'
-     });
+      color: 'negative',
+    });
     throw new Error('Validation error: Missing Password');
   }
 }
 async function doRegister(formData: FormData) {
   try {
-    validate(formData);    
+    validate(formData);
     if (formData.email) {
       formData.email = formData.email.toLowerCase();
-    }    
-    await memberStore.registerUser(formData);    
+    }
+    await memberStore.registerUser(formData);
     Notify.create({
-      message: 'Account created successfully. Please check your email for a confirmation link.',
+      message:
+        'Account created successfully. Please check your email for a confirmation link.',
       color: 'positive',
-    });    
+    });
     router.push({ name: 'confirm_registration' });
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -95,7 +98,8 @@ async function doRegister(formData: FormData) {
     } else {
       console.error('Unexpected error:', error);
       Notify.create({
-        message: 'There was an error creating your account. If this issue persists, contact support.',
+        message:
+          'There was an error creating your account. If this issue persists, contact support.',
         color: 'negative',
       });
     }

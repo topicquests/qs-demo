@@ -100,13 +100,7 @@ export const useMembersStore = defineStore('members', {
         await this.fetchMembers();
       }
     },
-    async ensureMemberById({
-      id,
-      full = true,
-    }: {
-      id: number;
-      full?: boolean;
-    }) {
+    async ensureMemberById(id: number, full: boolean = true) {
       if (!this.members[id]) {
         await this.fetchMemberById(id, full);
       }
@@ -167,10 +161,10 @@ export const useMembersStore = defineStore('members', {
       const res: AxiosResponse<PublicMember[]> =
         await api.get('/public_members');
       if (res.status == 200) {
-        const fullMembers: any = Object.values(this.members).filter(
+        const fullMembers: PublicMember[] = Object.values(this.members).filter(
           (member: PublicMember) => this.fullMembers[member.id],
         );
-        const members:any = Object.fromEntries(
+        const members: MemberMap = Object.fromEntries(
           res.data.map((member: PublicMember) => [member.id, member]),
         );
         for (const member of fullMembers) {

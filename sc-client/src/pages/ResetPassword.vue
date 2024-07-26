@@ -58,7 +58,7 @@ import { computed, onBeforeMount, ref } from 'vue';
 import { Member } from '../types';
 import { waitUserLoaded } from '../app-access';
 import { useQuasar } from 'quasar';
-import { useMemberStore } from 'src/stores/member';
+import { useMemberStore } from '../stores/member';
 import { LocationQueryValue, useRoute, useRouter } from 'vue-router';
 
 const q = useQuasar();

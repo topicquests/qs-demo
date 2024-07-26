@@ -12,17 +12,10 @@
         </div>
         <div class="column items-center">
           <div v-if="getActiveQuests" style="width: 100%">
-            <quest-table
-              :quests="getActiveQuests"
-              :title="'Active Quests'"
-            />
+            <quest-table :quests="getActiveQuests" :title="'Active Quests'" />
             <q-btn :to="{ name: 'quest_list' }">All Quests</q-btn>
           </div>
-          <div
-            v-else-if="quests.length"
-            class="col-6"
-            style="width: 100%"
-          >
+          <div v-else-if="quests.length" class="col-6" style="width: 100%">
             <quest-table :quests="quests" :title="'Quests'" />
           </div>
           <div v-else class="column items-center q-mt-md">
@@ -71,7 +64,7 @@ import { useQuestStore } from '../stores/quests';
 import { Guild, GuildData } from '../types';
 import { computed, onBeforeMount, onMounted, ref } from 'vue';
 import member from '../components/member-handle.vue';
-import { useMembersStore } from 'src/stores/members';
+import { useMembersStore } from '../stores/members';
 import { waitUserLoaded } from '../app-access';
 
 // Stores
@@ -106,7 +99,7 @@ onBeforeMount(async () => {
   await Promise.all([
     questsStore.ensureAllQuests(),
     guildsStore.ensureAllGuilds(),
-    membersStore.ensureAllMembers()
+    membersStore.ensureAllMembers(),
   ]);
   ready.value = true;
 });

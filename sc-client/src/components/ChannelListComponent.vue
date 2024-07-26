@@ -50,7 +50,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { useChannelStore } from 'src/stores/channel';
+import { useChannelStore } from '../stores/channel';
 import { waitUserLoaded } from '../app-access';
 import { onBeforeUpdate } from 'vue';
 import { onBeforeMount } from 'vue';
@@ -68,7 +68,7 @@ const getChannels = computed(() => {
   return ChannelListProps.quest_id
     ? channelStore.getGameChannelsOfQuest(ChannelListProps.quest_id!)
     : channelStore.getGuildChannels;
-})
+});
 async function ensureData() {
   await channelStore.ensureChannels(ChannelListProps.guild_id!);
 }

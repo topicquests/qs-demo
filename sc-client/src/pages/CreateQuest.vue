@@ -35,7 +35,7 @@ import scoreboard from '../components/score-board.vue';
 import member_handle from '../components/member-handle.vue';
 import { waitUserLoaded } from '../app-access';
 import QuestCard from '../components/quest-edit-card.vue';
-import { useQuestStore } from 'src/stores/quests';
+import { useQuestStore } from '../stores/quests';
 import { onBeforeMount } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';

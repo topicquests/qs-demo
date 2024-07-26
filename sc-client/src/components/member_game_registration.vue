@@ -27,10 +27,10 @@
 <script setup lang="ts">
 import { Role, GuildMemberAvailableRole } from '../types';
 import { computed, onBeforeMount, onBeforeUpdate, ref } from 'vue';
-import { useMemberStore } from 'src/stores/member';
-import { useMembersStore } from 'src/stores/members';
-import { useRoleStore } from 'src/stores/role';
-import { useQuestStore } from 'src/stores/quests';
+import { useMemberStore } from '../stores/member';
+import { useMembersStore } from '../stores/members';
+import { useRoleStore } from '../stores/role';
+import { useQuestStore } from '../stores/quests';
 
 const MemberGameRegistrationProp = defineProps<{
   show?: boolean;

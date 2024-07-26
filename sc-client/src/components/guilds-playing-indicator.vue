@@ -56,7 +56,7 @@
 </template>
 <!-- TODO filter out cancelled game play in quest page -->
 <script setup lang="ts">
-import { useQuestStore } from 'src/stores/quests';
+import { useQuestStore } from '../stores/quests';
 import { GuildData, QuestData } from '../types';
 import { game_play_status_enum, game_play_status_type } from '../enums';
 

@@ -13,10 +13,7 @@
         <div class="column items-center">
           <div class="col-6" style="width: 100%">
             <div v-if="guilds.length">
-              <guilds-table 
-                :guilds="guilds" 
-                :title="'Guilds'">
-              </guilds-table>
+              <guilds-table :guilds="guilds" :title="'Guilds'"> </guilds-table>
             </div>
             <h3 v-else>There currently are no guilds</h3>
           </div>
@@ -33,8 +30,8 @@ import { waitUserLoaded } from '../app-access';
 import GuildsTable from '../components/guilds-table.vue';
 import { useGuildStore } from '../stores/guilds';
 import { computed, onBeforeMount, ref } from 'vue';
-import { useRoleStore } from 'src/stores/role';
-import { useQuestStore } from 'src/stores/quests';
+import { useRoleStore } from '../stores/role';
+import { useQuestStore } from '../stores/quests';
 
 // Stores
 const guildStore = useGuildStore();
@@ -45,7 +42,7 @@ const questStore = useQuestStore();
 const ready = ref(false);
 
 // Computed Properties
-const guilds = computed(() => guildStore.getGuilds)
+const guilds = computed(() => guildStore.getGuilds);
 
 // Lifecycle Hooks
 onBeforeMount(async () => {

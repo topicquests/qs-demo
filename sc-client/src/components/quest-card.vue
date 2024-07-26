@@ -9,19 +9,19 @@
           <h3 class="q-mt-md">
             {{ QuestCardProps.currentQuest.name }}
           </h3>
-          <q-btn v-if="QuestCardProps.currentQuest.description"
+          <q-btn
+            v-if="QuestCardProps.currentQuest.description"
             class="q-ml-xs q-mt-md"
             size="md"
             :flat="true"
-            icon="info"            
+            icon="info"
           >
             <q-tooltip self="bottom middle" max-width="25rem">
               <div v-html="QuestCardProps.currentQuest.description"></div>
             </q-tooltip>
           </q-btn>
           <router-link
-            :to="{ name: 'quest_page', 
-             params: { quest_id: currentQuest.id } }"
+            :to="{ name: 'quest_page', params: { quest_id: currentQuest.id } }"
             class="q-ml-sm q-mt-md"
           >
             Game
@@ -86,7 +86,7 @@
 // Imports
 import { QTreeNode } from 'quasar';
 import { QuestData } from '../types';
-import { useConversationStore, ibis_node_icon } from 'src/stores/conversation';
+import { useConversationStore, ibis_node_icon } from '../stores/conversation';
 
 // Props
 const QuestCardProps = defineProps<{
@@ -110,7 +110,8 @@ function getLastActivity() {
   let date: Date = new Date();
   let newestDate;
   var dateArray: QTreeNode[] = [];
-  const neighbourhood: Partial<QTreeNode> | undefined  = conversationStore.getNeighbourhood;
+  const neighbourhood: Partial<QTreeNode> | undefined =
+    conversationStore.getNeighbourhood;
   if (neighbourhood!.length) {
     neighbourhood!.forEach((pub: Partial<QTreeNode>) => {
       if (pub.status == 'published') {

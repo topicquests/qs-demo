@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import signinCard from '../components/signin-card.vue';
-import { useMemberStore } from 'src/stores/member';
+import { useMemberStore } from '../stores/member';
 import { useQuasar } from 'quasar';
 import axios, { AxiosError } from 'axios';
 

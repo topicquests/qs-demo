@@ -3,10 +3,10 @@
     <q-card class="card">
       <section>
         <div class="row justify-center" :style="{ height: '40px' }">
-          <h2 class="q-ml-sm q-mr-lg">Change casting role </h2>
+          <h2 class="q-ml-sm q-mr-lg">Change casting role</h2>
         </div>
-        <div class="row justify-center"> 
-          <h3 class="q-ml-lg q-mr-lg">{{currentQuest.name}}</h3>
+        <div class="row justify-center">
+          <h3 class="q-ml-lg q-mr-lg">{{ currentQuest.name }}</h3>
         </div>
       </section>
       <q-separator color="grey" class="q-mb-md"></q-separator>
@@ -43,10 +43,10 @@
 </template>
 
 <script setup lang="ts">
-import { useMemberStore } from 'src/stores/member';
+import { useMemberStore } from '../stores/member';
 import { Role } from '../types';
 import { computed, ref, watchEffect } from 'vue';
-import { useQuestStore } from 'src/stores/quests';
+import { useQuestStore } from '../stores/quests';
 
 // Props
 const CastingRoleEditProps = defineProps<{
@@ -64,12 +64,12 @@ const memberStore = useMemberStore();
 const questStore = useQuestStore();
 
 // Reactive Variables
-const cr=ref<Role[]>([]);
+const cr = ref<Role[]>([]);
 
 // Computed Properties
-const currentQuest = computed(() => 
-  questStore.getQuestById(CastingRoleEditProps.questId)
-)
+const currentQuest = computed(() =>
+  questStore.getQuestById(CastingRoleEditProps.questId),
+);
 
 // Watches
 watchEffect(() => {

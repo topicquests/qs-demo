@@ -53,15 +53,13 @@
 
 <script setup lang="ts">
 import { onBeforeMount } from 'vue';
-import { useGuildStore } from 'src/stores/guilds';
-import { useQuestStore } from 'src/stores/quests';
+import { useGuildStore } from '../stores/guilds';
+import { useQuestStore } from '../stores/quests';
 
 const guildStore = useGuildStore();
 const questStore = useQuestStore();
 
-onBeforeMount(async () => {
- 
-});
+onBeforeMount(async () => {});
 </script>
 
 <style lang="scss" scoped>

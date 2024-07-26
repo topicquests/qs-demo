@@ -38,10 +38,10 @@
 </template>
 <script setup lang="ts">
 import { Guild, Quest, PublicMember } from '../types';
-import { useQuestStore } from 'src/stores/quests';
-import { useGuildStore } from 'src/stores/guilds';
-import { useMembersStore } from 'src/stores/members';
-import { useRoleStore } from 'src/stores/role';
+import { useQuestStore } from '../stores/quests';
+import { useGuildStore } from '../stores/guilds';
+import { useMembersStore } from '../stores/members';
+import { useRoleStore } from '../stores/role';
 
 const GuildMembersProps = defineProps<{
   guild?: Guild;
@@ -70,7 +70,7 @@ function getCastingRoleNamesForQuest(memberId: number) {
   const roles = castingRoles.map((cr) => roleStore.role[cr.role_id]);
   return roles;
 }
-function getAllCastingRoleNames(memberId: number):string {
+function getAllCastingRoleNames(memberId: number): string {
   const roles = getCastingRoleNamesForQuest(memberId);
   const rolesName: string = roles.map((cr) => cr.name).join(',');
   return rolesName;

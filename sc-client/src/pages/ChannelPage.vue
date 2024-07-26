@@ -73,27 +73,27 @@
 </template>
 
 <script setup lang="ts">
-import member from "../components/member.vue";
-import nodeCard from "../components/node-card.vue";
-import nodeForm from "../components/node-form.vue";
-import nodeTree from "../components/node-tree.vue";
+import member from '../components/member.vue';
+import nodeCard from '../components/node-card.vue';
+import nodeForm from '../components/node-form.vue';
+import nodeTree from '../components/node-tree.vue';
 import { waitUserLoaded } from '../app-access';
 import {
   ibis_node_type_type,
- // ibis_node_type_list,
- // publication_state_list,
- // public_private_bool,
+  // ibis_node_type_list,
+  // publication_state_list,
+  // public_private_bool,
   publication_state_type,
-} from "../enums";
-import { ConversationNode } from "../types";
-import { onBeforeMount, ref, watchEffect } from "vue";
-import { useGuildStore } from "src/stores/guilds";
-import { useQuestStore } from "src/stores/quests";
-import { useRoute } from "vue-router";
-import { useChannelStore } from "src/stores/channel";
-import { useRoleStore } from "src/stores/role";
-  
- /*
+} from '../enums';
+import { ConversationNode } from '../types';
+import { onBeforeMount, ref } from 'vue';
+import { useGuildStore } from 'src/stores/guilds';
+import { useQuestStore } from 'src/stores/quests';
+import { useRoute } from 'vue-router';
+import { useChannelStore } from 'src/stores/channel';
+import { useRoleStore } from 'src/stores/role';
+
+/*
   meta: (c) => ({
     // todo: not reactive because not computed
     title: `${c.getCurrentQuest ? "Game" : "Guild"} Channel - ${
@@ -102,66 +102,54 @@ import { useRoleStore } from "src/stores/role";
   }),
 })
 */
-  const guildStore = useGuildStore();
-  const questStore = useQuestStore();
-  const channelStore = useChannelStore();
-  const roleStore = useRoleStore();
-  const route = useRoute();
-  //const ibis_node_type_list: ibis_node_type_type = ibis_node_type_list;
-  //const publication_state_list: publication_state_type = publication_state_list;
-  //const public_private_bool: publication_state_type = public_private_bool;
-  const guildId = ref<number>();
-  const questId = ref<number>();
-  const channelId = ref<number>();
-  let selectedNodeId: number|null = null;
-  const ready = ref(false);
-  const currentGuild = guildStore.getCurrentGuild!;
-  const currentQuest = questStore.getCurrentQuest!;
-  const roles = roleStore.getRoles!;
+const guildStore = useGuildStore();
+const questStore = useQuestStore();
+const channelStore = useChannelStore();
+const roleStore = useRoleStore();
+const route = useRoute();
+//const ibis_node_type_list: ibis_node_type_type = ibis_node_type_list;
+//const publication_state_list: publication_state_type = publication_state_list;
+//const public_private_bool: publication_state_type = public_private_bool;
+const guildId = ref<number>();
+const questId = ref<number>();
+const channelId = ref<number>();
+let selectedNodeId: number | null = null;
+const ready = ref(false);
+const currentGuild = guildStore.getCurrentGuild!;
+const currentQuest = questStore.getCurrentQuest!;
+const roles = roleStore.getRoles!;
 
-  /*
-  watchEffect(() => {
-    return route(to, from) {
-      ready.value = false;
-      initialize();
-    }
-  })
-  */
-  function selectionChanged(id:number) {
-    selectedNodeId = id;
-  }
+function selectionChanged(id: number) {
+  selectedNodeId = id;
+}
 
-  async function initialize() {
-    if (typeof route.params.guild_id === 'string') 
-      guildId.value = Number.parseInt(route.params.guild_id);
-    if (typeof route.params.quest_id === 'string') 
-      questId.value = Number.parseInt(route.params.quest_id); 
-      channelId.value = Number.parseInt(route.params.channel_id);
-    channelStore.setCurrentChannel(channelId.value!);
-    await waitUserLoaded();
-    const promises = [];
-    guildStore.setCurrentGuild(guildId.value!);
-    questStore.setCurrentQuest(questId.value!);
-    if (questId.value) {
-      promises.push(questStore.ensureQuest({ quest_id: questId.value }));
-      promises.push(channelStore.ensureChannels(guildId.value!));
-    }
+async function initialize() {
+  if (typeof route.params.guild_id === 'string')
+    guildId.value = Number.parseInt(route.params.guild_id);
+  if (typeof route.params.quest_id === 'string')
+    questId.value = Number.parseInt(route.params.quest_id);
+  channelId.value = Number.parseInt(route.params.channel_id);
+  channelStore.setCurrentChannel(channelId.value!);
+  await waitUserLoaded();
+  const promises = [];
+  guildStore.setCurrentGuild(guildId.value!);
+  questStore.setCurrentQuest(questId.value!);
+  if (questId.value) {
+    promises.push(questStore.ensureQuest({ quest_id: questId.value }));
     promises.push(channelStore.ensureChannels(guildId.value!));
-    promises.push(guildStore.ensureGuild(guildId.value!));
-    promises.push(roleStore.ensureAllRoles());
-    promises.push(
-      channelStore.ensureChannelConversation(
-        channelId.value!,
-        guildId.value!,
-      )
-    );
-    await Promise.all(promises);
-    ready.value = true;
   }
-  onBeforeMount(async() => {
-    await initialize();
-  })
-
+  promises.push(channelStore.ensureChannels(guildId.value!));
+  promises.push(guildStore.ensureGuild(guildId.value!));
+  promises.push(roleStore.ensureAllRoles());
+  promises.push(
+    channelStore.ensureChannelConversation(channelId.value!, guildId.value!),
+  );
+  await Promise.all(promises);
+  ready.value = true;
+}
+onBeforeMount(async () => {
+  await initialize();
+});
 </script>
 
 <style scoped>

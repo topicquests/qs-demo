@@ -52,7 +52,11 @@
                 <span v-else>View</span>
               </router-link>
               <router-link
-              v-if="props.row && props.row.id && hasGuildAdminPermission(props.row.id)"
+                v-if="
+                  props.row &&
+                  props.row.id &&
+                  hasGuildAdminPermission(props.row.id)
+                "
                 :to="{
                   name: 'guild_admin',
                   params: { guild_id: props.row.id },
@@ -92,12 +96,12 @@ import { QTable, QTableProps } from 'quasar';
 import { Guild, GuildData, Casting } from '../types';
 import GuildsMembershipIndicator from './guilds-membership-indicator.vue';
 import GuildsPlayingIndicator from './guilds-playing-indicator.vue';
-import { useQuestStore } from 'src/stores/quests';
-import { useGuildStore } from 'src/stores/guilds';
-import { useBaseStore } from 'src/stores/baseStore';
+import { useQuestStore } from '../stores/quests';
+import { useGuildStore } from '../stores/guilds';
+import { useBaseStore } from '../stores/baseStore';
 import { computed, onBeforeMount, ref } from 'vue';
 import { permission_enum } from 'src/enums';
-import { useMemberStore } from 'src/stores/member';
+import { useMemberStore } from '../stores/member';
 
 interface GuildRow extends GuildData {
   score?: number;
@@ -202,7 +206,7 @@ const columns: QTableProps['columns'] = [
 // Computed Properties
 const currentQuest = computed({
   get: () => questStore.getCurrentQuest,
-  set: () => {}
+  set: () => {},
 });
 const hasGuildAdminPermission = computed(() => (id) => {
   if (!id) {
@@ -210,7 +214,10 @@ const hasGuildAdminPermission = computed(() => (id) => {
     return false;
   }
 
-  const guildPermission = baseStore.hasPermission(permission_enum.guildAdmin, id);
+  const guildPermission = baseStore.hasPermission(
+    permission_enum.guildAdmin,
+    id,
+  );
   return guildPermission || false;
 });
 
@@ -241,13 +248,13 @@ function numPlayers(guild: Guild) {
       .length;
   }
   return (guild.guild_membership || []).length;
-};
+}
 function guildIfPlaying(quest_id: number) {
   const casting: Casting = memberStore.castingPerQuest[quest_id];
   if (casting) {
     return casting.guild_id;
   }
-};
+}
 function guildRow(guild: GuildData): GuildRow {
   return {
     ...guild,
@@ -259,19 +266,19 @@ function guildRow(guild: GuildData): GuildRow {
     numPlayers: numPlayers(guild),
     //score: this.scores ? this.scores[guild.id] : null,
   };
-};
+}
 function lastMoveRel(row: GuildData) {
   return row.last_node_published_at
     ? DateTime.fromISO(row.last_node_published_at).toRelative()
     : '';
-};
+}
 function lastMoveFull(row: GuildData) {
   return row.last_node_published_at
     ? DateTime.fromISO(row.last_node_published_at).toLocaleString(
         DateTime.DATETIME_FULL,
       )
     : '';
-};
+}
 
 // Lifecycle Hooks
 onBeforeMount(async () => {
