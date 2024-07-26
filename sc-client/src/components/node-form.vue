@@ -1,13 +1,13 @@
 <template>
   <q-card class="node-card q-pa-md">
     <section class="node-card-title">
-      <q-input 
-        v-model="node.title" 
-        label="Node title" 
-        ref="title" 
+      <q-input
+        v-model="node.title"
+        label="Node title"
+        ref="title"
       >
       <template v-slot:prepend>
-        <IbisButton 
+        <IbisButton
           :node_type="node!.node_type as ibis_node_type_type"></IbisButton>
       </template>
       </q-input>
@@ -153,7 +153,7 @@ let pub_state_list: publication_state_type[] = publication_state_list;
 
 // Computed Properties
 const selectedNodeType = computed(() => {
-  if (selectedNode.value && isValidNodeType(selectedNode.value)) {  
+  if (selectedNode.value && isValidNodeType(selectedNode.value)) {
     return selectedNode.value
   }
   else {
@@ -161,7 +161,7 @@ const selectedNodeType = computed(() => {
   }
 });
 const selectedStatusType = computed(() => {
-  if (selectedStatus.value && isValidNodeStatus(selectedStatus.value)) {    
+  if (selectedStatus.value && isValidNodeStatus(selectedStatus.value)) {
     return selectedStatus.value
   }
   else {
@@ -181,6 +181,7 @@ const description = computed<string>({
 // Watches
 watch(() => NodeFormProps.nodeInput!.node_type, (newType) => {
   selectedNode.value = newType
+
 })
 watch(() => NodeFormProps.nodeInput!.status, (newType) => {
   selectedStatus.value = newType
@@ -210,19 +211,20 @@ const statusChanged = (newType:string) => {
 const nodeTypeChanged = (newType:string) => {
   if (newType && isValidNodeType(newType)) {
     selectedNode.value = newType;
+    node.value.node_type = newType
   } else {
     selectedNode.value = undefined;
   }
 };
 const setFocus = () => {
-    if(title.value) 
+    if(title.value)
       title.value.focus();
 };
 function action() {
   if (selectedStatus.value && isValidNodeStatus(selectedStatus.value)) {
     node.value.status = selectedStatus.value
   }
-  if (selectedNode.value && isValidNodeType(selectedNode.value)) { 
+  if (selectedNode.value && isValidNodeType(selectedNode.value)) {
     node.value.node_type = selectedNode.value
   }
   emit('action', node.value);

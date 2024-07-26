@@ -336,7 +336,7 @@ export const useGuildStore = defineStore('guild', {
         'guild_membership',
         data,
       );
-      if (res.status == 200) {
+      if (res.status == 201) {
         const membership = res.data[0];
         const guild = this.guilds[membership.guild_id];
         if (guild) {

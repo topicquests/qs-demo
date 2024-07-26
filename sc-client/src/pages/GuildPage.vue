@@ -144,7 +144,7 @@
               <div
                 v-if="
                 currentQuest &&
-                playingQuestInGuild  
+                playingQuestInGuild
                 "
                 class="col-12"
               >
@@ -291,7 +291,7 @@ let guildGamePlays: GamePlay[] = [];
 let casting: Casting|undefined;
 let pastQuests: Quest[] = [];
 
-//Table Columns 
+//Table Columns
 const columns: QTableProps['columns'] = [
   {
     name: 'desc',
@@ -366,7 +366,7 @@ watchEffect(async() => {
   if (!currentQuest.value) {
     return;
   }
-  await membersStore.ensureMemberById({ id: currentQuest.value!.creator });
+  await membersStore.ensureMemberById(currentQuest.value!.creator );
   await guildStore.ensureGuildsPlayingQuest({ quest_id: currentQuest.value!.id });
   const questCasting = currentQuest.value!.casting?.find(
     (ct: Casting) => ct.member_id == member!.value?.id,
@@ -446,7 +446,7 @@ function findPlayOfGuild(gamePlays: GamePlay[]|undefined): Partial<GamePlay | un
 function checkPermissions() {
   if (typeof guildStore.currentGuild === 'number') {
     isMember.value = !!guildStore.isGuildMember(guildStore.currentGuild);
-    canRegisterToQuest.value 
+    canRegisterToQuest.value
   }
 };
 async function castingRoleAdded(role_id: number) {
@@ -467,7 +467,7 @@ async function castingRoleRemoved(role_id: number) {
     return [];
   }
   await questStore.deleteCastingRole(
-    member_id,    
+    member_id,
     guild_id!,
     role_id,
     quest_id,

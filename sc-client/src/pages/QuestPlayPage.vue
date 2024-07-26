@@ -215,6 +215,7 @@ let myPlayingGuilds: Guild[] = [];
 onMounted(async () => {
   ready.value = false;
   await initialize();
+  ready.value = true;
 });
 
 // Computed Properties
@@ -273,7 +274,7 @@ async function initialize() {
     guildStore.ensureGuildsPlayingQuest({ quest_id: questId.value! })
   ]);
   await initializeGuildInner();
-  ready.value = true;
+
 }
 
 async function initializeGuildInner() {
@@ -297,6 +298,11 @@ async function initializeGuildInner() {
 watchEffect(async () => {
   if (guildId.value) {
     await initializeGuildInner();
+  }
+});
+watchEffect(async () => {
+  if (questId.value) {
+    await initialize();
   }
 });
 </script>

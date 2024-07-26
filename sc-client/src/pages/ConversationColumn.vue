@@ -22,7 +22,7 @@
               </router-link>
             </div>
             <q-card>
-              <div class="row justify-left q-mb-xl">
+              <div class="row justify-left q-mb-sm">
                 <div >
                   <h5>
                     <q-icon :name="getIcon(node!.id)" class="q-mr-sm" />
@@ -38,6 +38,13 @@
                         class="content"
                         v-html="node!.description"
                       ></div>
+                      <section v-if="node!.url || node!.node_type == 'reference'">
+                        <div class="row q-ml-md">
+                          <a v-bind:href="node!.url" target="_blank">
+                            <span> url: </span> {{ node!.url }}
+                          </a>
+                        </div>
+                      </section>
                     </div>
                   </q-card>
                 </div>
@@ -65,98 +72,107 @@
               </div>
               <div class="row justify-center items-center">
                 <div class="col-4 q-pa-sm" style="width: 100%">
-                  <q-card class="q-ma-md">
-                    <div class="row justify-center items-center q-pb-lg q-pt-lg" style="flex-wrap: wrap;">
-                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;">
-                          <!-- Header Nodes -->
-                          <div class="row">
-                              <q-img :src="issueIcon" alt="Issue Icon" class="icon" />
-                          </div>
-                          <div class="row">
-                            <span>Question</span>
-                          </div>
-                          <!-- Question Data -->
-                          <div v-if="filteredQuestions.length">
-                            <div v-for="question in filteredQuestions" :key="question!.id">
-                              <a href="#" @click.prevent="updateNodeId(question!.id)">
-                                {{ question!.title }}
-                              </a>
-                            </div>
-                          </div>
-                        </q-card>
-                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;">
-                          <div class="row">
-                            <q-img :src="positionIcon" alt="Position Icon" class="icon" />
-                          </div>
-                          <div class="row">
-                            <span>Answer</span>
-                          </div>
-                          <div class="row">
-                            <!-- Answer Data -->
-                            <div v-if="filteredAnswers.length">
-                              <div v-for="answer in filteredAnswers" :key="answer!.id">
-                                <a href="#" @click.prevent="updateNodeId(answer!.id)">
-                                  {{ answer!.title }}
-                                </a>
-                              </div>
-                            </div>
-                          </div>
-                        </q-card>
-                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;">
-                          <!-- Header Nodes -->
-                          <div class="row">
-                              <q-img :src="proIcon" alt="Pro Icon" class="icon" />
-                          </div>
-                          <div class="row">
-                            <span>Pro</span>
-                          </div>
-                          <!-- Pro Data -->
-                          <div v-if="filteredPro.length">
-                            <div v-for="pro in filteredPro" :key="pro!.id">
-                              <a href="#" @click.prevent="updateNodeId(pro!.id)">
-                                {{ pro!.title }}
-                              </a>
-                            </div>
-                          </div>
-                        </q-card>
-                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;">
-                          <!-- Header Nodes -->
-                          <div class="row">
-                              <q-img :src="conIcon" alt="Pro Icon" class="icon" />
-                          </div>
-                          <div class="row">
-                            <span>Con</span>
-                          </div>
-                          <!-- Con Data -->
-                          <div v-if="filteredCon.length">
-                            <div v-for="con in filteredCon" :key="con!.id">
-                              <a href="#" @click.prevent="updateNodeId(con!.id)">
-                                {{ con!.title }}
-                              </a>
-                            </div>
-                          </div>
-                        </q-card>
-                        <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px;">
-                          <!-- Header Nodes -->
-                          <div class="row">
-                              <q-img :src="refIcon" alt="Ref Icon" class="icon" />
-                          </div>
-                          <div class="row">
-                            <span>Ref</span>
-                          </div>
-                          <!-- Ref Data -->
-                          <div v-if="filteredRef.length">
-                            <div v-for="ref in filteredRef" :key="ref!.id">
-                              <a href="#" @click.prevent="updateNodeId(ref!.id)">
-                                {{ ref!.title }}
-                              </a>
-                            </div>
-                          </div>
-                        </q-card>
-                    </div>
-                  </q-card>
+                    <q-card class="q-ma-md">
+                        <div class="row justify-center items-center q-pb-lg q-pt-lg" style="flex-wrap: wrap;">
+                            <!-- First Card -->
+                            <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px; height: 200px; margin-right: 16px;">
+                                <!-- Header Nodes with rounded corners and title in the same row -->
+                                <div class="row q-pa-md q-pt-md q-pb-sm items-center" style="border-top-left-radius: 8px; border-top-right-radius: 8px; background-color: #f5f5f5;">
+                                    <q-img :src="issueIcon" alt="Issue Icon" class="icon" style="margin-right: 8px;" />
+                                    <span>Question</span>
+                                </div>
+                                <!-- Question Data -->
+                                <div v-if="filteredQuestions.length" style="height: calc(100% - 56px); overflow-y: auto;">
+                                  <div v-for="question in filteredQuestions" :key="question!.id" style="margin: 0;">
+                                        <a href="#" @click.prevent="updateNodeId(question!.id)">
+                                          <div>{{ question?.title }}</div>
+                                          <div style="font-size: 0.875rem; color: #666;">
+                                            {{ guildStore.getGuildById(question.guild_id)?.name || 'Unknown Guild' }}
+                                          </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </q-card>
+                            <!-- Second Card -->
+                            <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px; height: 200px; margin-right: 16px;">
+                                <!-- Header Nodes with rounded corners and title in the same row -->
+                                <div class="row q-pa-md q-pt-md q-pb-sm items-center" style="border-top-left-radius: 8px; border-top-right-radius: 8px; background-color: #f5f5f5;">
+                                    <q-img :src="positionIcon" alt="Position Icon" class="icon" style="margin-right: 8px;" />
+                                    <span>Answer</span>
+                                </div>
+                                <!-- Answer Data -->
+                                <div v-if="filteredAnswers.length" style="height: calc(100% - 56px); overflow-y: auto;">
+                                  <div v-for="answer in filteredAnswers" :key="answer!.id" style="margin: 0;">
+                                    <a href="#" @click.prevent="updateNodeId(answer!.id)">
+                                      <div>{{ answer?.title }}</div>
+                                      <div style="font-size: 0.875rem; color: #666;">
+                                        {{ guildStore.getGuildById(answer.guild_id)?.name || 'Unknown Guild' }}
+                                      </div>
+                                    </a>
+                                  </div>
+                                </div>
+                            </q-card>
+                            <!-- Third Card -->
+                            <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px; height: 200px; margin-right: 16px;">
+                                <!-- Header Nodes -->
+                                <div class="row q-pa-md q-pt-md q-pb-sm items-center" style="border-top-left-radius: 8px; border-top-right-radius: 8px; background-color: #f5f5f5;">
+                                    <q-img :src="proIcon" alt="Pro Icon" class="icon" style="margin-right: 8px;" />
+                                    <span>Pro</span>
+                                </div>
+                                <!-- Pro Data -->
+                                <div v-if="filteredPro.length" style="height: calc(100% - 56px); overflow-y: auto;">
+                                  <div v-for="pro in filteredPro" :key="pro!.id" style="margin: 0;">
+                                        <a href="#" @click.prevent="updateNodeId(pro!.id)">
+                                          <div>{{ pro?.title }}</div>
+                                          <div style="font-size: 0.875rem; color: #666;">
+                                            {{ guildStore.getGuildById(pro.guild_id)?.name || 'Unknown Guild' }}
+                                          </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </q-card>
+                            <!-- Fourth Card -->
+                            <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px; height: 200px; margin-right: 16px;">
+                                <!-- Header Nodes -->
+                                <div class="row q-pa-md q-pt-md q-pb-sm items-center" style="border-top-left-radius: 8px; border-top-right-radius: 8px; background-color: #f5f5f5;">
+                                    <q-img :src="conIcon" alt="Con Icon" class="icon" style="margin-right: 8px;" />
+                                    <span>Con</span>
+                                </div>
+                                <!-- Con Data -->
+                                <div v-if="filteredCon.length" style="height: calc(100% - 56px); overflow-y: auto;">
+                                  <div v-for="con in filteredCon" :key="con!.id" style="margin: 0;">
+                                        <a href="#" @click.prevent="updateNodeId(con!.id)">
+                                          <div>{{ con?.title }}</div>
+                                          <div style="font-size: 0.875rem; color: #666;">
+                                            {{ guildStore.getGuildById(con.guild_id)?.name || 'Unknown Guild' }}
+                                          </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </q-card>
+                            <!-- Fifth Card -->
+                            <q-card class="q-pl-sm q-ml-md q-mb-md" style="width: 17%; min-width: 200px; height: 200px;">
+                                <!-- Header Nodes -->
+                                <div class="row q-pa-md q-pt-md q-pb-sm items-center" style="border-top-left-radius: 8px; border-top-right-radius: 8px; background-color: #f5f5f5;">
+                                    <q-img :src="refIcon" alt="Ref Icon" class="icon" style="margin-right: 8px;" />
+                                    <span>Ref</span>
+                                </div>
+                                <!-- Ref Data -->
+                                <div v-if="filteredRef.length" style="height: calc(100% - 56px); overflow-y: auto;">
+                                  <div v-for="ref in filteredRef" :key="ref!.id" style="margin: 0;">
+                                        <a href="#" @click.prevent="updateNodeId(ref!.id)">
+                                          <div>{{ ref?.title }}</div>
+                                          <div style="font-size: 0.875rem; color: #666;">
+                                            {{ guildStore.getGuildById(ref.guild_id)?.name || 'Unknown Guild' }}
+                                          </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </q-card>
+                        </div>
+                    </q-card>
                 </div>
-              </div>
+            </div>
             </q-card>
           </q-card>
         </q-card>
@@ -165,7 +181,7 @@
 </template>
 <script setup lang="ts">
 // Imports
-import { computed, onBeforeMount, ref } from "vue";
+import { computed, onBeforeMount, ref, watch, watchEffect } from "vue";
 import { useRoute } from "vue-router";
 import { waitUserLoaded } from '../app-access';
 import { useConversationStore } from "src/stores/conversation";
@@ -178,9 +194,11 @@ import conIcon from 'src/statics/images/ibis/minus_sm.png';
 import refIcon from 'src/statics/images/ibis/reference_sm.png';
 import scoreboard from '../components/score-board.vue';
 import memberHandle from '../components/member-handle.vue';
+import { useGuildStore } from "../stores/guilds";
 
 // Stores
 const conversationStore = useConversationStore();
+const guildStore = useGuildStore();
 
 // Route
 const route = useRoute();
@@ -205,10 +223,17 @@ const filteredAnswers = computed(() => filterNodesByType(q.value, ibis_node_type
 const filteredPro = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.pro) || []);
 const filteredCon = computed(() => filterNodesByType(q.value, ibis_node_type_enum.con));
 const filteredRef = computed(() => q.value?.filter(item => item!.node_type === ibis_node_type_enum.reference) || []);
-function getIcon(id: number)  {
+function getIcon(id: number) {
   const treeIcon = findNodeById(tree.value, id)
   return treeIcon?.icon
 }
+
+// Watches
+watchEffect(()  => {
+  if(nodeId.value)
+      getIcon(nodeId.value);
+    });
+
 
 // Functions
 function updateNodeId(id:number) {
@@ -242,7 +267,7 @@ function findNodeById(nodes: Partial<QTreeNode[]> | undefined, id: number): QTre
   return null;
 }
 async function initialize() {
-  tree.value = conversationStore.getNeighbourhoodTree;
+  tree.value = conversationStore.getConversationTree;
   q.value = await conversationStore.getChildrenOf(nodeId.value)
 }
 

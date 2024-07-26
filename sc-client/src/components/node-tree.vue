@@ -68,7 +68,7 @@
           >
             {{ prop.node.label }}</span
           >
-          &nbsp;-&nbsp;<span class="node-creator">{{
+         <span class="node-creator">{{
             getMemberHandle(prop.node.creator_id)
           }}</span>
 
@@ -126,15 +126,15 @@
       <template v-slot:default-body="prop">
         <div
           v-if="prop.node.id != editingNodeId && !hideDescription"
-          class="row items-center"
+          class="row"
         >
-          <div v-if="prop.node.url">
+          <div v-if="prop.node.url" class="q-mt-md q-mb-md">
             <a v-bind:href="prop.node.url" target="_blank">
               {{ prop.node.url }}
             </a>
           </div>
-          <div class="scrollable-div" v-html="prop.node.description"></div>
         </div>
+          <div class="scrollable-div q-pt-md q-pb-md" v-html="prop.node.description"></div>
         <node-form
           :ref="nodeFormRef(prop.node.id)"
           v-if="editable && prop.node.id == editingNodeId"
@@ -299,13 +299,7 @@ const readStatus = computed(() => (id: number) =>
 
 const nodesTree = ref(getNodesTree());
 
-watch(
-  [NodeTreeProps, showFocusNeighbourhood, () => conversationStore.getConversationTree],
-  () => {
-    nodesTree.value = getNodesTree();
-  },
-  { deep: true }
-);
+
 
 function checkIfExpanded(nodeId: QTreeNode):boolean {
   const qtree = tree.value;
@@ -329,20 +323,15 @@ const canEdit = computed(() => (nodeId: number): boolean => {
     return conversationStore.canEdit(nodeId);
   }
 })
-/*
-function nodeMap(): ConversationMap {
-  if (NodeTreeProps.channelId)
-    return channelStore.getChannelById(NodeTreeProps.channelId);
-  if (showFocusNeighbourhood.value) return conversationStore.neighbourhood!;
-  if (NodeTreeProps.currentGuildId) return conversationStore.conversation;
-  const entries: [string, ConversationNode][] = Object.entries(
-    conversationStore.conversation,
-  );
-  return Object.fromEntries(
-    entries.filter(([id, node]) => node.status == 'published'),
-  );
-}
-*/
+// Watches
+watch(
+  [NodeTreeProps, showFocusNeighbourhood, () => conversationStore.getConversationTree],
+  () => {
+    nodesTree.value = getNodesTree();
+  },
+  { deep: true }
+);
+
 // Functions
 function calcPublicationConstraints(node: Partial<ConversationNode>) {
   if (!NodeTreeProps.currentGuildId) {
@@ -661,7 +650,7 @@ function scrollToNode(id: number | null, later: number | null = null): void {
     nextTick(() => {
       const element = document.querySelector<HTMLElement>(`[ref="node_${id}"]`);
       if (element) {
-        element.scrollIntoView({ block: 'center' });
+        element.scrollIntoView({ block: 'start' });
       } else {
         console.warn(`Element with ref "node_${id}" not found.`);
       }
@@ -763,11 +752,13 @@ onBeforeMount(async () => {
 }
 .node-title {
   font-family: 'Times New Roman', Times, serif;
-  font-size: 1.2em;
+  font-size: 10pt;
 }
 .node-creator {
   color: black;
-  font-size: small;
+  font-size:10pt;
+  margin-left:1em;
+  margin-right: 1em;
 }
 .score {
   font-size: small;
