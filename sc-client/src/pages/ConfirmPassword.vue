@@ -37,32 +37,32 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { useQuasar } from "quasar";
-import { useMemberStore } from "src/stores/member";
+import { ref } from 'vue';
+import { useQuasar } from 'quasar';
+import { useMemberStore } from 'src/stores/member';
 
 const q = useQuasar();
 const memberStore = useMemberStore();
-const email = ref<string|undefined>(undefined);
+const email = ref<string | undefined>(undefined);
 
 function sendConfirmationEmail() {
   try {
     let theEmail = email.value;
     if (!theEmail) {
-      q.notify({ type: "negative", message: "Missing Email" });
-        return;
+      q.notify({ type: 'negative', message: 'Missing Email' });
+      return;
     }
     memberStore.sendConfirmEmail(theEmail);
     q.notify({
-      type: "positive",
-      message: "Please check email for confirmation link",
+      type: 'positive',
+      message: 'Please check email for confirmation link',
     });
   } catch (err) {
     q.notify({
-      type: "negative",
-      message: "Could not reset the password",
+      type: 'negative',
+      message: 'Could not reset the password',
     });
-      console.log(err);
+    console.log(err);
   }
 }
 </script>
@@ -73,7 +73,7 @@ function sendConfirmationEmail() {
   width: 30%;
 }
 
-input[type="email"] {
+input[type='email'] {
   font-size: 14pt;
 }
 </style>

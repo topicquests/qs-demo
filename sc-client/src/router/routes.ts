@@ -169,8 +169,8 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/HouseRules.vue'),
       },
       {
-        path: "/node/:quest_id",
-        name: "conversation_column",
+        path: '/node/:quest_id',
+        name: 'conversation_column',
         component: () => import('pages/ConversationColumn.vue'),
       },
     ],

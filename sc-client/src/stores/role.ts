@@ -30,7 +30,10 @@ export const useRoleStore = defineStore('role', {
 
   getters: {
     getRoleById: (state: RoleState) => (id: number) => state.role[id],
-    getRoleByName: (state: RoleState) => (id: number, name: string):Role|undefined => state.role[name],
+    getRoleByName:
+      (state: RoleState) =>
+      (id: number, name: string): Role | undefined =>
+        state.role[name],
     getRoles: (state: RoleState) =>
       Object.values(state.role).sort((a, b) => a.name.localeCompare(b.name)),
     getRoleNodeConstraintsByRoleId: (state: RoleState) => (id: number) =>
@@ -68,32 +71,31 @@ export const useRoleStore = defineStore('role', {
         });
       }
     },
-    async createRole( data:Role ):Promise<Role> {
-      const res = await this.createRoleBase(data );
+    async createRole(data: Role): Promise<Role> {
+      const res = await this.createRoleBase(data);
       await this.fetchRoles();
       return res;
     },
     resetRole() {
       Object.assign(this, baseState);
     },
-    async createRoleNodeConstraint(data:RoleNodeConstraint):Promise<RoleNodeConstraint> {
-      const res = await this.createRoleNodeConstraintBase(
-        data,
-      );
+    async createRoleNodeConstraint(
+      data: RoleNodeConstraint,
+    ): Promise<RoleNodeConstraint> {
+      const res = await this.createRoleNodeConstraintBase(data);
       await this.fetchRoles();
       return res;
     },
-    async updateRoleNodeConstraint(data: RoleNodeConstraint):Promise<RoleNodeConstraint> {
-      const res:RoleNodeConstraint = await this.updateRoleNodeConstraintBase(
-        data,
-      );
+    async updateRoleNodeConstraint(
+      data: RoleNodeConstraint,
+    ): Promise<RoleNodeConstraint> {
+      const res: RoleNodeConstraint =
+        await this.updateRoleNodeConstraintBase(data);
       await this.fetchRoles();
       return res;
     },
-    async deleteRoleNodeConstraint( data:RoleNodeConstraint) {
-      await this.deleteRoleNodeConstraintBase(
-        data,
-      );
+    async deleteRoleNodeConstraint(data: RoleNodeConstraint) {
+      await this.deleteRoleNodeConstraintBase(data);
       await this.fetchRoles();
     },
 
@@ -137,7 +139,7 @@ export const useRoleStore = defineStore('role', {
           };
         }
       }
-      return res.data
+      return res.data;
     },
     async createRoleBase(data: Partial<Role>): Promise<Role> {
       const res: AxiosResponse<Role> = await api.post('/role', {
@@ -145,10 +147,10 @@ export const useRoleStore = defineStore('role', {
       });
       if (res.status == 200) {
         const role = res.data;
-        if(typeof role.id == 'number')
-        this.role = { ...this.role, [role.id]: role };
+        if (typeof role.id == 'number')
+          this.role = { ...this.role, [role.id]: role };
       }
-      return res.data
+      return res.data;
     },
     async updateRole(data: Partial<Role>, params) {
       params.data = filterKeys(data, rolePatchKeys);
@@ -175,8 +177,11 @@ export const useRoleStore = defineStore('role', {
         console.error(`Failed to delete role with ID ${params.id}.`);
       }
     },
-    async createRoleNodeConstraintBase(data:Partial<RoleNodeConstraint>):Promise<RoleNodeConstraint> {
-      const res: AxiosResponse<RoleNodeConstraint[]> = await api.post('/role_node_constraint',
+    async createRoleNodeConstraintBase(
+      data: Partial<RoleNodeConstraint>,
+    ): Promise<RoleNodeConstraint> {
+      const res: AxiosResponse<RoleNodeConstraint[]> = await api.post(
+        '/role_node_constraint',
         data,
       );
       if (res.status == 200) {
@@ -188,7 +193,9 @@ export const useRoleStore = defineStore('role', {
       }
       return res.data[0];
     },
-    async updateRoleNodeConstraintBase(data: RoleNodeConstraint):Promise<RoleNodeConstraint> {
+    async updateRoleNodeConstraintBase(
+      data: RoleNodeConstraint,
+    ): Promise<RoleNodeConstraint> {
       const params = Object();
       params.role_id = data.role_id;
       params.node_type = data.node_type;
@@ -203,7 +210,7 @@ export const useRoleStore = defineStore('role', {
       if (res.status == 200) {
         console.log('update updateRoleNodeConstraintBase successful');
       }
-      return res.data[0]
+      return res.data[0];
     },
     async deleteRoleNodeConstraintBase(data: RoleNodeConstraint) {
       const { role_id, node_type } = data;

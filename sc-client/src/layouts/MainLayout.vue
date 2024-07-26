@@ -81,12 +81,10 @@
       id="mySidenav"
       class="sidenav"
       :overlay="true"
-   >
-    <right_drawer
-      :currentGuild="currentGuild"
-      :currentQuest="currentQuest">
-    </right_drawer>
-  </q-drawer>
+    >
+      <right_drawer :currentGuild="currentGuild" :currentQuest="currentQuest">
+      </right_drawer>
+    </q-drawer>
     <q-drawer v-model="leftDrawer" :breakpoint="500" bordered :overlay="true">
       <q-scroll-area class="fit">
         <drawer_menu v-on:onLogout="onLogout"></drawer_menu>
@@ -123,14 +121,14 @@ const leftDrawer = ref(false);
 const isAuthenticated = ref(false);
 const rightDrawer = ref(false);
 const showTree = ref(true);
-const currentGuild = computed(() => guildStore.getCurrentGuild)
-const currentQuest = computed(() => questStore.getCurrentQuest)
+const currentGuild = computed(() => guildStore.getCurrentGuild);
+const currentQuest = computed(() => questStore.getCurrentQuest);
 
-const checkIfAuthenticated = computed((): boolean =>   
-  memberStore.isAuthenticated
-)
+const checkIfAuthenticated = computed(
+  (): boolean => memberStore.isAuthenticated,
+);
 function goTo(newRoute: string): void {
-  router.push({name: newRoute});
+  router.push({ name: newRoute });
 }
 async function onLogout() {
   rightDrawer.value = false;

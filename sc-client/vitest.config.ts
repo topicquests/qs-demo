@@ -1,15 +1,15 @@
 import { defineConfig } from 'vitest/config';
 import vue from '@vitejs/plugin-vue';
-import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
+import { quasar, transformAssetUrls } from '@quasar/vite-plugin';
 
 export default defineConfig({
   plugins: [
     vue({
-      template: { transformAssetUrls }
+      template: { transformAssetUrls },
     }),
     quasar({
-      sassVariables: 'src/quasar-variables.sass'
-    })
+      sassVariables: 'src/quasar-variables.sass',
+    }),
   ],
   test: {
     globals: true,
@@ -17,4 +17,3 @@ export default defineConfig({
     setupFiles: './test/setup.ts',
   },
 });
-

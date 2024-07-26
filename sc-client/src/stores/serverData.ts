@@ -33,16 +33,18 @@ export const useServerDataStore = defineStore('serverData', {
       }
     },
     resetServer() {
-      Object.assign(this, clearBaseState)
+      Object.assign(this, clearBaseState);
     },
     async fetchServerData(): Promise<ServerData> {
       const res: AxiosResponse<ServerData[]> = await api.get('/server_data');
       if (res.status == 200) {
         this.serverData = res.data[0];
       }
-      return res.data[0]
+      return res.data[0];
     },
-    async updateServerData(serverData:ServerData): Promise<Partial<ServerData>> {
+    async updateServerData(
+      serverData: ServerData,
+    ): Promise<Partial<ServerData>> {
       const res: AxiosResponse<ServerData[]> = await api.patch(
         '/server_data',
         serverData,
@@ -50,19 +52,17 @@ export const useServerDataStore = defineStore('serverData', {
       if (res.status == 200) {
         this.serverData = Object.assign({}, this.serverData, res.data[0]);
       }
-      return res.data[0]
+      return res.data[0];
     },
     async resetDefaultSingle() {
-      const res: AxiosResponse<ServerData[]> = await api.get(
-        '/server_data'
-      );
+      const res: AxiosResponse<ServerData[]> = await api.get('/server_data');
       if (res.status == 200) {
         this.fetchServerData();
       }
     },
     async resetDefaultAll(): Promise<void> {
       const res: AxiosResponse<Member[]> = await api.post(
-        '/rpc/reset_all_default_data'
+        '/rpc/reset_all_default_data',
       );
       if (res.status == 200) {
         this.fetchServerData();

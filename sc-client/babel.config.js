@@ -8,7 +8,6 @@ module.exports = {
   presets: [
     '@quasar/babel-preset-app',
     '@babel/preset-env',
-    '@babel/preset-typescript'
-  ]
+    '@babel/preset-typescript',
+  ],
 };
-

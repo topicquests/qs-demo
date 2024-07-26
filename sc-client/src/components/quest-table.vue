@@ -25,8 +25,7 @@
           <div>
             <q-btn icon="info" dense flat size="sm"
               ><q-tooltip max-width="25rem"
-                ><div v-html="props.row.description" 
-                  class="tooltip"></div>
+                ><div v-html="props.row.description" class="tooltip"></div>
               </q-tooltip>
             </q-btn>
           </div>
@@ -131,10 +130,7 @@ import { useMemberStore } from '../stores/member';
 import { useBaseStore } from '../stores/baseStore';
 import type { QTable } from 'quasar';
 import { QTableProps } from 'quasar';
-import {
-  permission_enum,
-  quest_status_type,
-} from '../enums';
+import { permission_enum, quest_status_type } from '../enums';
 import { GuildMembership, Quest, QuestData } from '../types';
 import QuestDateTimeInterval from './quest-date-time-interval.vue';
 import { computed, onBeforeMount, ref } from 'vue';
@@ -234,15 +230,15 @@ const questStatus = ref<quest_status_type | string>();
 const questStatusOptions = ref<quest_status_type[]>([]);
 
 // Computed Properties
-const getFilteredQuests = computed(():QuestData[] => { 
+const getFilteredQuests = computed((): QuestData[] => {
   if (questStatus.value && questStatus.value != 'All') {
     return questStore.getQuestsByStatus(questStatus.value);
   } else {
-      //questStatus.value = "All"
-      return QuestTableProps.quests;
+    //questStatus.value = "All"
+    return QuestTableProps.quests;
   }
-})
-const canAdminGuilds = computed((): boolean =>{
+});
+const canAdminGuilds = computed((): boolean => {
   return (
     baseStore.hasPermission(permission_enum.joinQuest) ||
     (memberStore.getUser?.guild_membership || []).find(
@@ -256,7 +252,7 @@ const canAdminGuilds = computed((): boolean =>{
       },
     ) != undefined
   );
-})
+});
 
 // Functions
 function refInterval(row: QuestData) {
@@ -280,7 +276,7 @@ function lastMoveFull(row: QuestData) {
 }
 
 // Lifecycle Hooks
-onBeforeMount(async() => {
+onBeforeMount(async () => {
   questStatusOptions.value = QuestTableProps.quests.map(
     (quest: Quest) => quest.status,
   );

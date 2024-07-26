@@ -15,13 +15,9 @@
       </h3>
     </div>
     <div class="col-3 q-md q-mb-md">
-      <channel-list
-        :guild_id="guildId"
-        :inPage="true"
-        title="Guild Channels"
-      />
+      <channel-list :guild_id="guildId" :inPage="true" title="Guild Channels" />
       <q-btn
-      v-if="canAddChannel && !creating"
+        v-if="canAddChannel && !creating"
         @click="createGuildChannel"
         label="Create Guild Channel"
       />
@@ -48,38 +44,38 @@
 </template>
 
 <script setup lang="ts">
-import ChannelList from "../components/ChannelListComponent.vue";
+import ChannelList from '../components/ChannelListComponent.vue';
 import { waitUserLoaded } from '../app-access';
 import {
   ibis_node_type_enum,
   meta_state_enum,
   permission_enum,
   publication_state_enum,
-} from "../enums";
-import { ConversationNode } from "../types";
-import { computed, onBeforeMount, ref } from "vue";
-import { useGuildStore } from "src/stores/guilds";
-import { useBaseStore } from "src/stores/baseStore";
-import { useChannelStore } from "src/stores/channel";
-import { useRoute } from "vue-router";
-import { useQuasar } from "quasar";
+} from '../enums';
+import { ConversationNode } from '../types';
+import { computed, onBeforeMount, ref } from 'vue';
+import { useGuildStore } from 'src/stores/guilds';
+import { useBaseStore } from 'src/stores/baseStore';
+import { useChannelStore } from 'src/stores/channel';
+import { useRoute } from 'vue-router';
+import { useQuasar } from 'quasar';
 
 const route = useRoute();
 const q = useQuasar();
 const guildStore = useGuildStore();
 const baseStore = useBaseStore();
-const channelStore = useChannelStore()
-const currentGuild = computed(() => guildStore.getCurrentGuild!)
+const channelStore = useChannelStore();
+const currentGuild = computed(() => guildStore.getCurrentGuild!);
 const guildId = ref<number>();
-const ready = ref(false); 
+const ready = ref(false);
 const creating = ref(false);
-const newChannelName = ref("");
+const newChannelName = ref('');
 const canAddChannel = computed({
   get: () => {
-  return baseStore.hasPermission(permission_enum.guildAdmin, guildId.value);
+    return baseStore.hasPermission(permission_enum.guildAdmin, guildId.value);
   },
-  set: () => {}
-})
+  set: () => {},
+});
 
 function createGuildChannel() {
   creating.value = true;
@@ -99,30 +95,29 @@ async function confirmCreateGuildChannel() {
     await channelStore.createChannelNode(channel);
     q.notify({
       message: `Added new conversation node`,
-      color: "positive",
+      color: 'positive',
     });
   } catch (err) {
-    console.log("there was an error in creating conversation node ", err);
+    console.log('there was an error in creating conversation node ', err);
     q.notify({
       message: `There was an error creating new conversation node.`,
-      color: "negative",
+      color: 'negative',
     });
   }
-    creating.value = false;
-  }
-  onBeforeMount(async() =>{
-    if(typeof route.params.guild_id === 'string' )
+  creating.value = false;
+}
+onBeforeMount(async () => {
+  if (typeof route.params.guild_id === 'string')
     guildId.value = Number.parseInt(route.params.guild_id);
-    await waitUserLoaded();
+  await waitUserLoaded();
   guildStore.setCurrentGuild(guildId.value!);
-    const promises = [
-      guildStore.ensureGuild(guildId.value!),
-      channelStore.ensureChannels(guildId.value!),
-    ];
-    await Promise.all(promises);
-    ready.value = true;
-  })
-
+  const promises = [
+    guildStore.ensureGuild(guildId.value!),
+    channelStore.ensureChannels(guildId.value!),
+  ];
+  await Promise.all(promises);
+  ready.value = true;
+});
 </script>
 
 <style scoped>

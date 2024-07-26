@@ -284,7 +284,7 @@ export interface defaultNodeType {
   node_type: ibis_node_type_type;
   meta?: boolean;
   url?: string;
-  draft_for_role_id?: number
+  draft_for_role_id?: number;
 }
 
 export type ServerData = {

@@ -1,15 +1,12 @@
 <template>
   <q-card class="node-card q-pa-md">
     <section class="node-card-title">
-      <q-input
-        v-model="node.title"
-        label="Node title"
-        ref="title"
-      >
-      <template v-slot:prepend>
-        <IbisButton
-          :node_type="node!.node_type as ibis_node_type_type"></IbisButton>
-      </template>
+      <q-input v-model="node.title" label="Node title" ref="title">
+        <template v-slot:prepend>
+          <IbisButton
+            :node_type="node!.node_type as ibis_node_type_type"
+          ></IbisButton>
+        </template>
       </q-input>
     </section>
     <section v-if="node!.url || node!.node_type == 'reference'">
@@ -34,7 +31,7 @@
       <template v-if="NodeFormProps.editing">
         <q-editor
           v-model="description"
-          style="width: 98%;"
+          style="width: 98%"
           class="q-editor node-card-details scrollable-div"
         />
       </template>
@@ -55,7 +52,7 @@
           @update:model-value="nodeTypeChanged"
           label="Type"
           style="width: 25%"
-      />
+        />
       </div>
     </section>
     <div v-if="NodeFormProps.editing" class="row justify-start q-pb-lg q-ml-lg">
@@ -136,15 +133,19 @@ const NodeFormProps = defineProps<{
   ibisTypes: ibis_node_type_type[];
   allowChangeMeta?: boolean;
   roles?: Role[];
-  pubFn?: (node: Partial<ConversationNode | defaultNodeType>) => publication_state_type[];
+  pubFn?: (
+    node: Partial<ConversationNode | defaultNodeType>,
+  ) => publication_state_type[];
 }>();
 
 // Emits
 const emit = defineEmits(['action', 'cancel']);
 
 // Reactive Variables
-const selectedNode = ref<string | undefined>(NodeFormProps.nodeInput?.node_type)
-const selectedStatus = ref<string | undefined>(NodeFormProps.nodeInput?.status)
+const selectedNode = ref<string | undefined>(
+  NodeFormProps.nodeInput?.node_type,
+);
+const selectedStatus = ref<string | undefined>(NodeFormProps.nodeInput?.status);
 const title = ref<QInput>();
 const node = ref<Partial<ConversationNode> | defaultNodeType>({});
 
@@ -154,21 +155,19 @@ let pub_state_list: publication_state_type[] = publication_state_list;
 // Computed Properties
 const selectedNodeType = computed(() => {
   if (selectedNode.value && isValidNodeType(selectedNode.value)) {
-    return selectedNode.value
-  }
-  else {
-    return undefined
+    return selectedNode.value;
+  } else {
+    return undefined;
   }
 });
 const selectedStatusType = computed(() => {
   if (selectedStatus.value && isValidNodeStatus(selectedStatus.value)) {
-    return selectedStatus.value
+    return selectedStatus.value;
+  } else {
+    return undefined;
   }
-  else {
-    return undefined
-  }
-})
-const roles = computed(() => NodeFormProps.roles)
+});
+const roles = computed(() => NodeFormProps.roles);
 const description = computed<string>({
   get() {
     return NodeFormProps.nodeInput!.description || '';
@@ -179,19 +178,27 @@ const description = computed<string>({
 });
 
 // Watches
-watch(() => NodeFormProps.nodeInput!.node_type, (newType) => {
-  selectedNode.value = newType
-
-})
-watch(() => NodeFormProps.nodeInput!.status, (newType) => {
-  selectedStatus.value = newType
-})
-watch(() => NodeFormProps.nodeInput, (newType) => {
-  node.value = {...newType}
-})
+watch(
+  () => NodeFormProps.nodeInput!.node_type,
+  (newType) => {
+    selectedNode.value = newType;
+  },
+);
+watch(
+  () => NodeFormProps.nodeInput!.status,
+  (newType) => {
+    selectedStatus.value = newType;
+  },
+);
+watch(
+  () => NodeFormProps.nodeInput,
+  (newType) => {
+    node.value = { ...newType };
+  },
+);
 
 // Created
-node.value = {...NodeFormProps.nodeInput}
+node.value = { ...NodeFormProps.nodeInput };
 
 // Functions
 function isValidNodeType(type: string): type is ibis_node_type_type {
@@ -201,31 +208,30 @@ function isValidNodeStatus(status: any): status is publication_state_type {
   return publication_state_list.includes(status);
 }
 
-const statusChanged = (newType:string) => {
+const statusChanged = (newType: string) => {
   if (newType && isValidNodeStatus(newType)) {
     selectedStatus.value = newType;
   } else {
     selectedStatus.value = undefined;
   }
 };
-const nodeTypeChanged = (newType:string) => {
+const nodeTypeChanged = (newType: string) => {
   if (newType && isValidNodeType(newType)) {
     selectedNode.value = newType;
-    node.value.node_type = newType
+    node.value.node_type = newType;
   } else {
     selectedNode.value = undefined;
   }
 };
 const setFocus = () => {
-    if(title.value)
-      title.value.focus();
+  if (title.value) title.value.focus();
 };
 function action() {
   if (selectedStatus.value && isValidNodeStatus(selectedStatus.value)) {
-    node.value.status = selectedStatus.value
+    node.value.status = selectedStatus.value;
   }
   if (selectedNode.value && isValidNodeType(selectedNode.value)) {
-    node.value.node_type = selectedNode.value
+    node.value.node_type = selectedNode.value;
   }
   emit('action', node.value);
 }

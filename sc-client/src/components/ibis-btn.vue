@@ -11,9 +11,9 @@ const IbisButtonProps = defineProps<{
   node_type?: ibis_node_type_type;
   small?: boolean;
 }>();
-const icon = computed(() => 
-  ibis_node_icon(IbisButtonProps.node_type!, IbisButtonProps.small)
-)
+const icon = computed(() =>
+  ibis_node_icon(IbisButtonProps.node_type!, IbisButtonProps.small),
+);
 function icon_size() {
   return IbisButtonProps.small ? '16px' : '32px';
 }

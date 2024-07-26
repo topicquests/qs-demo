@@ -7,9 +7,7 @@ import { createRouter, createMemoryHistory } from 'vue-router';
 // Create the mock router
 const router = createRouter({
   history: createMemoryHistory(),
-  routes: [
-    { path: '/signin', component: { template: '<div>Sign In</div>' } },
-  ],
+  routes: [{ path: '/signin', component: { template: '<div>Sign In</div>' } }],
 });
 
 describe('RegistrationFormComponent', () => {

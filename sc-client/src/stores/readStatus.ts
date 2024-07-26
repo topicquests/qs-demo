@@ -111,9 +111,8 @@ export const useReadStatusStore = defineStore('readStatus', {
     async fetchReadStatus(params: { rootid: number }) {
       const res: AxiosResponse<ReadStatusData[]> = await api.post(
         'rpc/unread_status_list',
-        
-          params,
-        
+
+        params,
       );
       if (res.status == 200) {
         this['readStatus'] = Object.fromEntries(
