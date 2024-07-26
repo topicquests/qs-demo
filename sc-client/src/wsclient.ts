@@ -40,7 +40,7 @@ export class WSClient {
         memberStore.member &&
         token_store.tokenIsValid()
       ) {
-        this.login(memberStore.member.id, memberStore.member.token);
+        this.login(memberStore.member.id, memberStore.token);
       } else if (this.login_message) {
         this.ws.send(this.login_message);
       }
@@ -119,10 +119,7 @@ export class WSClient {
         }
         break;
       case 'members':
-        await this.membersStore.fetchMemberById({
-          full: true,
-          params: { id },
-        });
+        await this.membersStore.fetchMemberById(id, true);
         if (this.memberStore.member.id == id)
           await this.memberStore.fetchLoginUser();
         break;
