@@ -167,10 +167,10 @@ export const useMembersStore = defineStore('members', {
       const res: AxiosResponse<PublicMember[]> =
         await api.get('/public_members');
       if (res.status == 200) {
-        const fullMembers = Object.values(this.members).filter(
+        const fullMembers: any = Object.values(this.members).filter(
           (member: PublicMember) => this.fullMembers[member.id],
         );
-        const members = Object.fromEntries(
+        const members:any = Object.fromEntries(
           res.data.map((member: PublicMember) => [member.id, member]),
         );
         for (const member of fullMembers) {
