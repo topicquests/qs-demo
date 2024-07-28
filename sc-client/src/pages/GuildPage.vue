@@ -363,83 +363,22 @@ const canRegisterToQuest = computed(() =>
 );
 
 // Watches
-watch(
-  () => currentQuest.value?.id,
-  async () => {
-    if (!currentQuest.value) {
-      return;
-    }
-    await membersStore.ensureMemberById(currentQuest.value!.creator);
-    await guildStore.ensureGuildsPlayingQuest({
-      quest_id: currentQuest.value!.id,
-    });
-    const questCasting = currentQuest.value!.casting?.find(
-      (ct: Casting) => ct.member_id == member!.value?.id,
-    );
-    if (questCasting) {
-      if (questCasting.guild_id == currentGuildId.value) {
-        memberPlaysQuestInThisGuild = true;
-        casting = questCasting;
-      }
-    }
-    const gamePlay: Partial<GamePlay> | undefined = findPlayOfGuild(
-      currentQuest.value!.game_play,
-    );
-    var node_id = gamePlay?.focus_node_id;
-    if (!node_id) {
-      await conversationStore.ensureRootNode(questStore.currentQuest);
-      node_id = conversationStore.conversationRoot?.id;
-    }
-    if (node_id && typeof currentGuildId.value === 'number') {
-      await conversationStore.ensureConversationNeighbourhood(
-        node_id,
-        currentGuildId.value,
-      );
-    } else {
-      // ill-constructed quest
-      await conversationStore.resetConversation();
-    }
-    return 'success';
-  },
-);
-watch(
-  [member?.value, currentQuest, guildId, castingRoles.value],
-  () => {
-    if (
-      member?.value &&
-      currentQuest.value &&
-      currentGuild.value &&
-      castingRoles.value
-    )
-      return getCastingRoles();
-  },
-  { immediate: true },
-);
+watch(currentQuest, (newValue, oldValue) => {
+  getCastingRoles();
+  initializeQuest()
+}, { immediate: true });
+watchEffect(() => {
+  if(!guildId.value) {
+    return
+  }
+})
 
 // Functions
 async function getCastingRoles() {
-  if (member!.value) {
+  if(member!.value && currentQuest.value) {
     const castingRolesData =
-      (await membersStore.castingRolesPerQuest(
-        member!.value.id,
-        currentQuest.value?.id,
-      )) || [];
-    castingRoles.value = castingRolesData.map(
-      (cr) => allRoles.value[cr.role_id],
-    );
-  }
-}
-async function initializeQuest() {
-  var quest_id: number | undefined | null = questStore.currentQuest;
-  if (
-    quest_id &&
-    !guildGamePlays.find((gp: GamePlay) => gp.quest_id == quest_id)
-  ) {
-    quest_id = null;
-  }
-  if (!quest_id) {
-    const gamePlay = guildGamePlays[0];
-    await questStore.setCurrentQuest(gamePlay.quest_id);
+      await membersStore.castingRolesPerQuest(member!.value.id, currentQuest.value?.id) || [];
+    castingRoles.value = castingRolesData.map((cr) => allRoles.value[cr.role_id]);
   }
 }
 async function joinToGuild() {
@@ -533,6 +472,59 @@ async function initializeStage2() {
   if (guildGamePlays.length > 0) {
     await initializeQuest();
   }
+};
+async function initializeQuest() {
+  if (currentQuest.value) {
+    const creatorId = currentQuest.value.creator;
+    if (!creatorId)
+      await membersStore.ensureMemberById(creatorId);
+    var quest_id: number | undefined | null = questStore.currentQuest;
+    await guildStore.ensureGuildsPlayingQuest({ quest_id });
+  if (
+    quest_id &&
+    !guildGamePlays.find((gp: GamePlay) => gp.quest_id == quest_id)
+  ) {
+    quest_id = null;
+  }
+  if (!quest_id) {
+    const gamePlay = guildGamePlays[0];
+    await questStore.setCurrentQuest(gamePlay.quest_id);
+  }
+  const castingList = currentQuest.value.casting;
+  if (!castingList) {
+    console.error("currentQuest.value.casting is undefined");
+    return;
+  }
+
+  const questCasting = castingList.find(
+    (ct: Casting) => ct.member_id == member!.value?.id,
+  );
+  if (questCasting) {
+    if (questCasting.guild_id == currentGuildId.value) {
+      memberPlaysQuestInThisGuild = true;
+      casting = questCasting;
+    }
+  }
+
+  const gamePlayData = currentQuest.value.game_play;
+  if (!gamePlayData) {
+    console.error("currentQuest.value.game_play is undefined");
+    return;
+  }
+  const gamePlay: Partial<GamePlay> | undefined = findPlayOfGuild(gamePlayData);
+  var node_id = gamePlay?.focus_node_id;
+  if (!node_id) {
+    await conversationStore.ensureRootNode(questStore.currentQuest);
+    node_id = conversationStore.conversationRoot?.id;
+  }
+  if (node_id && typeof currentGuildId.value === 'number') {
+    await conversationStore.ensureConversationNeighbourhood({ node_id, guild: currentGuildId.value });
+  } else {
+    // ill-constructed quest
+    await conversationStore.resetConversation();
+  }
+  return 'success';
+}
 }
 
 //Lifecycle Hooks

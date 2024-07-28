@@ -174,8 +174,8 @@
 </template>
 
 <script setup lang="ts">
-import { ConversationNode, QTreeNode } from '../types';
-import NodeForm from './node-form.vue';
+import { Casting, ConversationNode, Guild, PublicMember, QTreeNode, QuestData } from '../types';
+import NodeForm  from './node-form.vue';
 import ReadStatusCounterButton from './read-status-counter-button.vue';
 import { ibis_child_types } from '../stores/conversation';
 import { QTree, useQuasar } from 'quasar';
@@ -216,6 +216,7 @@ const readStatusStore = useReadStatusStore();
 const membersStore = useMembersStore();
 const roleStore = useRoleStore();
 
+// Quasar
 const $q = useQuasar();
 
 // Emits
@@ -234,7 +235,6 @@ const searchFilter = ref('');
 const editingNodeId = ref<number | null>(null);
 const addingChildToNodeId = ref<number | null>(null);
 const allowChangeMeta = ref(false);
-
 const newNode = ref<Partial<ConversationNode>>({});
 const tree = ref<QTree>();
 const nodeForms = shallowRef<
@@ -249,7 +249,7 @@ const nodeFormRef = computed(
 );
 const form = ref<InstanceType<typeof NodeForm> | null>(null);
 
-// Variables
+// Non Reactive Variables
 let baseNodePubStateConstraints: publication_state_type[];
 let listenerInstalled = false;
 let selectedIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
@@ -260,13 +260,13 @@ const searchFilter_ = computed(() => {
   return searchFilter.value + '_';
 });
 const getMemberHandle = computed(() => (id: number) => {
-  const member = membersStore.getMemberById(id);
+  const member = membersStore.getMemberById(id) as PublicMember;
   if (member) {
     if (questStore.getCurrentQuest && !NodeTreeProps.channelId) {
-      const castings = questStore.getCurrentQuest.casting || [];
+      const castings = questStore.getCurrentQuest.casting as Casting[] || [];
       const guild_id = castings.find((c) => c.member_id == id)?.guild_id;
       if (guild_id) {
-        const guild = guildStore.getGuildById(guild_id);
+        const guild = guildStore.getGuildById(guild_id) as Guild;
         return `${member.handle} of ${guild?.name}`;
       }
     }
@@ -293,11 +293,9 @@ const scores = computed((): ScoreMap | undefined => {
     return conversationStore.getPrivateScoreMap;
   return conversationStore.getScoreMap;
 });
-const readStatus = computed(
-  () => (id: number) => readStatusStore.getNodeReadStatus(id),
-);
-
-const getNodesTree = () => {
+const readStatus = computed(() => (id: number): boolean =>
+  readStatusStore.getNodeReadStatus(id))
+  const getNodesTree = () => {
   if (NodeTreeProps.channelId) {
     return channelStore.getChannelConversationTree(NodeTreeProps.channelId);
   }
@@ -310,7 +308,7 @@ const getNodesTree = () => {
   return conversationStore.getConversationTree;
 };
 
-const nodesTree = ref(getNodesTree());
+const nodesTree = ref<Partial<QTreeNode[]> | undefined | null>(getNodesTree());
 
 function checkIfExpanded(nodeId: QTreeNode): boolean {
   const qtree = tree.value;
@@ -427,9 +425,8 @@ function filterMethod(node: Partial<ConversationNode>, filter_string: string) {
   }
   return true;
 }
-
 function canAddTo(nodeId: number): boolean {
-  const quest = questStore.getQuestById(NodeTreeProps.currentQuestId!);
+  const quest = questStore.getQuestById(NodeTreeProps.currentQuestId!) as QuestData;
   if (quest) {
     return (
       (quest.is_playing || quest.is_quest_member) && quest.status != 'finished'
@@ -474,7 +471,6 @@ function editNode(nodeId: number) {
 }
 function addChildToNode(nodeId: number | null) {
   const formKey = `addChildForm_${nodeId}`;
-
   editingNodeId.value = null;
   const parent = getNode(nodeId);
   const parent_ibis_type = parent!.node_type;
@@ -499,10 +495,8 @@ function cancel() {
   editingNodeId.value = null;
   addingChildToNodeId.value = null;
   newNode.value = {};
-}
-
+};
 async function confirmAddChild(node: Partial<ConversationNode>) {
-  // const parent = this.getNode(this.addingChildToNodeId);
   try {
     if (NodeTreeProps.channelId) {
       await channelStore.createChannelNode(node);
@@ -522,7 +516,7 @@ async function confirmAddChild(node: Partial<ConversationNode>) {
       color: 'negative',
     });
   }
-}
+};
 async function confirmEdit(node: Partial<ConversationNode>) {
   try {
     if (NodeTreeProps.channelId) {
@@ -542,19 +536,19 @@ async function confirmEdit(node: Partial<ConversationNode>) {
       color: 'negative',
     });
   }
-}
+};
 function selectionChanged(id: number) {
   if (id === null) {
     return;
   }
   selectedNodeId.value = id;
   emit('selectionChanged', id);
-}
+};
 async function changeNeighbourhood() {
   ready.value = false;
   await treePromise();
   ready.value = true;
-}
+};
 async function treePromise() {
   if (showFocusNeighbourhood.value) {
     let node_id: number | null | undefined =
@@ -580,9 +574,8 @@ async function treePromise() {
   return await conversationStore.ensureConversation(
     NodeTreeProps.currentQuestId!,
   );
-}
-
-function keyResponder(evt: KeyboardEvent) {
+};
+function keyResponder(evt:KeyboardEvent) {
   const qtree = tree.value;
   const targetElement = evt.target as HTMLElement | null;
   if (!(selectedNodeId.value || addingChildToNodeId)) return;
@@ -635,7 +628,7 @@ function keyResponder(evt: KeyboardEvent) {
         evt.preventDefault();
       }
   }
-}
+};
 function hiddenByCollapse(qnode: QTreeNode) {
   const qtree = tree.value;
   while (qnode) {
@@ -644,7 +637,7 @@ function hiddenByCollapse(qnode: QTreeNode) {
     if (!qtree!.isExpanded(qnode.id)) return true;
   }
   return false;
-}
+};
 function inSearchFilter(qnode: QTreeNode) {
   // assume searchFilter not empty
   if (filterMethod(qnode, searchFilter_.value)) return true;
@@ -653,13 +646,11 @@ function inSearchFilter(qnode: QTreeNode) {
   }
   return false;
 }
-
 function scrollToNode(id: number | null, later: number | null = null): void {
   if (id === null) {
     console.warn('scrollToNode called with null id.');
     return;
   }
-
   if (later !== null) {
     setTimeout(() => scrollToNode(id, null), later);
   } else {
@@ -672,7 +663,7 @@ function scrollToNode(id: number | null, later: number | null = null): void {
       }
     });
   }
-}
+};
 function selectPrevious() {
   const qtree = tree;
   const sequence = conversationStore.getTreeSequence;
@@ -689,7 +680,7 @@ function selectPrevious() {
       return true;
     }
   }
-}
+};
 function selectNext() {
   const qtree = tree;
   const sequence = conversationStore.getTreeSequence;
@@ -706,7 +697,7 @@ function selectNext() {
       return true;
     }
   }
-}
+};
 async function ensureData() {
   // not sure I want this much before each update
   let promises = [roleStore.ensureAllRoles()];
@@ -733,7 +724,7 @@ async function ensureData() {
       membersStore.ensureMemberById(questStore.getCurrentQuest!.creator),
     );
   await Promise.all(promises);
-}
+};
 
 // Lifecycle Hooks
 onBeforeMount(async () => {
@@ -824,11 +815,8 @@ onBeforeMount(async () => {
   color: orange;
 }
 .scrollable-div {
-  max-height: 200px;
   width: 75%;
-  overflow-y: scroll;
-  border: 1px solid grey;
-  padding: 1em;
-  color: grey;
+  padding:1em;
+  color:grey
 }
 </style>

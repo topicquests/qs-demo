@@ -26,11 +26,11 @@ const clearBaseState: ReadStatusState = {
 export const useReadStatusStore = defineStore('readStatus', {
   state: () => baseState,
   getters: {
-    getNodeReadStatus: (state: ReadStatusState) => (node_id: number) => {
+    getNodeReadStatus: (state: ReadStatusState) => (node_id: number):boolean => {
       const memberStore = useMemberStore();
       const memberId = memberStore.getUserId;
       if (state.readStatus) {
-        const read = Object.values(state.readStatus).filter(
+        const read:ReadStatusData[] = Object.values(state.readStatus).filter(
           (isRead: ReadStatusData) => isRead.node_id == node_id && memberId,
         );
         if (read.length > 0) {
@@ -72,6 +72,7 @@ export const useReadStatusStore = defineStore('readStatus', {
     resetReadStatus() {
       Object.assign(this, clearBaseState);
     },
+    // Axios Calls
     async creatReadStatus(data: Partial<ReadStatusData>) {
       const res: AxiosResponse<ReadStatusData[]> = await api.post(
         '/read_status',
@@ -79,7 +80,7 @@ export const useReadStatusStore = defineStore('readStatus', {
           data,
         },
       );
-      if (res.status == 200) {
+      if (res.status == 201) {
         const readStatusData: ReadStatusData = Object.assign(res.data[0], {
           node_id: null,
         });
@@ -130,7 +131,7 @@ export const useReadStatusStore = defineStore('readStatus', {
         new_member_id: number;
         status_new: boolean;
       }> = await api.post('rpc/node_set_read_status', data);
-      if (res.status == 200) {
+      if (res.status == 200 || res.status == 201) {
         const memberStore = useMemberStore();
         const memberId = memberStore.getUserId;
         const node_id = res.data.new_node_id;

@@ -99,22 +99,18 @@ const clearBaseState: ConversationState = {
 export const useConversationStore = defineStore('conversation', {
   state: () => baseState,
   getters: {
-    getConversation: (
-      state: ConversationState,
-    ): Partial<QTreeNode[] | undefined> => Object.values(state.conversation),
-    getConversationNodeById:
-      (state: ConversationState) =>
-      (id: number): QTreeNode | undefined =>
-        state.conversation[id],
+    getConversation: (state: ConversationState): QTreeNode[] | undefined =>
+      Object.values(state.conversation),
+    getConversationNodeById: (state: ConversationState) => (id: number):QTreeNode | undefined =>
+      state.conversation[id],
     getRootNode: (state: ConversationState): ConversationNode | undefined => {
       if (state.conversationRoot) {
         return state.conversationRoot;
       }
       return undefined;
     },
-    getNeighbourhood: (
-      state: ConversationState,
-    ): Partial<QTreeNode[] | undefined> => Object.values(state.neighbourhood!),
+    getNeighbourhood: (state: ConversationState):QTreeNode[] | undefined =>
+      Object.values(state.neighbourhood!),
     getFocusNode: (state: ConversationState) => {
       if (state.neighbourhoodRoot && state.neighbourhood) {
         state.neighbourhood[state.neighbourhoodRoot];
@@ -127,9 +123,7 @@ export const useConversationStore = defineStore('conversation', {
       ),
     getNeighbourhoodTree: (state: ConversationState) =>
       state.neighbourhood ? makeTree(Object.values(state.neighbourhood)) : null,
-    getConversationTree: (
-      state: ConversationState,
-    ): Partial<QTreeNode[] | undefined> =>
+    getConversationTree: (state: ConversationState): QTreeNode[] | undefined =>
       state.full
         ? makeTree(
             Object.values(state.conversation),

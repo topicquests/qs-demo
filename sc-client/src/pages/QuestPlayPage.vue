@@ -5,13 +5,12 @@
         <div>
           <member></member>
         </div>
-
         <div class="row justify-center q-mt-lg">
-          <h3 class="q-mt-md">
+          <h2 class="q-mt-md" v-if="currentQuest">
             {{ currentQuest.name }}
             <q-btn
               v-if="currentQuest.description"
-              class="q-ml-xs q-mt-md"
+              class="q-ml-xs"
               size="md"
               :flat="true"
               icon="info"
@@ -20,13 +19,14 @@
                 <div v-html="currentQuest.description"></div>
               </q-tooltip>
             </q-btn>
-          </h3>
+          </h2 >
           <router-link
+          v-if="currentQuest"
             :to="{
               name: 'quest_teams',
               params: { quest_id: currentQuest.id },
             }"
-            class="q-ml-sm q-mt-md"
+            class="q-ml-sm q-pt-lg q-mt-md"
             >Teams</router-link
           >
         </div>
@@ -219,15 +219,8 @@ onMounted(async () => {
 });
 
 // Computed Properties
-const guildId = computed(() => {
-  const quest_id = questStore.getCurrentQuest?.id;
-  const casting = memberStore.castingPerQuest[quest_id!];
-  return casting ? casting.guild_id : undefined;
-});
-
 const memberId = computed(() => memberStore.member?.id);
 const currentQuest = computed(() => questStore.getCurrentQuest!);
-
 const myGuilds = (onlyAsLeader = false) => {
   let memberships = memberStore.member?.guild_membership || [];
   memberships = memberships.filter((gm) => gm.status === 'confirmed');
@@ -239,6 +232,22 @@ const myGuilds = (onlyAsLeader = false) => {
   }
   return guildIds.map((gid) => guildStore.getGuildById(gid));
 };
+const guildId = computed(() => {
+  const quest_id = questStore.getCurrentQuest?.id;
+  const casting = memberStore.castingPerQuest[quest_id!];
+  return casting ? casting.guild_id : undefined;
+});
+// Watches
+watchEffect(async () => {
+  if (guildId.value) {
+    await initializeGuildInner();
+  }
+});
+watchEffect(async () => {
+  if (questId.value) {
+    await initialize();
+  }
+});
 
 // Functions
 function guildsPlayingGame(onlyMine = false, recruiting = false) {
@@ -297,18 +306,6 @@ async function initializeGuildInner() {
     }
   }
 }
-
-// Watch for Changes
-watchEffect(async () => {
-  if (guildId.value) {
-    await initializeGuildInner();
-  }
-});
-watchEffect(async () => {
-  if (questId.value) {
-    await initialize();
-  }
-});
 </script>
 
 <style scoped>
