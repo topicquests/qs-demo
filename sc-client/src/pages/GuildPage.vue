@@ -238,7 +238,7 @@ import {
   PublicMember,
   GuildData,
 } from '../types';
-import { computed, ref, watch, watchEffect } from 'vue';
+import { computed, ref, watch } from 'vue';
 import castingRoleEdit from '../components/casting_role_edit.vue';
 import guildMembers from '../components/guild-members.vue';
 import memberGameRegistration from '../components/member_game_registration.vue';
@@ -363,11 +363,13 @@ const canRegisterToQuest = computed(() =>
 );
 
 // Watches
-watch(currentQuest, (newValue, oldValue) => {
-  getCastingRoles();
-  initializeQuest()
+watch(currentQuest, () => {
+  if (currentQuest.value) {
+    getCastingRoles();
+    initializeQuest()
+  }
 }, { immediate: true });
-watchEffect(() => {
+watch(guildId, () => {
   if(!guildId.value) {
     return
   }

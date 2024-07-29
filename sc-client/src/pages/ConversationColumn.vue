@@ -349,7 +349,7 @@
 </template>
 <script setup lang="ts">
 // Imports
-import { computed, onBeforeMount, ref, watch, watchEffect } from 'vue';
+import { computed, onBeforeMount, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { waitUserLoaded } from '../app-access';
 import { useConversationStore } from 'src/stores/conversation';
@@ -417,8 +417,9 @@ function getIcon(id: number) {
 }
 
 // Watches
-watchEffect(() => {
-  if (nodeId.value) getIcon(nodeId.value);
+watch(nodeId,() => {
+  if(nodeId.value)
+    getIcon(nodeId.value);
 });
 
 // Functions

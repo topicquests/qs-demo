@@ -316,8 +316,7 @@ const description = computed({
 });
 
 // Watches
-watch(
-  () => QuestCardProps.thisQuest,
+watch( () => QuestCardProps.thisQuest,
   (newQuest) => {
     quest.value = { ...newQuest };
   },

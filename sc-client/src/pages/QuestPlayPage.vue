@@ -145,12 +145,12 @@
         </div>
         <div class="row justify-center q-mt-lg">
           <router-link
-            :to="{
-              name: 'conversation_column',
-              params: { quest_id: questId },
-            }"
+          :to="{
+            name: 'conversation_column',
+            params: { quest_id: questId },
+          }"
           >
-            Card View
+          Card View
           </router-link>
         </div>
         <div class="row justify-center q-mt-lg">
@@ -183,10 +183,10 @@ import nodeTree from '../components/node-tree.vue';
 import { permission_enum } from '../enums';
 import { waitUserLoaded } from '../app-access';
 import { useRoute, useRouter } from 'vue-router';
-import { ref, computed, onMounted, watchEffect } from 'vue';
-import { useQuestStore } from '../stores/quests';
-import { useGuildStore } from '../stores/guilds';
-import { useMemberStore } from '../stores/member';
+import { ref, computed, onMounted, watch } from 'vue';
+import { useQuestStore } from 'src/stores/quests';
+import { useGuildStore } from 'src/stores/guilds';
+import { useMemberStore } from 'src/stores/member';
 import { useBaseStore } from '../stores/baseStore';
 import memberGameRegistration from '../components/member_game_registration.vue';
 import { Guild } from 'src/types';
@@ -223,14 +223,14 @@ const memberId = computed(() => memberStore.member?.id);
 const currentQuest = computed(() => questStore.getCurrentQuest!);
 const myGuilds = (onlyAsLeader = false) => {
   let memberships = memberStore.member?.guild_membership || [];
-  memberships = memberships.filter((gm) => gm.status === 'confirmed');
-  let guildIds = memberships.map((gm) => gm.guild_id);
+  memberships = memberships.filter(gm => gm.status === 'confirmed');
+  let guildIds = memberships.map(gm => gm.guild_id);
   if (onlyAsLeader) {
-    guildIds = guildIds.filter((gid) =>
-      baseStore.hasPermission(permission_enum.joinQuest, gid),
+    guildIds = guildIds.filter(gid =>
+      baseStore.hasPermission(permission_enum.joinQuest, gid)
     );
   }
-  return guildIds.map((gid) => guildStore.getGuildById(gid));
+  return guildIds.map(gid => guildStore.getGuildById(gid));
 };
 const guildId = computed(() => {
   const quest_id = questStore.getCurrentQuest?.id;
@@ -238,31 +238,22 @@ const guildId = computed(() => {
   return casting ? casting.guild_id : undefined;
 });
 // Watches
-watchEffect(async () => {
-  if (guildId.value) {
+watch(guildId, async () => {
     await initializeGuildInner();
-  }
 });
-watchEffect(async () => {
-  if (questId.value) {
+watch (questId, async () => {
     await initialize();
-  }
 });
 
 // Functions
 function guildsPlayingGame(onlyMine = false, recruiting = false) {
-  let guildIds =
-    questStore.getCurrentQuest?.game_play?.map((gp) => gp.guild_id) || [];
+  let guildIds = questStore.getCurrentQuest?.game_play?.map(gp => gp.guild_id) || [];
   if (onlyMine) {
-    guildIds = guildIds.filter((g) =>
-      memberStore.member?.guild_membership?.some(
-        (gm) => gm.guild_id === g && gm.status === 'confirmed',
-      ),
-    );
+    guildIds = guildIds.filter(g => memberStore.member?.guild_membership?.some(gm => gm.guild_id === g && gm.status === 'confirmed'));
   }
-  let guilds = guildIds.map((gid) => guildStore.getGuildById(gid));
+  let guilds = guildIds.map(gid => guildStore.getGuildById(gid));
   if (recruiting) {
-    guilds = guilds.filter((g) => g.open_for_applications);
+    guilds = guilds.filter(g => g.open_for_applications);
   }
   return guilds;
 }
@@ -285,9 +276,10 @@ async function initialize() {
   await questStore.setCurrentQuest(questId.value!);
   await Promise.all([
     questStore.ensureQuest({ quest_id: questId.value! }),
-    guildStore.ensureGuildsPlayingQuest({ quest_id: questId.value! }),
+    guildStore.ensureGuildsPlayingQuest({ quest_id: questId.value! })
   ]);
   await initializeGuildInner();
+
 }
 
 async function initializeGuildInner() {

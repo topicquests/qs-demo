@@ -45,7 +45,7 @@
 <script setup lang="ts">
 import { useMemberStore } from '../stores/member';
 import { Role } from '../types';
-import { computed, ref, watchEffect } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useQuestStore } from '../stores/quests';
 
 // Props
@@ -68,12 +68,13 @@ const cr = ref<Role[]>([]);
 
 // Computed Properties
 const currentQuest = computed(() =>
-  questStore.getQuestById(CastingRoleEditProps.questId),
+  questStore.getQuestById(CastingRoleEditProps.questId!),
 );
 
 // Watches
-watchEffect(() => {
-  cr.value = [...CastingRoleEditProps.castingRoles];
+watch(cr, () => {
+  if (CastingRoleEditProps.castingRoles)
+    cr.value = [...CastingRoleEditProps.castingRoles];
 });
 
 // FUnctions
