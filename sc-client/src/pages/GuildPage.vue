@@ -238,7 +238,7 @@ import {
   PublicMember,
   GuildData,
 } from '../types';
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, watchEffect } from 'vue';
 import castingRoleEdit from '../components/casting_role_edit.vue';
 import guildMembers from '../components/guild-members.vue';
 import memberGameRegistration from '../components/member_game_registration.vue';
@@ -478,13 +478,14 @@ async function initializeQuest() {
     const creatorId = currentQuest.value.creator;
     if (!creatorId)
       await membersStore.ensureMemberById(creatorId);
-    var quest_id: number | undefined | null = questStore.currentQuest;
+    var quest_id: number | undefined = questStore.currentQuest;
+    if(typeof quest_id === 'number')
     await guildStore.ensureGuildsPlayingQuest({ quest_id });
   if (
     quest_id &&
     !guildGamePlays.find((gp: GamePlay) => gp.quest_id == quest_id)
   ) {
-    quest_id = null;
+    quest_id = undefined;
   }
   if (!quest_id) {
     const gamePlay = guildGamePlays[0];
@@ -518,7 +519,7 @@ async function initializeQuest() {
     node_id = conversationStore.conversationRoot?.id;
   }
   if (node_id && typeof currentGuildId.value === 'number') {
-    await conversationStore.ensureConversationNeighbourhood({ node_id, guild: currentGuildId.value });
+    await conversationStore.ensureConversationNeighbourhood( node_id, currentGuildId.value );
   } else {
     // ill-constructed quest
     await conversationStore.resetConversation();
