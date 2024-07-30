@@ -298,11 +298,11 @@ const quest = ref<Partial<QuestData>>({});
 const turn_based_bool = [
   {
     label: 'Continuous',
-    value: true,
+    value: false,
   },
   {
     label: 'Turn-based',
-    value: false,
+    value: true,
   },
 ];
 
