@@ -13,6 +13,7 @@
         <div class="row justify-end" style="width: 89%">
           <div class="col-4 text-right q-pr-md">
             <router-link
+            v-if="quest_id"
               class="quest-link"
               :to="{
                 name: 'quest_page',
@@ -44,7 +45,6 @@
             ></quest-card>
           </div>
         </div>
-
         <div>
           <div class="row justify-center">
             <div class="column items-center">
@@ -82,7 +82,7 @@ import memberHandle from '../components/member-handle.vue';
 import nodeForm from '../components/node-form.vue';
 import questCard from '../components/quest-edit-card.vue';
 import { waitUserLoaded } from '../app-access';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useQuestStore } from '../stores/quests';
 import { useConversationStore } from '../stores/conversation';
 import { useQuasar } from 'quasar';
@@ -117,16 +117,12 @@ const defaultNode: defaultNodeType = {
 
 // Computed Properties
 const currentQuest = computed(() => questStore.getCurrentQuest);
-
 const node = computed(() => getNode());
 
 // Functions
 function getNode(): Partial<ConversationNode> | defaultNodeType {
   const rootNode = conversationStore.getRootNode;
   return rootNode || defaultNode;
-}
-function quest(): QuestData | undefined {
-  return questStore.getCurrentQuest;
 }
 async function editNode(node: ConversationNode) {
   if (node.id) {

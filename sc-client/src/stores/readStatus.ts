@@ -26,18 +26,20 @@ const clearBaseState: ReadStatusState = {
 export const useReadStatusStore = defineStore('readStatus', {
   state: () => baseState,
   getters: {
-    getNodeReadStatus: (state: ReadStatusState) => (node_id: number):boolean => {
-      const memberStore = useMemberStore();
-      const memberId = memberStore.getUserId;
-      if (state.readStatus) {
-        const read:ReadStatusData[] = Object.values(state.readStatus).filter(
-          (isRead: ReadStatusData) => isRead.node_id == node_id && memberId,
-        );
-        if (read.length > 0) {
-          return state.readStatus[node_id].status;
-        } else return true;
-      }
-    },
+    getNodeReadStatus:
+      (state: ReadStatusState) =>
+      (node_id: number): boolean => {
+        const memberStore = useMemberStore();
+        const memberId = memberStore.getUserId;
+        if (state.readStatus) {
+          const read: ReadStatusData[] = Object.values(state.readStatus).filter(
+            (isRead: ReadStatusData) => isRead.node_id == node_id && memberId,
+          );
+          if (read.length > 0) {
+            return state.readStatus[node_id].status;
+          } else return true;
+        }
+      },
     getUnreadStatusCount: (state: ReadStatusState) => (node_id: number) => {
       if (state.readStatus) {
         const unreadStatusCount: number =

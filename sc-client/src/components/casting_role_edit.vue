@@ -64,7 +64,7 @@ const memberStore = useMemberStore();
 const questStore = useQuestStore();
 
 // Reactive Variables
-const cr = ref<Role[]>([]);
+const cr = ref<Role[]>(CastingRoleEditProps.castingRoles || []);
 
 // Computed Properties
 const currentQuest = computed(() =>
@@ -72,9 +72,12 @@ const currentQuest = computed(() =>
 );
 
 // Watches
-watch(cr, () => {
-  if (CastingRoleEditProps.castingRoles)
-    cr.value = [...CastingRoleEditProps.castingRoles];
+watch(CastingRoleEditProps, (newRole) => {
+    const newCastingRoles = CastingRoleEditProps.castingRoles || [];
+    cr.value = [...newCastingRoles];
+});
+watch(cr, (newVal) => {
+  console.log('cr has changed:', newVal);
 });
 
 // FUnctions

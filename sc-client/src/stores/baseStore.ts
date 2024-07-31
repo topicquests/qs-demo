@@ -65,12 +65,14 @@ export const useBaseStore = defineStore('base', {
           return true;
         }
 
-
         let guild: Partial<Guild> | undefined = undefined;
         let quest: Partial<Quest> | undefined = undefined;
 
         if (guildN) {
-          guild = typeof guildN === 'number' ? guildStore.getGuildById(guildN) : guildN;
+          guild =
+            typeof guildN === 'number'
+              ? guildStore.getGuildById(guildN)
+              : guildN;
 
           if (guild) {
             const membership = (guild.guild_membership || []).find(
@@ -79,15 +81,20 @@ export const useBaseStore = defineStore('base', {
                 m.status === registration_status_enum.confirmed,
             );
 
-            if (membership?.permissions?.includes(permission) || membership?.permissions?.includes(permission_enum.guildAdmin)) {
+            if (
+              membership?.permissions?.includes(permission) ||
+              membership?.permissions?.includes(permission_enum.guildAdmin)
+            ) {
               return true;
             }
           }
         }
 
-
         if (questN) {
-          quest = typeof questN === 'number' ? useQuestStore().getQuestById(questN) : questN;
+          quest =
+            typeof questN === 'number'
+              ? useQuestStore().getQuestById(questN)
+              : questN;
 
           if (quest) {
             const membership = (quest.quest_membership || []).find(
@@ -122,9 +129,9 @@ export const useBaseStore = defineStore('base', {
             }
 
             if (nodeType) {
-              const rnc:Partial<Role> = (role?.role_node_constraint || []).find(
-                (rnc) => rnc.node_type === nodeType,
-              );
+              const rnc: Partial<Role> = (
+                role?.role_node_constraint || []
+              ).find((rnc) => rnc.node_type === nodeType);
 
               if (rnc?.permissions?.includes(permission)) {
                 return true;
@@ -132,7 +139,6 @@ export const useBaseStore = defineStore('base', {
             }
           }
         }
-
 
         return false;
       },

@@ -101,15 +101,17 @@ export const useConversationStore = defineStore('conversation', {
   getters: {
     getConversation: (state: ConversationState): QTreeNode[] | undefined =>
       Object.values(state.conversation),
-    getConversationNodeById: (state: ConversationState) => (id: number):QTreeNode | undefined =>
-      state.conversation[id],
+    getConversationNodeById:
+      (state: ConversationState) =>
+      (id: number): QTreeNode | undefined =>
+        state.conversation[id],
     getRootNode: (state: ConversationState): ConversationNode | undefined => {
       if (state.conversationRoot) {
         return state.conversationRoot;
       }
       return undefined;
     },
-    getNeighbourhood: (state: ConversationState):QTreeNode[] | undefined =>
+    getNeighbourhood: (state: ConversationState): QTreeNode[] | undefined =>
       Object.values(state.neighbourhood!),
     getFocusNode: (state: ConversationState) => {
       if (state.neighbourhoodRoot && state.neighbourhood) {

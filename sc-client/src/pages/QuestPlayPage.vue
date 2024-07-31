@@ -1,27 +1,41 @@
 <template>
   <q-page v-if="ready" class="bg-secondary">
     <div class="row justify-center">
-      <q-card style="width: 90%" class="q-mt-md">
+      <q-card style="width: 100%" class="q-mt-md">
         <div>
           <member></member>
         </div>
-        <div class="row justify-center q-mt-lg">
-          <h2 class="q-mt-md" v-if="currentQuest">
-            {{ currentQuest.name }}
-            <q-btn
-              v-if="currentQuest.description"
-              class="q-ml-xs"
-              size="md"
-              :flat="true"
-              icon="info"
-            >
-              <q-tooltip self="bottom middle" max-width="25rem">
-                <div v-html="currentQuest.description"></div>
-              </q-tooltip>
-            </q-btn>
-          </h2 >
+        <div class="row justify-center q-mt-lg" style="background-color: #f1c40f;">
+            <div>
+              <h2 class="quest-name" v-if="currentQuest">
+                {{ currentQuest.name }}
+                <q-btn
+                  v-if="currentQuest.description"
+                  class="q-ml-xs"
+                  size="md"
+                  :flat="true"
+                  icon="info"
+                  @click="showDialog = true"
+                >
+                </q-btn>
+              </h2>
+              <q-dialog v-model="showDialog" persistent >
+                <q-card style="max-height: 1000px;">
+                  <q-card-section>
+                    <div class="text-h6">Quest Information</div>
+                    <div>{{currentQuest.name}}</div>
+                  </q-card-section>
+                  <q-card-section>
+                    <div v-html="currentQuest.description"></div>
+                  </q-card-section>
+                  <q-card-actions align="right">
+                    <q-btn flat label="Close" color="primary" v-close-popup />
+                  </q-card-actions>
+                </q-card>
+              </q-dialog>
+            </div>
           <router-link
-          v-if="currentQuest"
+            v-if="currentQuest"
             :to="{
               name: 'quest_teams',
               params: { quest_id: currentQuest.id },
@@ -37,6 +51,7 @@
           <span v-else-if="questStore.isQuestMember(questId!)">
             You can
             <router-link
+              v-if="questId"
               :to="{ name: 'quest_edit', params: { quest_id: questId } }"
               >administer</router-link
             >
@@ -55,6 +70,7 @@
           <span v-else-if="myPlayingGuilds.length == 1">
             Your guild
             <router-link
+              v-if="questId"
               :to="{
                 name: 'guild',
                 params: {
@@ -76,6 +92,7 @@
             <ul>
               <li v-for="guild in myPlayingGuilds" :key="guild.id">
                 <router-link
+                v-if="guild.id"
                   :to="{ name: 'guild', params: { guild_id: guild.id } }"
                   >{{ guild.name }}</router-link
                 >
@@ -85,6 +102,7 @@
           <span v-else-if="myGuilds(true).length == 1">
             You are a leader in {{ myGuilds(true)[0].name }}. Maybe you want to
             <router-link
+              v-if="myGuilds(true)[0].id"
               :to="{
                 name: 'guild',
                 params: {
@@ -100,6 +118,7 @@
             <ul>
               <li v-for="guild in myGuilds(true)" :key="guild.id">
                 <router-link
+                  v-if="guild.id"
                   :to="{ name: 'guild', params: { guild_id: guild.id } }"
                   >{{ guild.name }}</router-link
                 >
@@ -116,6 +135,7 @@
             <ul>
               <li v-for="guild in myGuilds()" :key="guild.id">
                 <router-link
+                  v-if="guild.id"
                   :to="{ name: 'guild', params: { guild_id: guild.id } }"
                   >{{ guild.name }}</router-link
                 >
@@ -145,16 +165,16 @@
         </div>
         <div class="row justify-center q-mt-lg">
           <router-link
-          :to="{
-            name: 'conversation_column',
-            params: { quest_id: questId },
-          }"
+            :to="{
+              name: 'conversation_column',
+              params: { quest_id: questId },
+            }"
           >
-          Card View
+            Card View
           </router-link>
         </div>
-        <div class="row justify-center q-mt-lg">
-          <div class="col-11 q-md q-mr-lg">
+        <div class="row" style="width: 100%; padding: 0; margin: 0">
+          <div style="width: 100%;">
             <node-tree
               :currentQuestId="questId"
               :currentGuildId="guildId"
@@ -207,6 +227,7 @@ const registerMemberDialog = ref(false);
 const questId = ref<number | undefined>(undefined);
 const mySelectedPlayingGuildId = ref<number | undefined>(undefined);
 const selectedNodeId = ref<number | undefined>(undefined);
+const showDialog = ref(false)
 
 // Variables
 let myPlayingGuilds: Guild[] = [];
@@ -223,14 +244,14 @@ const memberId = computed(() => memberStore.member?.id);
 const currentQuest = computed(() => questStore.getCurrentQuest!);
 const myGuilds = (onlyAsLeader = false) => {
   let memberships = memberStore.member?.guild_membership || [];
-  memberships = memberships.filter(gm => gm.status === 'confirmed');
-  let guildIds = memberships.map(gm => gm.guild_id);
+  memberships = memberships.filter((gm) => gm.status === 'confirmed');
+  let guildIds = memberships.map((gm) => gm.guild_id);
   if (onlyAsLeader) {
-    guildIds = guildIds.filter(gid =>
-      baseStore.hasPermission(permission_enum.joinQuest, gid)
+    guildIds = guildIds.filter((gid) =>
+      baseStore.hasPermission(permission_enum.joinQuest, gid),
     );
   }
-  return guildIds.map(gid => guildStore.getGuildById(gid));
+  return guildIds.map((gid) => guildStore.getGuildById(gid));
 };
 const guildId = computed(() => {
   const quest_id = questStore.getCurrentQuest?.id;
@@ -239,21 +260,26 @@ const guildId = computed(() => {
 });
 // Watches
 watch(guildId, async () => {
-    await initializeGuildInner();
+  await initializeGuildInner();
 });
-watch (questId, async () => {
-    await initialize();
+watch(questId, async () => {
+  await initialize();
 });
 
 // Functions
 function guildsPlayingGame(onlyMine = false, recruiting = false) {
-  let guildIds = questStore.getCurrentQuest?.game_play?.map(gp => gp.guild_id) || [];
+  let guildIds =
+    questStore.getCurrentQuest?.game_play?.map((gp) => gp.guild_id) || [];
   if (onlyMine) {
-    guildIds = guildIds.filter(g => memberStore.member?.guild_membership?.some(gm => gm.guild_id === g && gm.status === 'confirmed'));
+    guildIds = guildIds.filter((g) =>
+      memberStore.member?.guild_membership?.some(
+        (gm) => gm.guild_id === g && gm.status === 'confirmed',
+      ),
+    );
   }
-  let guilds = guildIds.map(gid => guildStore.getGuildById(gid));
+  let guilds = guildIds.map((gid) => guildStore.getGuildById(gid));
   if (recruiting) {
-    guilds = guilds.filter(g => g.open_for_applications);
+    guilds = guilds.filter((g) => g.open_for_applications);
   }
   return guilds;
 }
@@ -276,10 +302,9 @@ async function initialize() {
   await questStore.setCurrentQuest(questId.value!);
   await Promise.all([
     questStore.ensureQuest({ quest_id: questId.value! }),
-    guildStore.ensureGuildsPlayingQuest({ quest_id: questId.value! })
+    guildStore.ensureGuildsPlayingQuest({ quest_id: questId.value! }),
   ]);
   await initializeGuildInner();
-
 }
 
 async function initializeGuildInner() {
@@ -317,5 +342,10 @@ async function initializeGuildInner() {
   transition: 0.5s;
   padding-top: 60px;
   border: 1px solid gray;
+}
+.quest-name {
+  text-decoration: underline;
+  padding: 5px;
+  margin-top: 16px;
 }
 </style>

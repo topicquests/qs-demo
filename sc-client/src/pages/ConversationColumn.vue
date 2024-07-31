@@ -13,6 +13,7 @@
           </div>
           <div class="row justify-center q-mt-lg">
             <router-link
+            v-if="questId"
               :to="{
                 name: 'quest_page',
                 params: { quest_id: questId },
@@ -417,9 +418,8 @@ function getIcon(id: number) {
 }
 
 // Watches
-watch(nodeId,() => {
-  if(nodeId.value)
-    getIcon(nodeId.value);
+watch(nodeId, () => {
+  if (nodeId.value) getIcon(nodeId.value);
 });
 
 // Functions

@@ -51,6 +51,7 @@
           <slot v-bind:quest="props.row">
             <span v-if="props.row.is_quest_member">
               <router-link
+                v-if="props.row.id"
                 :to="{
                   name: 'quest_edit',
                   params: { quest_id: props.row.id },

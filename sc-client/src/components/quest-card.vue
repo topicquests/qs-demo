@@ -21,6 +21,7 @@
             </q-tooltip>
           </q-btn>
           <router-link
+            v-if="currentQuest.id"
             :to="{ name: 'quest_page', params: { quest_id: currentQuest.id } }"
             class="q-ml-sm q-mt-md"
           >

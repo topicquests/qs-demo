@@ -178,7 +178,8 @@ const description = computed<string>({
 });
 
 // Watches
-watch(() => NodeFormProps.nodeInput!.node_type,
+watch(
+  () => NodeFormProps.nodeInput!.node_type,
   (newType) => {
     selectedNode.value = newType;
   },

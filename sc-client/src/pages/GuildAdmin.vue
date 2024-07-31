@@ -440,12 +440,12 @@ const findPlayOfGuild = computed(() => (gamePlays: GamePlay[]) => {
 async function addGuildAdmin(member: PublicMember) {
   const id = member.id;
   const guildMembership = guildStore.getGuildMembershipById(id);
-  if (guildMembership.permissions.includes(permission_enum.guildAdmin)) {
+  if (guildMembership!.permissions.includes(permission_enum.guildAdmin)) {
     console.error(`adding admin permissions to ${id} who already has them`);
     return;
   }
-  guildMembership.permissions = [
-    ...guildMembership.permissions,
+  guildMembership!.permissions = [
+    ...guildMembership!.permissions,
     permission_enum.guildAdmin,
   ];
   try {
@@ -457,7 +457,7 @@ async function addGuildAdmin(member: PublicMember) {
         (await membersStore.getMemberById(id)?.handle),
     });
   } catch (error) {
-    guildMembership.permissions.pop();
+    guildMembership!.permissions.pop();
     $q.notify({
       type: 'negative',
       message: 'Could not add guild admin: ' + error.response.data.message,
@@ -468,7 +468,7 @@ async function removeGuildAdmin(member: PublicMember) {
   const id = member.id;
 
   const guildMembership = guildStore.getGuildMembershipById(id);
-  const perm = guildMembership.permissions;
+  const perm = guildMembership!.permissions;
   const loc = perm.indexOf(permission_enum.guildAdmin);
   if (loc < 0) {
     console.error(
@@ -477,7 +477,7 @@ async function removeGuildAdmin(member: PublicMember) {
     return;
   }
   perm.splice(loc, 1);
-  guildMembership.permissions = perm;
+  guildMembership!.permissions = perm;
   try {
     await guildStore.updateGuildMembership(guildMembership!);
     $q.notify({
@@ -487,7 +487,7 @@ async function removeGuildAdmin(member: PublicMember) {
         (await membersStore.getMemberById(id)?.handle),
     });
   } catch (error) {
-    guildMembership.permissions.push(permission_enum.guildAdmin);
+    guildMembership!.permissions.push(permission_enum.guildAdmin);
     $q.notify({
       type: 'negative',
       message: 'Could not remove guild admin: ' + error.response.data.message,

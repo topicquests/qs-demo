@@ -36,17 +36,19 @@ const baseState: MembersState = {
 export const useMembersStore = defineStore('members', {
   state: () => baseState,
   getters: {
-    getMembers: (state: MembersState):PublicMember[] =>
+    getMembers: (state: MembersState): PublicMember[] =>
       Object.values(state.members).sort((a, b) =>
         a.handle.localeCompare(b.handle),
       ),
-    getMemberById: (state: MembersState) => (id: number):PublicMember => {
-      const member = state.members[id];
-      if (member) return member;
-      const loggedIn = useMemberStore().member;
-      // may also be in member
-      if (loggedIn?.id == id) return loggedIn;
-    },
+    getMemberById:
+      (state: MembersState) =>
+      (id: number): PublicMember => {
+        const member = state.members[id];
+        if (member) return member;
+        const loggedIn = useMemberStore().member;
+        // may also be in member
+        if (loggedIn?.id == id) return loggedIn;
+      },
     getMembersByIds: (state: MembersState) => (ids: number[]) =>
       ids.map((id) => state.members[id]),
     getMemberByHandle: (state: MembersState) => (handle: string) =>

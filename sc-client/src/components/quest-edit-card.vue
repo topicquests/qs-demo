@@ -292,7 +292,7 @@ const $q = useQuasar();
 const emit = defineEmits(['doUpdateQuest']);
 
 // Reactive Variables
-const quest = ref<Partial<QuestData>>({});
+const quest = ref<Partial<QuestData>>(QuestCardProps.thisQuest);
 
 // Non Reactive Variables
 const turn_based_bool = [
@@ -316,7 +316,8 @@ const description = computed({
 });
 
 // Watches
-watch( () => QuestCardProps.thisQuest,
+watch(
+  () => QuestCardProps.thisQuest,
   (newQuest) => {
     quest.value = { ...newQuest };
   },

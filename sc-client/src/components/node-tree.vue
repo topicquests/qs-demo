@@ -1,6 +1,6 @@
 <template>
   <div class="q-pb-xl" v-if="ready">
-    <div class="row justify-end">
+    <div class="row justify-end" style="background-color: #d3d3d3;">
       <q-btn icon="menu" :flat="true" :dense="true">
         <q-menu>
           <q-list>
@@ -51,6 +51,7 @@
       </q-btn>
     </div>
     <q-tree
+      v-if="nodesTree"
       ref="tree"
       :nodes="nodesTree"
       node-key="id"
@@ -174,8 +175,15 @@
 </template>
 
 <script setup lang="ts">
-import { Casting, ConversationNode, Guild, PublicMember, QTreeNode, QuestData } from '../types';
-import NodeForm  from './node-form.vue';
+import {
+  Casting,
+  ConversationNode,
+  Guild,
+  PublicMember,
+  QTreeNode,
+  QuestData,
+} from '../types';
+import NodeForm from './node-form.vue';
 import ReadStatusCounterButton from './read-status-counter-button.vue';
 import { ibis_child_types } from '../stores/conversation';
 import { QTree, useQuasar } from 'quasar';
@@ -263,7 +271,7 @@ const getMemberHandle = computed(() => (id: number) => {
   const member = membersStore.getMemberById(id) as PublicMember;
   if (member) {
     if (questStore.getCurrentQuest && !NodeTreeProps.channelId) {
-      const castings = questStore.getCurrentQuest.casting as Casting[] || [];
+      const castings = (questStore.getCurrentQuest.casting as Casting[]) || [];
       const guild_id = castings.find((c) => c.member_id == id)?.guild_id;
       if (guild_id) {
         const guild = guildStore.getGuildById(guild_id) as Guild;
@@ -293,9 +301,12 @@ const scores = computed((): ScoreMap | undefined => {
     return conversationStore.getPrivateScoreMap;
   return conversationStore.getScoreMap;
 });
-const readStatus = computed(() => (id: number): boolean =>
-  readStatusStore.getNodeReadStatus(id))
-  const getNodesTree = () => {
+const readStatus = computed(
+  () =>
+    (id: number): boolean =>
+      readStatusStore.getNodeReadStatus(id),
+);
+const getNodesTree = () => {
   if (NodeTreeProps.channelId) {
     return channelStore.getChannelConversationTree(NodeTreeProps.channelId);
   }
@@ -426,7 +437,9 @@ function filterMethod(node: Partial<ConversationNode>, filter_string: string) {
   return true;
 }
 function canAddTo(nodeId: number): boolean {
-  const quest = questStore.getQuestById(NodeTreeProps.currentQuestId!) as QuestData;
+  const quest = questStore.getQuestById(
+    NodeTreeProps.currentQuestId!,
+  ) as QuestData;
   if (quest) {
     return (
       (quest.is_playing || quest.is_quest_member) && quest.status != 'finished'
@@ -495,7 +508,7 @@ function cancel() {
   editingNodeId.value = null;
   addingChildToNodeId.value = null;
   newNode.value = {};
-};
+}
 async function confirmAddChild(node: Partial<ConversationNode>) {
   try {
     if (NodeTreeProps.channelId) {
@@ -516,7 +529,7 @@ async function confirmAddChild(node: Partial<ConversationNode>) {
       color: 'negative',
     });
   }
-};
+}
 async function confirmEdit(node: Partial<ConversationNode>) {
   try {
     if (NodeTreeProps.channelId) {
@@ -536,19 +549,19 @@ async function confirmEdit(node: Partial<ConversationNode>) {
       color: 'negative',
     });
   }
-};
+}
 function selectionChanged(id: number) {
   if (id === null) {
     return;
   }
   selectedNodeId.value = id;
   emit('selectionChanged', id);
-};
+}
 async function changeNeighbourhood() {
   ready.value = false;
   await treePromise();
   ready.value = true;
-};
+}
 async function treePromise() {
   if (showFocusNeighbourhood.value) {
     let node_id: number | null | undefined =
@@ -574,8 +587,8 @@ async function treePromise() {
   return await conversationStore.ensureConversation(
     NodeTreeProps.currentQuestId!,
   );
-};
-function keyResponder(evt:KeyboardEvent) {
+}
+function keyResponder(evt: KeyboardEvent) {
   const qtree = tree.value;
   const targetElement = evt.target as HTMLElement | null;
   if (!(selectedNodeId.value || addingChildToNodeId)) return;
@@ -628,7 +641,7 @@ function keyResponder(evt:KeyboardEvent) {
         evt.preventDefault();
       }
   }
-};
+}
 function hiddenByCollapse(qnode: QTreeNode) {
   const qtree = tree.value;
   while (qnode) {
@@ -637,7 +650,7 @@ function hiddenByCollapse(qnode: QTreeNode) {
     if (!qtree!.isExpanded(qnode.id)) return true;
   }
   return false;
-};
+}
 function inSearchFilter(qnode: QTreeNode) {
   // assume searchFilter not empty
   if (filterMethod(qnode, searchFilter_.value)) return true;
@@ -663,7 +676,7 @@ function scrollToNode(id: number | null, later: number | null = null): void {
       }
     });
   }
-};
+}
 function selectPrevious() {
   const qtree = tree;
   const sequence = conversationStore.getTreeSequence;
@@ -680,7 +693,7 @@ function selectPrevious() {
       return true;
     }
   }
-};
+}
 function selectNext() {
   const qtree = tree;
   const sequence = conversationStore.getTreeSequence;
@@ -697,7 +710,7 @@ function selectNext() {
       return true;
     }
   }
-};
+}
 async function ensureData() {
   // not sure I want this much before each update
   let promises = [roleStore.ensureAllRoles()];
@@ -724,7 +737,7 @@ async function ensureData() {
       membersStore.ensureMemberById(questStore.getCurrentQuest!.creator),
     );
   await Promise.all(promises);
-};
+}
 
 // Lifecycle Hooks
 onBeforeMount(async () => {
@@ -816,7 +829,7 @@ onBeforeMount(async () => {
 }
 .scrollable-div {
   width: 75%;
-  padding:1em;
-  color:grey
+  padding: 1em;
+  color: grey;
 }
 </style>
