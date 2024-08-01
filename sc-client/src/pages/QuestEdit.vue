@@ -13,7 +13,7 @@
         <div class="row justify-end" style="width: 89%">
           <div class="col-4 text-right q-pr-md">
             <router-link
-            v-if="quest_id"
+              v-if="quest_id"
               class="quest-link"
               :to="{
                 name: 'quest_page',

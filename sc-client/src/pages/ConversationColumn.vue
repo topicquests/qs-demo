@@ -13,7 +13,7 @@
           </div>
           <div class="row justify-center q-mt-lg">
             <router-link
-            v-if="questId"
+              v-if="questId"
               :to="{
                 name: 'quest_page',
                 params: { quest_id: questId },

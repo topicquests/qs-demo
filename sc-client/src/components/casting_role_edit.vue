@@ -11,7 +11,6 @@
       </section>
       <q-separator color="grey" class="q-mb-md"></q-separator>
       <p class="note">Can only be changed prior to start of quest</p>
-
       <div class="row">
         <span class="handle q-pl-md q-mt-md">
           {{ memberStore.member!.handle }}
@@ -73,11 +72,8 @@ const currentQuest = computed(() =>
 
 // Watches
 watch(CastingRoleEditProps, (newRole) => {
-    const newCastingRoles = CastingRoleEditProps.castingRoles || [];
-    cr.value = [...newCastingRoles];
-});
-watch(cr, (newVal) => {
-  console.log('cr has changed:', newVal);
+  const newCastingRoles = CastingRoleEditProps.castingRoles || [];
+  cr.value = [...newCastingRoles];
 });
 
 // FUnctions

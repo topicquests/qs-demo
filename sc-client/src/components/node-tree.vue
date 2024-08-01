@@ -1,6 +1,6 @@
 <template>
   <div class="q-pb-xl" v-if="ready">
-    <div class="row justify-end" style="background-color: #d3d3d3;">
+    <div class="row justify-end" style="background-color: #d3d3d3">
       <q-btn icon="menu" :flat="true" :dense="true">
         <q-menu>
           <q-list>

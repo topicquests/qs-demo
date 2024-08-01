@@ -5,35 +5,38 @@
         <div>
           <member></member>
         </div>
-        <div class="row justify-center q-mt-lg" style="background-color: #f1c40f;">
-            <div>
-              <h2 class="quest-name" v-if="currentQuest">
-                {{ currentQuest.name }}
-                <q-btn
-                  v-if="currentQuest.description"
-                  class="q-ml-xs"
-                  size="md"
-                  :flat="true"
-                  icon="info"
-                  @click="showDialog = true"
-                >
-                </q-btn>
-              </h2>
-              <q-dialog v-model="showDialog" persistent >
-                <q-card style="max-height: 1000px;">
-                  <q-card-section>
-                    <div class="text-h6">Quest Information</div>
-                    <div>{{currentQuest.name}}</div>
-                  </q-card-section>
-                  <q-card-section>
-                    <div v-html="currentQuest.description"></div>
-                  </q-card-section>
-                  <q-card-actions align="right">
-                    <q-btn flat label="Close" color="primary" v-close-popup />
-                  </q-card-actions>
-                </q-card>
-              </q-dialog>
-            </div>
+        <div
+          class="row justify-center q-mt-lg"
+          style="background-color: #f1c40f"
+        >
+          <div>
+            <h2 class="quest-name" v-if="currentQuest">
+              {{ currentQuest.name }}
+              <q-btn
+                v-if="currentQuest.description"
+                class="q-ml-xs"
+                size="md"
+                :flat="true"
+                icon="info"
+                @click="showDialog = true"
+              >
+              </q-btn>
+            </h2>
+            <q-dialog v-model="showDialog" persistent>
+              <q-card style="max-height: 1000px">
+                <q-card-section>
+                  <div class="text-h6">Quest Information</div>
+                  <div>{{ currentQuest.name }}</div>
+                </q-card-section>
+                <q-card-section>
+                  <div v-html="currentQuest.description"></div>
+                </q-card-section>
+                <q-card-actions align="right">
+                  <q-btn flat label="Close" color="primary" v-close-popup />
+                </q-card-actions>
+              </q-card>
+            </q-dialog>
+          </div>
           <router-link
             v-if="currentQuest"
             :to="{
@@ -92,7 +95,7 @@
             <ul>
               <li v-for="guild in myPlayingGuilds" :key="guild.id">
                 <router-link
-                v-if="guild.id"
+                  v-if="guild.id"
                   :to="{ name: 'guild', params: { guild_id: guild.id } }"
                   >{{ guild.name }}</router-link
                 >
@@ -174,7 +177,7 @@
           </router-link>
         </div>
         <div class="row" style="width: 100%; padding: 0; margin: 0">
-          <div style="width: 100%;">
+          <div style="width: 100%">
             <node-tree
               :currentQuestId="questId"
               :currentGuildId="guildId"
@@ -227,7 +230,7 @@ const registerMemberDialog = ref(false);
 const questId = ref<number | undefined>(undefined);
 const mySelectedPlayingGuildId = ref<number | undefined>(undefined);
 const selectedNodeId = ref<number | undefined>(undefined);
-const showDialog = ref(false)
+const showDialog = ref(false);
 
 // Variables
 let myPlayingGuilds: Guild[] = [];

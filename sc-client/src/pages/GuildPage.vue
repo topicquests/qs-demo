@@ -12,51 +12,8 @@
                 <scoreboard></scoreboard>
               </div>
             </div>
-            <div class="row justify-end guild-header">
-              <div class="col-4 text-right q-pr-md">
-                <router-link
-                  class="guild-header"
-                  v-if="canRegisterToQuest"
-                  :to="{
-                    name: 'guild_admin',
-                    params: { guild_id: currentGuild!.id },
-                  }"
-                  >>>go to admin page</router-link
-                >
-              </div>
-            </div>
-            <div class="col-12" v-if="currentGuild">
-              <h1 class="text-center">
-                {{ currentGuild.name }}
-                <q-btn
-                  v-if="
-                    member && !isMember && currentGuild.open_for_applications
-                  "
-                  label="Join Guild"
-                  @click="joinToGuild()"
-                  style="margin-right: 1em"
-                  class="bg-dark-blue"
-                />
-              </h1>
-              <span v-if="!currentGuild.open_for_applications">
-                guild closed</span
-              >
-              <span v-if="!member && currentGuild.open_for_applications">
-                login or register to join</span
-              >
-            </div>
-            <div class="row justify-center">
-              <div class="column; guild-description-col">
-                <q-card class="q-mb-md">
-                  <div class="content-container">
-                    <div
-                      class="content"
-                      v-html="currentGuild?.description"
-                    ></div>
-                  </div>
-                </q-card>
-              </div>
-            </div>
+            <guild-header></guild-header>
+            <guild-description></guild-description>
             <div class="row">
               <div class="col-12 items-center">
                 <div style="width: 100%">
@@ -69,67 +26,13 @@
                         <h2 class="q-mt-md q-mb-md">Registered Quests</h2>
                       </div>
                     </div>
-                    <div class="row justify-start">
-                      <div v-if="activeQuests.length > 0">
-                        <div v-for="quest in activeQuests" :key="quest.id">
-                          <q-radio
-                            v-model="questStore.currentQuest"
-                            color="black"
-                            :val="quest.id"
-                            :label="quest.name"
-                            class="q-ml-xl"
-                          >
-                            <q-btn
-                              v-if="
-                                isMember && !memberStore.guildPerQuest[quest.id]
-                              "
-                              label="Play"
-                              @click="prompt = true"
-                              id="radio-btn"
-                              size="md"
-                              class="bg-primary q-ml-md"
-                            />
-                            <q-btn
-                              v-else-if="
-                                memberStore.guildPerQuest[quest.id] &&
-                                memberStore.guildPerQuest[quest.id] ==
-                                  guildStore.currentGuild
-                              "
-                              class="q-ml-md bg-primary"
-                              label="Go To Quest"
-                              id="radio-btn"
-                              size="sm"
-                              @click="
-                                router.push({
-                                  name: 'quest_page',
-                                  params: { quest_id: String(quest.id) },
-                                })
-                              "
-                            />
-                            <router-link
-                              v-if="
-                                memberStore.guildPerQuest[quest.id] &&
-                                memberStore.guildPerQuest[quest.id] !=
-                                  guildStore.currentGuild
-                              "
-                              :to="{
-                                name: 'guild',
-                                params: {
-                                  guild_id: memberStore.guildPerQuest[quest.id],
-                                },
-                              }"
-                              >Playing in guild</router-link
-                            >
-                          </q-radio>
-                        </div>
-                      </div>
-
-                      <div v-else class="col-12">
-                        <h2 h2 class="q-mt-md q-mb-md">
-                          You are not registered to any quests
-                        </h2>
-                      </div>
-                    </div>
+                    <active-quest
+                      :isMember="isMember"
+                      :guildId="guildId"
+                      :questId="currentQuestId"
+                      :activeQuests="activeQuests"
+                    >
+                    </active-quest>
                   </q-card>
                 </div>
               </div>
@@ -161,7 +64,6 @@
                 />
               </div>
             </div>
-
             <div class="row justify-centetr">
               <div
                 class="column items-center"
@@ -206,12 +108,6 @@
                 </q-card>
               </div>
             </div>
-            <q-dialog v-model="prompt" persistent>
-              <member-game-registration
-                :guildId="guildId!"
-                :questId="questStore.currentQuest"
-              />
-            </q-dialog>
           </q-card>
         </div>
       </q-card>
@@ -223,25 +119,20 @@
 // Imports
 import scoreboard from '../components/score-board.vue';
 import memberHandle from '../components/member-handle.vue';
+import guildHeader from '../components/guild-header.vue';
+import guildDescription from '../components/guild-description.vue';
+import activeQuest from '../components/active-quests.vue';
 import { waitUserLoaded } from '../app-access';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import {
   registration_status_enum,
   quest_status_enum,
   permission_enum,
 } from '../enums';
-import {
-  Quest,
-  GamePlay,
-  Casting,
-  Role,
-  PublicMember,
-  GuildData,
-} from '../types';
+import { Quest, GamePlay, Casting, Role, PublicMember } from '../types';
 import { computed, ref, watch } from 'vue';
 import castingRoleEdit from '../components/casting_role_edit.vue';
 import guildMembers from '../components/guild-members.vue';
-import memberGameRegistration from '../components/member_game_registration.vue';
 import '../css/app.scss';
 import { QTableProps } from 'quasar';
 import { onBeforeMount } from 'vue';
@@ -257,7 +148,6 @@ import { useQuasar } from 'quasar';
 import { storeToRefs } from 'pinia';
 
 // Route
-const router = useRouter();
 const route = useRoute();
 
 // Stores
@@ -275,18 +165,16 @@ const $q = useQuasar();
 
 //Reactive Variables
 const isMember = ref(false);
-const prompt = ref(false);
 const guildId = ref<number | undefined>();
 const ready = ref(false);
 const { member } = storeToRefs(memberStore);
 const castingRoles = ref<Role[]>([]);
+const memberPlaysQuestInThisGuild = ref(false);
 
 //Non Reactive Variables
-let activeQuests: Quest[] = [];
-let memberPlaysQuestInThisGuild = false;
 let guildGamePlays: GamePlay[] = [];
-let casting: Casting | undefined;
 let pastQuests: Quest[] = [];
+const activeQuests = ref<Quest[]>([]);
 
 //Table Columns
 const columns: QTableProps['columns'] = [
@@ -364,20 +252,27 @@ const canRegisterToQuest = computed(() =>
 
 // Watches
 watch(
-  currentQuest,
+  currentQuestId,
   () => {
-    if (currentQuest.value) {
+    if (currentQuestId.value) {
       getCastingRoles();
       initializeQuest();
     }
   },
   { immediate: true },
 );
-watch(guildId, () => {
-  if (guildId.value) {
-    getCastingRoles()
+watch(
+  member,
+  (newVal, oldVal) => {
+    if (newVal) {
+      getCastingRoles();
+    }
+  },
+  {
+    immediate: true,
+    deep: true
   }
-});
+);
 
 // Functions
 async function getCastingRoles() {
@@ -392,20 +287,7 @@ async function getCastingRoles() {
     );
   }
 }
-async function joinToGuild() {
-  if (typeof guildStore.currentGuild === 'number')
-    await guildStore.addGuildMembership({
-      guild_id: guildStore.currentGuild,
-      member_id: member!.value?.id,
-    });
-  isMember.value = true;
-  await channelStore.resetChannel();
-  $q.notify({
-    type: 'positive',
-    message: 'You are joining guild ' + guildStore.currentGuild,
-  });
-  return;
-}
+
 function findPlayOfGuild(
   gamePlays: GamePlay[] | undefined,
 ): Partial<GamePlay | undefined> {
@@ -473,7 +355,7 @@ async function initializeStage2() {
         q.status == quest_status_enum.scoring) &&
       playQuestIds.includes(q.id),
   );
-  activeQuests = questStore.getQuests.filter(
+  activeQuests.value = questStore.getQuests.filter(
     (q: Quest) =>
       (q.status == quest_status_enum.ongoing ||
         q.status == quest_status_enum.paused ||
@@ -512,8 +394,7 @@ async function initializeQuest() {
     );
     if (questCasting) {
       if (questCasting.guild_id == currentGuildId.value) {
-        memberPlaysQuestInThisGuild = true;
-        casting = questCasting;
+        memberPlaysQuestInThisGuild.value = true;
       }
     }
 
