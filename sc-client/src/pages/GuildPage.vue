@@ -144,12 +144,10 @@ import { useGuildStore } from '../stores/guilds';
 import { useRoleStore } from '../stores/role';
 import { useChannelStore } from '../stores/channel';
 import { useConversationStore } from '../stores/conversation';
-import { useQuasar } from 'quasar';
 import { storeToRefs } from 'pinia';
 
 // Route
 const route = useRoute();
-
 // Stores
 const baseStore = useBaseStore();
 const guildStore = useGuildStore();
@@ -160,8 +158,6 @@ const roleStore = useRoleStore();
 const channelStore = useChannelStore();
 const conversationStore = useConversationStore();
 
-// Quasar
-const $q = useQuasar();
 
 //Reactive Variables
 const isMember = ref(false);
@@ -270,8 +266,8 @@ watch(
   },
   {
     immediate: true,
-    deep: true
-  }
+    deep: true,
+  },
 );
 
 // Functions
@@ -379,7 +375,7 @@ async function initializeQuest() {
     ) {
       quest_id = undefined;
     }
-    if (!quest_id) {
+    if (quest_id) {
       const gamePlay = guildGamePlays[0];
       await questStore.setCurrentQuest(gamePlay.quest_id);
     }
