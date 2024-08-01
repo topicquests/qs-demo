@@ -22,7 +22,6 @@
           :guildId="guildId"
           :selectedNodeId="selectedNodeId"
         ></quest-node-tree>
-
       </q-card>
     </div>
   </q-page>

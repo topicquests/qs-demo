@@ -36,14 +36,24 @@ import { useMemberStore } from '../stores/member';
 const guildStore = useGuildStore();
 const memberStore = useMemberStore();
 
-const currentGuild = computed(() => guildStore.getCurrentGuild);
+const currentGuild = computed({
+  get:() => {
+    return guildStore.getCurrentGuild
+  },
+  set:() => {}
+})
 const member = computed(() => memberStore.member);
-const isMember = computed(
-  () => !!guildStore.isGuildMember(currentGuild.value?.id),
-);
+const isMember = computed({
+  get: () => {
+    return !!guildStore.isGuildMember(currentGuild.value?.id)
+  },
+  set:(value) => {
+    return value;
+  }
+})
 
 const joinToGuild = async () => {
-  if (typeof currentGuild.value === 'number')
+  if (typeof currentGuild.value.id === 'number')
     await guildStore.addGuildMembership({
       guild_id: currentGuild.value.id,
       member_id: member.value?.id,
