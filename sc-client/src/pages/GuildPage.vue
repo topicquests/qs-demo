@@ -160,7 +160,6 @@ const roleStore = useRoleStore();
 const channelStore = useChannelStore();
 const conversationStore = useConversationStore();
 
-
 //Reactive Variables
 const isMember = ref(false);
 const guildId = ref<number | undefined>();

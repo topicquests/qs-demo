@@ -37,20 +37,20 @@ const guildStore = useGuildStore();
 const memberStore = useMemberStore();
 
 const currentGuild = computed({
-  get:() => {
-    return guildStore.getCurrentGuild
+  get: () => {
+    return guildStore.getCurrentGuild;
   },
-  set:() => {}
-})
+  set: () => {},
+});
 const member = computed(() => memberStore.member);
 const isMember = computed({
   get: () => {
-    return !!guildStore.isGuildMember(currentGuild.value?.id)
+    return !!guildStore.isGuildMember(currentGuild.value?.id);
   },
-  set:(value) => {
+  set: (value) => {
     return value;
-  }
-})
+  },
+});
 
 const joinToGuild = async () => {
   if (typeof currentGuild.value.id === 'number')
