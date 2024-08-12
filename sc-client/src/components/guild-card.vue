@@ -56,9 +56,9 @@
 import { useQuasar } from 'quasar';
 import { waitUserLoaded } from '../app-access';
 import { public_private_bool } from '../enums';
-import { Guild, GuildData } from '../types';
+import { Guild } from '../types';
 import { useGuildStore } from '../stores/guilds';
-import { onBeforeMount, ref, watch } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 
 const GuildCardProps = defineProps<{
   currentGuild?: Partial<Guild>;

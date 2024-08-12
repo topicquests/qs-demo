@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-//import { filterKeys} from './base';
 import { AxiosResponse } from 'axios';
 import { useMemberStore } from './member';
 import { useMembersStore } from './members';
@@ -28,7 +27,7 @@ import {
   publication_state_list,
 } from '../enums';
 import { getWSClient } from '../wsclient';
-import { filterKeys } from './base';
+import { filterKeys } from './baseStore';
 
 interface QuestMap {
   [key: number]: QuestData;
@@ -350,7 +349,7 @@ export const useQuestStore = defineStore('quest', {
           res.data.map((guild: QuestData) => [guild.id, guild]),
         );
         if (!full) {
-          for (const quest of Object.values(this.quests)) {
+          for (const quest of Object.values<QuestData>(this.quests)) {
             if (!this.fullQuests[quest.id]) {
               continue;
             }

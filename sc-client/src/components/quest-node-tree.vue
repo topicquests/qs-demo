@@ -15,7 +15,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import nodeTree from '../components/node-tree.vue';
 

@@ -98,7 +98,6 @@ import memberHandle from '../components/member-handle.vue';
 import scoreboard from '../components/score-board.vue';
 import roleTable from '../components/role-table.vue';
 import serverDataCard from '../components/server-data-card.vue';
-import type { Member, PublicMember } from '../types';
 import { waitUserLoaded } from '../app-access';
 import { ref, computed } from 'vue';
 import { permission_enum } from '../enums';

@@ -82,7 +82,7 @@ import memberHandle from '../components/member-handle.vue';
 import nodeForm from '../components/node-form.vue';
 import questCard from '../components/quest-edit-card.vue';
 import { waitUserLoaded } from '../app-access';
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { useQuestStore } from '../stores/quests';
 import { useConversationStore } from '../stores/conversation';
 import { useQuasar } from 'quasar';

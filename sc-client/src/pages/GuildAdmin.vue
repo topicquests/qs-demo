@@ -280,8 +280,6 @@ import {
   QuestData,
   PublicMember,
   Guild,
-  GuildData,
-  Member,
 } from '../types';
 import { computed, ref } from 'vue';
 import roleTable from '../components/role-table.vue';
@@ -494,13 +492,15 @@ async function removeGuildAdmin(member: PublicMember) {
     });
   }
 }
+
+/*
 function isGuildAdmin(id: number) {
-  const perm = guildStore.getGuildMembershipById(id)?.permissions;
-  if (perm?.find((e) => e == 'guildAdmin')) {
-    return true;
-  }
-  return false;
+  return guildStore
+    .getGuildMembershipById(id)
+    ?.permissions.includes(permission_enum.guildAdmin);
 }
+*/
+
 async function roleAdded(member_id: number, role_id: number) {
   const guild_id = guildId;
   if (guild_id)
@@ -510,6 +510,7 @@ async function roleAdded(member_id: number, role_id: number) {
       role_id,
     });
 }
+
 async function roleRemoved(member_id: number, role_id: number) {
   const guild_id: number | undefined = guildId;
   if (typeof guild_id == 'number')
@@ -519,6 +520,7 @@ async function roleRemoved(member_id: number, role_id: number) {
       role_id,
     });
 }
+
 async function doSubmit() {
   try {
     if (currentGuild.value) await guildStore.updateGuild(currentGuild.value);

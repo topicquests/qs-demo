@@ -46,7 +46,6 @@
 <script setup lang="ts">
 import scoreboard from '../components/score-board.vue';
 import questTable from '../components/quest-table.vue';
-import member from '../components/member-handle.vue';
 
 import { waitUserLoaded } from '../app-access';
 import { useMemberStore } from '../stores/member';

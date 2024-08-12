@@ -1,4 +1,3 @@
-import {} from './base';
 import { ConversationNode, ReadStatusData } from '../types';
 import { defineStore } from 'pinia';
 import { useMemberStore } from './member';

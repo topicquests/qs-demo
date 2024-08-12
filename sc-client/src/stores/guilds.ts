@@ -16,7 +16,7 @@ import { useQuestStore } from './quests';
 import { api } from '../boot/axios';
 import { AxiosResponse } from 'axios';
 import { getWSClient } from '../wsclient';
-import { filterKeys } from './base';
+import { filterKeys } from './baseStore';
 
 interface GuildMap {
   [key: number]: GuildData;
@@ -259,7 +259,7 @@ export const useGuildStore = defineStore('guild', {
           res.data.map((guild: GuildData) => [guild.id, guild]),
         );
         if (!full) {
-          for (const guild of Object.values(this.guilds)) {
+          for (const guild of Object.values<GuildData>(this.guilds)) {
             if (!this.fullGuilds[guild.id]) {
               continue;
             }

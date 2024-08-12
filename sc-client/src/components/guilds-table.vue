@@ -130,7 +130,6 @@ const memberStore = useMemberStore();
 const extra = GuildsTableProp.extra_columns || [];
 
 // Reactive Variables
-const guildPermission = ref(false);
 const selectedGuild = ref<GuildRow[]>([]);
 
 // Columns

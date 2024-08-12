@@ -199,7 +199,6 @@ export const useRoleStore = defineStore('role', {
       const params = Object();
       params.role_id = data.role_id;
       params.node_type = data.node_type;
-      data.slug = undefined;
       Object.assign(data, {
         updated_at: undefined,
         role_node_constraint: undefined,

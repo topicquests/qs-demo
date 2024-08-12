@@ -73,19 +73,8 @@
 </template>
 
 <script setup lang="ts">
-import member from '../components/member.vue';
-import nodeCard from '../components/node-card.vue';
-import nodeForm from '../components/node-form.vue';
 import nodeTree from '../components/node-tree.vue';
 import { waitUserLoaded } from '../app-access';
-import {
-  ibis_node_type_type,
-  // ibis_node_type_list,
-  // publication_state_list,
-  // public_private_bool,
-  publication_state_type,
-} from '../enums';
-import { ConversationNode } from '../types';
 import { onBeforeMount, ref } from 'vue';
 import { useGuildStore } from 'src/stores/guilds';
 import { useQuestStore } from 'src/stores/quests';
@@ -128,7 +117,8 @@ async function initialize() {
     guildId.value = Number.parseInt(route.params.guild_id);
   if (typeof route.params.quest_id === 'string')
     questId.value = Number.parseInt(route.params.quest_id);
-  channelId.value = Number.parseInt(route.params.channel_id);
+  if (typeof route.params.channel_id === 'string')
+    channelId.value = Number.parseInt(route.params.channel_id);
   channelStore.setCurrentChannel(channelId.value!);
   await waitUserLoaded();
   const promises = [];

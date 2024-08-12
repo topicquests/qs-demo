@@ -81,7 +81,7 @@ export default {
       console.info('QFT-1', this.member);
       console.info('QFT-2', JSON.stringify(json));
       // use the conversation node database
-      conversation.create(json).then((response) => {
+      conversation.create(json).then((/* response */) => {
         router.push('/topics');
         // parents, if any, set in server
       });

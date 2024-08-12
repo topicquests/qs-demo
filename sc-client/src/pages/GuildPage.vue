@@ -144,7 +144,6 @@ import { useGuildStore } from '../stores/guilds';
 import { useRoleStore } from '../stores/role';
 import { useChannelStore } from '../stores/channel';
 import { useConversationStore } from '../stores/conversation';
-import { useQuasar } from 'quasar';
 import { storeToRefs } from 'pinia';
 
 // Route

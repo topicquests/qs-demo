@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { filterKeys } from './base';
+import { filterKeys } from './baseStore';
 import { AxiosResponse } from 'axios';
 import {
   PublicMember,
@@ -163,8 +163,8 @@ export const useMembersStore = defineStore('members', {
       const res: AxiosResponse<PublicMember[]> =
         await api.get('/public_members');
       if (res.status == 200) {
-        const fullMembers: PublicMember[] = Object.values(this.members).filter(
-          (member: PublicMember) => this.fullMembers[member.id],
+        const fullMembers = Object.values<PublicMember>(this.members).filter(
+          (member) => this.fullMembers[member.id],
         );
         const members: MemberMap = Object.fromEntries(
           res.data.map((member: PublicMember) => [member.id, member]),

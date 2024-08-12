@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { Notify, QNotifyCreateOptions } from 'quasar';
+import { Notify } from 'quasar';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useMemberStore } from '../stores/member';

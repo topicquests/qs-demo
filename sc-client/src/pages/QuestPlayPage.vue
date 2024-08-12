@@ -38,8 +38,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useQuestStore } from 'src/stores/quests';
 import { useGuildStore } from 'src/stores/guilds';
 import { useMemberStore } from 'src/stores/member';
-import memberGameRegistration from '../components/member_game_registration.vue';
-import { Guild } from 'src/types';
+import { Guild, GuildMembership } from 'src/types';
 
 // Stores
 const questStore = useQuestStore();
@@ -86,7 +85,7 @@ function guildsPlayingGame(onlyMine = false, recruiting = false) {
   if (onlyMine) {
     guildIds = guildIds.filter((g) =>
       memberStore.member?.guild_membership?.some(
-        (gm) => gm.guild_id === g && gm.status === 'confirmed',
+        (gm: GuildMembership) => gm.guild_id === g && gm.status === 'confirmed',
       ),
     );
   }

@@ -107,7 +107,6 @@ import { useRouter } from 'vue-router';
 import { useMemberStore } from '../stores/member';
 import { useGuildStore } from '../stores/guilds';
 import { useQuestStore } from '../stores/quests';
-import { GuildData } from '../types';
 import { useQuasar } from 'quasar';
 import drawer_menu from '../components/drawer_menu.vue';
 import right_drawer from 'src/components/right-drawer.vue';

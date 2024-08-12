@@ -17,7 +17,7 @@ import { useRouter } from 'vue-router';
 import signinCard from '../components/signin-card.vue';
 import { useMemberStore } from '../stores/member';
 import { useQuasar } from 'quasar';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 const router = useRouter();
 const $q = useQuasar();
