@@ -24,6 +24,11 @@ const routes = [
         name: "lobby",
         component: () => import("pages/Lobby.vue"),
       },
+      {
+        path: "/admin",
+        name: "admin",
+        component: () => import("pages/Admin.vue"),
+      },
       //Quest pages
       {
         path: "/quest",
@@ -132,11 +137,13 @@ const routes = [
         name: "reset_pass",
         component: () => import("pages/ResetPassword.vue"),
       },
-      // {
-      //   path: "/node/:quest_id",
-      //   name: "conversation_column",
-      //   component: () => import("pages/ConversationColumn.vue"),
-      // },
+      /*
+      {
+        path: "/node/:quest_id",
+        name: "conversation_column",
+        component: () => import("pages/ConversationColumn.vue"),
+      },
+      */
       {
         path: "/nodeEdit/:quest_id",
         name: "node_edit",
@@ -147,11 +154,6 @@ const routes = [
       //   name: "conversation_column_edit",
       //   component: () => import("pages/ConversationColumnEdit.vue"),
       // },
-      {
-        path: "/admin",
-        name: "admin",
-        component: () => import("pages/Admin.vue"),
-      },
       {
         path: "/guild/:guild_id/channel",
         name: "guild_channel_list",

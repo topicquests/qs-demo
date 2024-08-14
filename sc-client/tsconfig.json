@@ -1,0 +1,24 @@
+{
+  "extends": "@quasar/app-vite/tsconfig-preset",
+  "compilerOptions": {
+    "target": "es6",
+    "strict": false,
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "types": ["vite", "quasar", "node"],
+    "lib": ["esnext", "dom"]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "src/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "test/setup.ts"
+  ], // Include your test files
+  "vueCompilerOptions": {
+    "target": 3.3
+  }
+}

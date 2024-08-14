@@ -113,7 +113,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { ref } from "vue";
 import { QInput } from "quasar";
 import Component from "vue-class-component";
 import IbisButton from "./ibis-btn.vue";
@@ -139,6 +139,7 @@ const NodeFormProps = Vue.extend({
     >,
   },
 });
+const title = ref<QInput>();
 
 @Component<NodeForm>({
   name: "NodeForm",
@@ -190,7 +191,7 @@ export default class NodeForm extends NodeFormProps {
     if (this.pubFn) this.pub_state_list = this.pubFn(this.node);
   }
   setFocus() {
-    const titleEl = this.$refs.title as QInput;
+    const titleEl: QInput = title.value;
     titleEl.focus();
   }
 }

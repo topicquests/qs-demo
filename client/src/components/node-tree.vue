@@ -850,6 +850,7 @@ export default class NodeTree extends NodeTreeProps {
       document.addEventListener("keyup", this.keyResponder);
       this.listenerInstalled = true;
     }
+    console.log("InitialSelectedNod", this.initialSelectedNodeId);
     this.selectedNodeId = this.initialSelectedNodeId;
     if (this.currentGuildId) {
       this.showDraft = true;
