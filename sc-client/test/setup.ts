@@ -12,11 +12,12 @@ const routes = [
   },
   {
     path: '/register',
-    component: { template: '<div>Register</div>' }
+    component: { template: '<div>Register</div>' },
   },
   {
     path: '/confirmPassword',
-    component: { template: '<div>Confirm Password</div>' } },
+    component: { template: '<div>Confirm Password</div>' },
+  },
 ];
 
 const router = createRouter({
@@ -54,7 +55,7 @@ vi.mock('quasar', () => ({
   },
   QIcon: {
     name: 'QIcon',
-    template: '<i />',
+    template: '<img />',
   },
   QCardSection: {
     name: 'QCardSection',
@@ -74,6 +75,6 @@ vi.mock('quasar', () => ({
   },
   QCard: {
     name: 'QCard',
-    template: '<div />',
+    template: '<div><slot /></div>',
   },
 }));
