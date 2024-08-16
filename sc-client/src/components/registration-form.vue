@@ -92,7 +92,9 @@
           </q-card-actions>
         </q-card-section>
         <q-card-section class="text-center q-pa-sm">
-          <router-link to="/signin" class="text-grey-6">Existing user?</router-link>
+          <router-link to="/signin" class="text-grey-6"
+            >Existing user?</router-link
+          >
         </q-card-section>
       </q-form>
     </q-card-section>
@@ -112,7 +114,6 @@ export interface FormData {
 // Emits
 const emit = defineEmits(['doRegister']);
 
-
 // Reactive Variables
 const isPwd = ref(true);
 const formdata = ref<FormData>({});
@@ -120,7 +121,7 @@ const emailError = ref<string | null>(null);
 
 // Functions
 function doRegister() {
-  console.log("Form data before emitting:", formdata.value);
+  console.log('Form data before emitting:', formdata.value);
   emit('doRegister', formdata.value);
 }
 

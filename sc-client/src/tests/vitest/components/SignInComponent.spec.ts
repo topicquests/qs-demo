@@ -5,18 +5,18 @@ import SignInComponent from '../../../components/signin-card.vue';
 describe('SignInComponent', () => {
   let wrapper;
   beforeEach(() => {
-    wrapper = mount(SignInComponent );
+    wrapper = mount(SignInComponent);
   });
   //Test that form exist
   it('validate form exist', async () => {
     const form = wrapper.findComponent({ name: 'QForm' });
-    expect(form.exists()).toBe(true)
-  })
+    expect(form.exists()).toBe(true);
+  });
 
   // Test that email input exists
-  it('validate email q-input exists',  async () => {
+  it('validate email q-input exists', async () => {
     const emailInput = wrapper.find('input[type="email"]');
-    console.log("EmailInput ", emailInput)
+    console.log('EmailInput ', emailInput);
     expect(emailInput.exists()).toBe(true);
   });
 
@@ -66,6 +66,9 @@ describe('SignInComponent', () => {
     await loginButton.trigger('click');
 
     expect(wrapper.emitted().doLogin).toBeTruthy();
-    expect(wrapper.emitted().doLogin[0]).toEqual(['test@example.com', 'password123']);
+    expect(wrapper.emitted().doLogin[0]).toEqual([
+      'test@example.com',
+      'password123',
+    ]);
   });
 });

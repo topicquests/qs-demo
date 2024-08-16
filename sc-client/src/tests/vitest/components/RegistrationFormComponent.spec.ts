@@ -5,16 +5,16 @@ import RegistrationFormComponent from '../../../components/registration-form.vue
 describe('RegistrationFormComponent', () => {
   let wrapper;
   beforeEach(() => {
-    wrapper = mount(RegistrationFormComponent );
+    wrapper = mount(RegistrationFormComponent);
   });
   // Assert that email input exists
   it('validate email q-input exists', async () => {
     const emailInput = wrapper.find('input[type="email"]');
-    console.log("EmailInput ", emailInput)
+    console.log('EmailInput ', emailInput);
     expect(emailInput.exists()).toBe(true);
-  })
+  });
 
-   // Assert that formdata.email is updated correctly
+  // Assert that formdata.email is updated correctly
   it('updates form data when input value changes', async () => {
     const emailInput = wrapper.find('input[type="email"]');
     await emailInput.setValue('tomhanks@email.com');

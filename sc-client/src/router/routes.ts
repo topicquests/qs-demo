@@ -107,9 +107,9 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/GuildChannelList.vue'),
       },
       {
-        path: "/role/:role_id/edit",
-        name: "role_edit",
-        component: () => import("pages/RoleEdit.vue"),
+        path: '/role/:role_id/edit',
+        name: 'role_edit',
+        component: () => import('pages/RoleEdit.vue'),
       },
       {
         path: '/guild/:guild_id/channel/:channel_id',
