@@ -16,7 +16,7 @@ import {
 import { defineStore } from 'pinia';
 import { calc_threat_status, ThreatMap, ScoreMap } from '../scoring';
 import { base_scoring } from '../scoring/base_scoring';
-import { api } from 'src/boot/axios';
+import { api } from '../boot/axios';
 import { useMemberStore } from './member';
 import { useBaseStore, filterKeys } from './baseStore';
 export function ibis_child_types(

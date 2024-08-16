@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useQuestStore } from 'src/stores/quests';
+import { useQuestStore } from '../stores/quests';
 
 const questStore = useQuestStore();
 const showDialog = ref(false);

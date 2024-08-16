@@ -35,10 +35,10 @@ import questActions from '../components/quest-actions.vue';
 import { waitUserLoaded } from '../app-access';
 import { useRoute } from 'vue-router';
 import { ref, computed, onMounted, watch } from 'vue';
-import { useQuestStore } from 'src/stores/quests';
-import { useGuildStore } from 'src/stores/guilds';
-import { useMemberStore } from 'src/stores/member';
-import { Guild, GuildMembership } from 'src/types';
+import { useQuestStore } from '../stores/quests';
+import { useGuildStore } from '../stores/guilds';
+import { useMemberStore } from '../stores/member';
+import { Guild, GuildMembership } from '../types';
 
 // Stores
 const questStore = useQuestStore();

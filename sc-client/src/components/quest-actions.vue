@@ -118,9 +118,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useQuestStore } from 'src/stores/quests';
-import { useGuildStore } from 'src/stores/guilds';
-import { useMemberStore } from 'src/stores/member';
+import { useQuestStore } from '../stores/quests';
+import { useGuildStore } from '../stores/guilds';
+import { useMemberStore } from '../stores/member';
 import { useBaseStore } from '../stores/baseStore';
 import { permission_enum } from '../enums';
 

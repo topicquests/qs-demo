@@ -101,7 +101,7 @@ import { useConversationStore } from '../stores/conversation';
 import { useMembersStore } from '../stores/members';
 import { useRoleStore } from '../stores/role';
 import { useRoute } from 'vue-router';
-import { QuestData } from 'src/types';
+import { QuestData } from '../types';
 
 const guildStore = useGuildStore();
 const questStore = useQuestStore();

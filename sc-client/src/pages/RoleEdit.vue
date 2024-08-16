@@ -47,8 +47,8 @@
 import { onBeforeMount, ref } from 'vue';
 import scoreboard from '../components/score-board.vue';
 import member from '../components/member-handle.vue';
-import { useRoleStore } from 'src/stores/role';
-import { Role, RoleNodeConstraint } from 'src/types';
+import { useRoleStore } from '../stores/role';
+import { Role, RoleNodeConstraint } from '../types';
 import { useRoute } from 'vue-router';
 
 const roleStore = useRoleStore();

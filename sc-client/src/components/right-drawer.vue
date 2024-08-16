@@ -21,7 +21,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { GuildData, QuestData } from 'src/types';
+import { GuildData, QuestData } from '../types';
 import channelList from '../components/ChannelListComponent.vue';
 
 const rightDrawerProps = defineProps<{
