@@ -1,6 +1,9 @@
+import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { mount } from '@vue/test-utils';
 import { describe, it, expect, beforeEach } from 'vitest';
 import SignInComponent from '../../../components/signin-card.vue';
+
+installQuasarPlugin();
 
 describe('SignInComponent', () => {
   let wrapper;

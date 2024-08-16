@@ -1,6 +1,9 @@
+import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { mount } from '@vue/test-utils';
 import { describe, it, expect, beforeEach } from 'vitest';
 import RegistrationFormComponent from '../../../components/registration-form.vue';
+
+installQuasarPlugin();
 
 describe('RegistrationFormComponent', () => {
   let wrapper;

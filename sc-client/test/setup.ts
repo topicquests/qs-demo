@@ -32,49 +32,5 @@ app.use(router);
 
 beforeAll(() => {
   config.global.plugins = [router];
-  config.global.mocks = {
-    $q: {
-      dark: {
-        isActive: false,
-      },
-    },
-  };
-
   global.router = router;
-  global.Quasar = Quasar;
 });
-
-// Mock Quasar components
-vi.mock('quasar', () => ({
-  Quasar: {
-    use: vi.fn(),
-  },
-  QInput: {
-    name: 'QInput',
-    template: '<input />',
-  },
-  QIcon: {
-    name: 'QIcon',
-    template: '<img />',
-  },
-  QCardSection: {
-    name: 'QCardSection',
-    template: '<div><slot /> </div>',
-  },
-  QForm: {
-    name: 'QForm',
-    template: '<form><slot /></form>',
-  },
-  QBtn: {
-    name: 'QBtn',
-    template: '<button />',
-  },
-  QCardActions: {
-    name: 'QCardActions',
-    template: '<div><slot /> </div>',
-  },
-  QCard: {
-    name: 'QCard',
-    template: '<div><slot /></div>',
-  },
-}));
