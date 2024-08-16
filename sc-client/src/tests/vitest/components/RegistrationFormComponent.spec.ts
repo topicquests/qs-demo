@@ -10,6 +10,7 @@ describe('RegistrationFormComponent', () => {
   // Assert that email input exists
   it('validate email q-input exists', async () => {
     const emailInput = wrapper.find('input[type="email"]');
+    console.log("EmailInput ", emailInput)
     expect(emailInput.exists()).toBe(true);
   })
 

@@ -9,7 +9,14 @@ const routes = [
     path: '/signin',
     name: 'signin',
     component: () => import('../src/pages/SignInPage.vue'),
-  }
+  },
+  {
+    path: '/register',
+    component: { template: '<div>Register</div>' }
+  },
+  {
+    path: '/confirmPassword',
+    component: { template: '<div>Confirm Password</div>' } },
 ];
 
 const router = createRouter({
