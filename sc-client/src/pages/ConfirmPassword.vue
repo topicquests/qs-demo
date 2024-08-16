@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useQuasar } from 'quasar';
-import { useMemberStore } from 'src/stores/member';
+import { useMemberStore } from '../stores/member';
 
 const q = useQuasar();
 const memberStore = useMemberStore();

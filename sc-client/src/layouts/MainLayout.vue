@@ -109,7 +109,7 @@ import { useGuildStore } from '../stores/guilds';
 import { useQuestStore } from '../stores/quests';
 import { useQuasar } from 'quasar';
 import drawer_menu from '../components/drawer_menu.vue';
-import right_drawer from 'src/components/right-drawer.vue';
+import right_drawer from '../components/right-drawer.vue';
 
 const router = useRouter();
 const memberStore = useMemberStore();

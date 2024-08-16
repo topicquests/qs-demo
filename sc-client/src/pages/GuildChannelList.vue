@@ -54,9 +54,9 @@ import {
 } from '../enums';
 import { ConversationNode } from '../types';
 import { computed, onBeforeMount, ref } from 'vue';
-import { useGuildStore } from 'src/stores/guilds';
-import { useBaseStore } from 'src/stores/baseStore';
-import { useChannelStore } from 'src/stores/channel';
+import { useGuildStore } from '../stores/guilds';
+import { useBaseStore } from '../stores/baseStore';
+import { useChannelStore } from '../stores/channel';
 import { useRoute } from 'vue-router';
 import { useQuasar } from 'quasar';
 

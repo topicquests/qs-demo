@@ -100,7 +100,7 @@ import { useQuestStore } from '../stores/quests';
 import { useGuildStore } from '../stores/guilds';
 import { useBaseStore } from '../stores/baseStore';
 import { computed, onBeforeMount, ref } from 'vue';
-import { permission_enum } from 'src/enums';
+import { permission_enum } from '../enums';
 import { useMemberStore } from '../stores/member';
 
 interface GuildRow extends GuildData {

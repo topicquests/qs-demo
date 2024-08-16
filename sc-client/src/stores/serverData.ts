@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { Member, ServerData } from 'src/types';
+import { Member, ServerData } from '../types';
 import { defineStore } from 'pinia';
 import { api } from '../boot/axios';
 

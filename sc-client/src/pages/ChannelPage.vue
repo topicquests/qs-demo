@@ -76,11 +76,11 @@
 import nodeTree from '../components/node-tree.vue';
 import { waitUserLoaded } from '../app-access';
 import { onBeforeMount, ref } from 'vue';
-import { useGuildStore } from 'src/stores/guilds';
-import { useQuestStore } from 'src/stores/quests';
+import { useGuildStore } from '../stores/guilds';
+import { useQuestStore } from '../stores/quests';
 import { useRoute } from 'vue-router';
-import { useChannelStore } from 'src/stores/channel';
-import { useRoleStore } from 'src/stores/role';
+import { useChannelStore } from '../stores/channel';
+import { useRoleStore } from '../stores/role';
 
 /*
   meta: (c) => ({

@@ -89,7 +89,7 @@ import { useQuasar } from 'quasar';
 import { ibis_node_type_enum } from '../enums';
 import { onBeforeMount } from 'vue';
 import { useRoute } from 'vue-router';
-import { ConversationNode, Quest, QuestData, defaultNodeType } from 'src/types';
+import { ConversationNode, Quest, QuestData, defaultNodeType } from '../types';
 
 // Stores
 const questStore = useQuestStore();

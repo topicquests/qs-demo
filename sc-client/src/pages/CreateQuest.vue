@@ -39,7 +39,7 @@ import { useQuestStore } from '../stores/quests';
 import { onBeforeMount } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
-import { QuestData } from 'src/types';
+import { QuestData } from '../types';
 
 const router = useRouter();
 const $q = useQuasar();

@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { useMemberStore } from './member';
 import { useConversationStore } from './conversation';
 import { useChannelStore } from './channel';
-import { api } from 'src/boot/axios';
+import { api } from '../boot/axios';
 import { AxiosResponse } from 'axios';
 
 export interface ReadStatusMap {

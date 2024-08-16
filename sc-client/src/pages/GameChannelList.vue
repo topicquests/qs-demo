@@ -74,11 +74,11 @@ import {
 } from '../enums';
 import { ConversationNode } from '../types';
 import { computed, onBeforeMount, ref } from 'vue';
-import { useQuestStore } from 'src/stores/quests';
-import { useBaseStore } from 'src/stores/baseStore';
-import { useChannelStore } from 'src/stores/channel';
+import { useQuestStore } from '../stores/quests';
+import { useBaseStore } from '../stores/baseStore';
+import { useChannelStore } from '../stores/channel';
 import { useRoute } from 'vue-router';
-import { useGuildStore } from 'src/stores/guilds';
+import { useGuildStore } from '../stores/guilds';
 
 const route = useRoute();
 const questStore = useQuestStore();

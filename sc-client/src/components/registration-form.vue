@@ -4,6 +4,7 @@
       <q-form>
         <div class="q-mb-sm">
           <q-input
+            ref="emailInput"
             square
             clearable
             filled
@@ -12,11 +13,13 @@
             name="email"
             label="Email"
             tabindex="1"
+            @blur="validateEmail"
           >
             <template v-slot:prepend>
               <q-icon name="email" tabindex="-1" />
             </template>
           </q-input>
+          <div v-if="emailError" class="text-red">{{ emailError }}</div>
         </div>
         <div class="q-mb-sm">
           <q-input
@@ -89,17 +92,15 @@
           </q-card-actions>
         </q-card-section>
         <q-card-section class="text-center q-pa-sm">
-          <router-link to="/signin" class="text-grey-6"
-            >Existing user?</router-link
-          >
+          <router-link to="/signin" class="text-grey-6">Existing user?</router-link>
         </q-card-section>
       </q-form>
     </q-card-section>
   </div>
 </template>
+
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 
 export interface FormData {
   email?: string;
@@ -111,15 +112,15 @@ export interface FormData {
 // Emits
 const emit = defineEmits(['doRegister']);
 
-// Router
-const router = useRouter();
 
 // Reactive Variables
 const isPwd = ref(true);
 const formdata = ref<FormData>({});
+const emailError = ref<string | null>(null);
 
 // Functions
 function doRegister() {
+  console.log("Form data before emitting:", formdata.value);
   emit('doRegister', formdata.value);
 }
 
@@ -127,8 +128,16 @@ function getFormData() {
   return formdata.value;
 }
 
+function validateEmail() {
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  emailError.value = emailPattern.test(formdata.value.email || '')
+    ? null
+    : 'Invalid email format';
+}
+
 defineExpose({ getFormData });
 </script>
+
 <style>
 input[type='email'] {
   font-family: Arial, Helvetica, sans-serif;
@@ -150,5 +159,8 @@ input[type='text'] {
   box-sizing: border-box;
   border: none;
   width: 100%;
+}
+.text-red {
+  color: red;
 }
 </style>
