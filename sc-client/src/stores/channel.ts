@@ -149,6 +149,8 @@ export const useChannelStore = defineStore('channel', {
     async fetchChannels(guild_id: number) {
       const params = {
         guild_id: `eq.${guild_id}`,
+        meta: 'eq.channel',
+        parent_id: 'is.null',
       };
       const res: AxiosResponse<ConversationNode[]> = await api.get(
         '/conversation_node',
