@@ -16,7 +16,7 @@
         <div>
           <p id="node-card-detail-header">Details<br /></p>
         </div>
-        <div v-html="node.description" id="node-card-details"></div>
+        <div v-html="description()" id="node-card-details"></div>
       </section>
     </q-card>
   </div>

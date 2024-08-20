@@ -259,7 +259,7 @@ watch(
 );
 watch(
   member,
-  (newVal, oldVal) => {
+  (newVal) => {
     if (newVal) {
       getCastingRoles();
     }

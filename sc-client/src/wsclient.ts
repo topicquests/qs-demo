@@ -32,7 +32,7 @@ export class WSClient {
 
     shouldReconnect.handle1000 = true;
     this.ws = new RobustWebSocket(url, null, { shouldReconnect });
-    this.ws.addEventListener('open', (event) => {
+    this.ws.addEventListener('open', () => {
       console.log('Connected to server');
       this.connected = true;
       if (
@@ -50,7 +50,7 @@ export class WSClient {
     this.ws.addEventListener('message', (event: Event) => {
       this.onMessage(event);
     });
-    this.ws.addEventListener('close', (event) => {
+    this.ws.addEventListener('close', () => {
       console.log('Disconnected from server');
       this.connected = false;
     });

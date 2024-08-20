@@ -71,7 +71,7 @@ const currentQuest = computed(() =>
 );
 
 // Watches
-watch(CastingRoleEditProps, (newRole) => {
+watch(CastingRoleEditProps, (/* newRole */) => {
   const newCastingRoles = CastingRoleEditProps.castingRoles || [];
   cr.value = [...newCastingRoles];
 });

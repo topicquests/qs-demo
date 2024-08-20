@@ -172,7 +172,7 @@ export const useConversationStore = defineStore('conversation', {
       const scoreMap = this.getScoreMap || {};
       const guildScoreMap: ScoreMap = {};
       Object.keys(scoreMap).forEach((key) => {
-        const guild_id = this.conversation[key].guild_id;
+        const { guild_id } = this.conversation[key];
         guildScoreMap[guild_id] =
           (guildScoreMap[guild_id] || 0) + scoreMap[key];
       });
@@ -182,7 +182,7 @@ export const useConversationStore = defineStore('conversation', {
       const scoreMap = this.getPrivateScoreMap || {};
       const guildScoreMap: ScoreMap = {};
       Object.keys(scoreMap).forEach((key) => {
-        const guild_id = this.conversation[key].guild_id;
+        const { guild_id } = this.conversation[key];
         guildScoreMap[guild_id] =
           (guildScoreMap[guild_id] || 0) + scoreMap[key];
       });
@@ -244,7 +244,7 @@ export const useConversationStore = defineStore('conversation', {
     async ensureConversation(quest_id: number) {
       // maybe allow guildId, min status.
       if (quest_id != this.currentQuest || !this.full) {
-        const res = await this.fetchConversation({ quest_id });
+        await this.fetchConversation({ quest_id });
       }
     },
     async ensureRootNode(quest_id: number | undefined) {

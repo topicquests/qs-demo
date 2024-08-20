@@ -53,12 +53,10 @@ import { useRoute } from 'vue-router';
 
 const roleStore = useRoleStore();
 const route = useRoute();
-const name = 'RoleEdit';
-const newRoleNodeConstraint = false;
+let newRoleNodeConstraint = false;
 let role_id: number;
-const isAdmin = false;
 const ready = ref(false);
-const newRoleNodeConstraintCard: Partial<RoleNodeConstraint> = {
+let newRoleNodeConstraintCard: Partial<RoleNodeConstraint> = {
   node_type: 'question',
   max_pub_state: 'published',
 };
@@ -98,44 +96,30 @@ async function deleteRoleById(role: Role) {
 }
 
 async function addRoleNodeConstraint_(roleNodeConstraint: RoleNodeConstraint) {
-  roleNodeConstraint.role_id = this.role_id;
-  await this.createRoleNodeConstraint({ data: roleNodeConstraint });
-  this.newRoleNodeConstraintCard = await this.getRoleNodeConstraintsByRoleId(
-    this.role_id,
-  )[0];
+  roleNodeConstraint.role_id = role_id;
+  await roleStore.createRoleNodeConstraint(roleNodeConstraint);
+  newRoleNodeConstraintCard =
+    await roleStore.getRoleNodeConstraintsByRoleId(role_id)[0];
 }
 async function updateRoleNodeConstraint_(
   roleNodeConstraint: RoleNodeConstraint,
 ) {
-  roleNodeConstraint.role_id = this.role_id;
-  await this.updateRoleNodeConstraint({
-    params: {
-      role_id: this.role_id,
-      node_type: roleNodeConstraint.node_type,
-    },
-    data: { role_id: this.role_id, node_type: roleNodeConstraint.node_type },
-  });
-  this.newRoleNodeConstraintCard = await this.getRoleNodeConstraintsByRoleId(
-    this.role_id,
-  )[0];
+  roleNodeConstraint.role_id = role_id;
+  await roleStore.updateRoleNodeConstraint(roleNodeConstraint);
+  newRoleNodeConstraintCard =
+    await roleStore.getRoleNodeConstraintsByRoleId(role_id)[0];
 }
 async function deleteRoleNodeConstraint_(
   roleNodeConstraint: RoleNodeConstraint,
 ) {
-  roleNodeConstraint.role_id = this.role_id;
-  await this.deleteRoleNodeConstraint({
-    params: {
-      role_id: this.role_id,
-      node_type: roleNodeConstraint.node_type,
-    },
-    data: { role_id: this.role_id, node_type: roleNodeConstraint.node_type },
-  });
+  roleNodeConstraint.role_id = role_id;
+  await roleStore.deleteRoleNodeConstraint(roleNodeConstraint);
 }
 
 async function editRoleNodeConstraint(roleNodeConstraint: RoleNodeConstraint) {
-  this.newRoleNodeConstraintCard = roleNodeConstraint[0];
+  newRoleNodeConstraintCard = roleNodeConstraint[0];
   console.log('Edit Role Constraint', roleNodeConstraint[0]);
-  this.newRoleNodeConstraint = true;
+  newRoleNodeConstraint = true;
 }
 
 onBeforeMount(async () => {
