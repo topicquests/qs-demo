@@ -123,6 +123,7 @@ import { useGuildStore } from '../stores/guilds';
 import { useMemberStore } from '../stores/member';
 import { useBaseStore } from '../stores/baseStore';
 import { permission_enum } from '../enums';
+import memberGameRegistration from '../components/member_game_registration.vue';
 
 const questStore = useQuestStore();
 const guildStore = useGuildStore();
