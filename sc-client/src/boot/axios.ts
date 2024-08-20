@@ -8,7 +8,7 @@ declare module '@vue/runtime-core' {
   }
 }
 
-const server_url = process.env.SERVER_URL || 'http://localhost:3000';
+declare const server_url: string;
 
 // Be careful when using SSR for cross-request state pollution
 // due to creating a Singleton instance here;
@@ -16,7 +16,7 @@ const server_url = process.env.SERVER_URL || 'http://localhost:3000';
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-export const api = axios.create({ baseURL: server_url });
+export const api = axios.create({ baseURL: server_url! });
 
 // TODO: right now expiry is shared knowledge with backend.
 // Ideally, I should read it from the token.

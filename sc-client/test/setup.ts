@@ -1,5 +1,3 @@
-const server_url = process.env.SERVER_URL || 'http://localhost:3000';
-
 import { beforeAll } from 'vitest';
 import { createApp } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
@@ -39,5 +37,6 @@ app.use(router);
 
 beforeAll(() => {
   config.global.plugins = [router, pinia];
+  global.server_url = process.env.SERVER_URL || 'http://localhost:3000';
   global.router = router;
 })
