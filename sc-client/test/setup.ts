@@ -29,6 +29,7 @@ const router = createRouter({
 const pinia = createPinia();
 setActivePinia(pinia);
 
+global.server_url = process.env.SERVER_URL || 'http://localhost:3000';
 
 const app = createApp({});
 
@@ -37,6 +38,5 @@ app.use(router);
 
 beforeAll(() => {
   config.global.plugins = [router, pinia];
-  global.server_url = process.env.SERVER_URL || 'http://localhost:3000';
   global.router = router;
-})
+});
