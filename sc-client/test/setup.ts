@@ -1,8 +1,11 @@
-import { beforeAll, vi } from 'vitest';
+const server_url = process.env.SERVER_URL || 'http://localhost:3000';
+
+import { beforeAll } from 'vitest';
 import { createApp } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { Quasar, QuasarPluginOptions } from 'quasar'; // Import types if needed
 import { config } from '@vue/test-utils';
+import { createPinia, setActivePinia } from 'pinia';
 
 const routes = [
   {
@@ -25,12 +28,16 @@ const router = createRouter({
   routes,
 });
 
+const pinia = createPinia();
+setActivePinia(pinia);
+
+
 const app = createApp({});
 
 app.use(Quasar, {} as QuasarPluginOptions);
 app.use(router);
 
 beforeAll(() => {
-  config.global.plugins = [router];
+  config.global.plugins = [router, pinia];
   global.router = router;
-});
+})
