@@ -48,6 +48,7 @@
     "@quasar/quasar-app-extension-testing-unit-vitest": "^1.0.0",
     "@quasar/vite-plugin": "^1.7.0",
     "@testing-library/jest-dom": "^6.4.8",
+    "@testing-library/vue": "^8.1.0",
     "@tsconfig/recommended": "~1.0",
     "@types/jest": "^29.5.12",
     "@types/luxon": "~3.4",

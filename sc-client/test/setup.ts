@@ -19,6 +19,16 @@ const routes = [
     path: '/confirmPassword',
     component: { template: '<div>Confirm Password</div>' },
   },
+  {
+    path: '/guild/:guild_id/channel',
+    name: 'guild_channel_list',
+    component: () => import('../src/pages/GuildChannelList.vue'),
+  },
+  {
+    path: '/guild/:guild_id/quest/:quest_id/channel',
+    name: 'game_channel_list',
+    component: () => import('../src/pages/GameChannelList.vue'),
+  },
 ];
 
 const router = createRouter({
