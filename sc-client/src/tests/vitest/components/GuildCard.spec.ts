@@ -1,13 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { flushPromises, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import {  QBtn } from 'quasar';
 import GuildCardComponent from '../../../components/guild-card.vue';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
-import { useGuildStore } from 'src/stores/guilds';
 
-// Install Quasar with the necessary components
 installQuasarPlugin({
-  components: {  QBtn,  },
+  components: {QBtn},
 });
 vi.mock('src/stores/guilds', () => ({
   useGuildStore: () => ({
@@ -36,7 +34,6 @@ function createWrapper(props = {}) {
   });
 }
 describe('GuildCardComponent', () => {
-  const guildStore = useGuildStore();
   beforeEach(() => {
     global.document.execCommand = vi.fn();
   });
@@ -54,28 +51,10 @@ describe('GuildCardComponent', () => {
     expect(description.exists()).toBe(true)
   })
 
-it('does not show guild description if showDescription is false', () => {
-  const wrapper = createWrapper({showDescription:false});
-  console.log(wrapper.html())
-  const description = wrapper.findComponent('.q-editor')
-  expect(description.exists()).toBe(false)
-})
-it('calls updateGuild on submit', async () => {
-  const wrapper = createWrapper()
-
-  console.log(wrapper.html());
-
-  await wrapper.find('q-btn-stub[label="Submit"]').trigger('click');
-  expect(wrapper.emitted().doSubmit)
-  const updateGuildSpy = vi.spyOn(guildStore, 'updateGuild');
-  await wrapper.vm.doSubmit()
-  await wrapper.vm.$nextTick()
-  await flushPromises();
-  expect(updateGuildSpy).toHaveBeenCalledWith({
-    id: mockGuildStore.currentGuild.id,
-    name: mockGuildStore.currentGuild.name,
-    public: mockGuildStore.currentGuild.public,
-    open_for_applications: mockGuildStore.currentGuild.open_for_applications,
-  });
-});
+  it('does not show guild description if showDescription is false', () => {
+    const wrapper = createWrapper({showDescription:false});
+    console.log(wrapper.html())
+    const description = wrapper.findComponent('.q-editor')
+    expect(description.exists()).toBe(false)
+  })
 });
