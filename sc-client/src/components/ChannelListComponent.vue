@@ -65,9 +65,12 @@ const channelStore = useChannelStore();
 const ready = ref(false);
 
 const getChannels = computed(() => {
-  return ChannelListProps.quest_id
+  console.log(ChannelListProps.quest_id, channelStore.getGameChannelsOfQuest(ChannelListProps.quest_id!))
+  const channels = ChannelListProps.quest_id
     ? channelStore.getGameChannelsOfQuest(ChannelListProps.quest_id!)
     : channelStore.getGuildChannels;
+    console.log(channels)
+  return channels
 });
 async function ensureData() {
   await channelStore.ensureChannels(ChannelListProps.guild_id!);
@@ -81,6 +84,7 @@ onBeforeMount(async () => {
   ensureData();
   ready.value = true;
 });
+defineExpose({getChannels})
 </script>
 
 <style>

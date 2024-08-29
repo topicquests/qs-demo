@@ -1,8 +1,7 @@
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { mount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
-import SidebarMenu from '../../../components/drawer_menu.vue'; // Adjust the path as necessary
-
+import SidebarMenu from '../../../components/drawer_menu.vue';
 installQuasarPlugin();
 vi.mock('@/path/to/config', () => ({
   ...vi.importActual('@/path/to/config'),

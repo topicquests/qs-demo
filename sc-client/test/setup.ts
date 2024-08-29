@@ -5,6 +5,7 @@ import { Quasar, QuasarPluginOptions } from 'quasar'; // Import types if needed
 import { config } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 
+// Define routes
 const routes = [
   {
     path: '/signin',
@@ -31,22 +32,32 @@ const routes = [
   },
 ];
 
+// Create router instance
 const router = createRouter({
   history: createMemoryHistory(),
   routes,
 });
 
+// Create and set Pinia store
 const pinia = createPinia();
 setActivePinia(pinia);
 
+// Define global environment variables
 global.server_url = process.env.SERVER_URL || 'http://localhost:3000';
 
+// Create Vue app instance
 const app = createApp({});
 
+// Install Quasar and router
 app.use(Quasar, {} as QuasarPluginOptions);
 app.use(router);
+app.use(pinia);
 
+// Set up global configuration for tests
 beforeAll(() => {
   config.global.plugins = [router, pinia];
   global.router = router;
+
 });
+
+

@@ -35,7 +35,7 @@ describe('SignInComponent', () => {
 
     await emailInput.setValue('test@example.com');
     await passwordInput.setValue('password123');
-
+console.log(wrapper.html())
     const formData = {
       email: wrapper.vm.mail,
       password: wrapper.vm.pass,
