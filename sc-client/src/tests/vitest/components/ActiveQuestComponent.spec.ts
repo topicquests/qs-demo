@@ -26,7 +26,6 @@ describe('ActiveQuestComponent.vue', () => {
   beforeEach(() => {
     wrapper = mount(ActiveQuestComponent, {
       global: {
-
         stubs: {
           'member-game-registration': true,
         },
