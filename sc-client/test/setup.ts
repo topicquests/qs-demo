@@ -30,6 +30,11 @@ const routes = [
     name: 'game_channel_list',
     component: () => import('../src/pages/GameChannelList.vue'),
   },
+  {
+    path: '/guild/:guild_id',
+    name: 'guild',
+    component: () => import('../src/pages/GuildPage.vue'),
+  },
 ];
 
 // Create router instance

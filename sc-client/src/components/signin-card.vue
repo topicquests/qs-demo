@@ -4,7 +4,6 @@
       <h3 style="text-align: center" class="text-h5 text-white q-my-md">
         Welcome back!
       </h3>
-      <input type="email" v-model="mail" />
     </q-card-section>
     <q-card-section>
       <q-form class="q-px-sm">

@@ -27,7 +27,7 @@ export interface GuildsState {
   fullFetch: boolean;
   fullGuilds: { [key: number]: boolean };
 }
-const questStore = useQuestStore();
+
 const baseState: GuildsState = {
   currentGuild: 0,
   guilds: {},
@@ -98,6 +98,7 @@ export const useGuildStore = defineStore('guild', {
     getGuildsPlayingCurrentQuest: (
       state: GuildsState,
     ): GuildData[] | undefined => {
+      const questStore = useQuestStore();
       const quest: QuestData | undefined = questStore.getCurrentQuest;
       if (!quest) return [];
       const guildId: (number | null)[] | undefined = quest.game_play?.map(
@@ -165,6 +166,7 @@ export const useGuildStore = defineStore('guild', {
       quest_id: number;
       full?: boolean;
     }) {
+      const questStore = useQuestStore();
       await questStore.ensureQuest({
         quest_id,
         full: true,

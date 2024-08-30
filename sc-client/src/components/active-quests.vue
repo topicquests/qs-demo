@@ -78,7 +78,7 @@ import { useRouter } from 'vue-router';
 // Props
 const ActiveQuestsProps = defineProps<{
   isMember: boolean;
-  activeQuests: Quest;
+  activeQuests: Partial<Quest>;
   questId?: number;
   guildId?: number;
 }>();
