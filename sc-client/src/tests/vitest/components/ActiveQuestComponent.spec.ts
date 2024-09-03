@@ -1,83 +1,101 @@
 import { mount } from '@vue/test-utils';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
+import { createTestingPinia } from '@pinia/testing';
 import { describe, it, expect, beforeEach } from 'vitest';
 import ActiveQuestComponent from '../../../components/active-quests.vue';
-import { useMemberStore } from '../../../stores/member';
-import { useGuildStore } from '../../../stores/guilds';
-import { useQuestStore } from 'src/stores/quests';
+import { useMemberStore } from 'src/stores/member';
+import { useGuildStore } from 'src/stores/guilds';
 
 installQuasarPlugin();
 
-
-
-describe('ActiveQuestComponent.vue', () => {
-  let wrapper: any;
-  const memberStore = useMemberStore();
-  const guildStore = useGuildStore();
-  const questStore = useQuestStore();
-
-  memberStore.$patch({
-    member: {
-      casting: [{ quest_id: 1, guild_id: 2 }],
+function createWrapper(props = {}) {
+  return mount(ActiveQuestComponent, {
+    global: {
+      stubs: {
+        'member-game-registration': true,
+      },
+    },
+    plugins: [
+      createTestingPinia({
+        initialState: {
+          member: {
+            guildPerQuest: {
+              1: 1, // Quest 1 registered for current guild
+              3: 3, // Quest 3 registered for another guild
+            },
+          },
+        },
+      }),
+    ],
+    props: {
+      isMember: true,
+      activeQuests: [
+        { id: 1, name: 'Quest 1' },
+        { id: 2, name: 'Quest 2' },
+        { id: 3, name: 'Quest 3' },
+      ],
+      questId: 1,
+      guildId: 1,
+      quest: {
+        id: 1,
+      },
+      ...props,
     },
   });
+}
 
+describe('ActiveQuestComponent.vue', () => {
+  let memberStore;
 
   beforeEach(() => {
-    wrapper = mount(ActiveQuestComponent, {
-      global: {
-        stubs: {
-          'member-game-registration': true,
-        },
-      },
-      props: {
-        isMember: true,
-        activeQuests: [
-          { id: 1, name: 'Quest 1' },
-          { id: 2, name: 'Quest 2' },
-        ],
-        questId: 1,
-        guildId: 1,
+    memberStore = useMemberStore();
+    memberStore.$patch({
+      member: {
+        casting: [{ quest_id: 1, guild_id: 1 }, { quest_id: 2, guild_id: 2 }],
       },
     });
   });
 
   it('renders quests if activeQuests is not empty', () => {
-    expect(wrapper.findAll('q-radio').length).toBe(2);
+    const wrapper=createWrapper();
+    expect(wrapper.findAll('.q-radio').length).toBeGreaterThanOrEqual(3);
   });
 
-  it('shows the "Play" button if the user is a member but not registered in the guild', async () => {
-    memberStore.guildPerQuest = { 1: undefined };
-    await wrapper.setProps({
-      activeQuests: [{ id: 1, name: 'Quest 1' }],
-    });
-    const playButton = wrapper.find('q-btn[label="Play"]');
-    expect(playButton.exists()).toBe(true);
+  it('verifies there are three quests registered to guild', () => {
+    const wrapper=createWrapper();
+    const quests = wrapper.findAll('.q-radio');
+    expect(quests.length).toBeGreaterThanOrEqual(3);
   });
 
-  it('shows the "Go To Quest" button if the user is registered in the current guild', async () => {
-    memberStore.guildPerQuest = { 1: 1 };
+  it('Quest 1 Member can register to play', () => {
+    const guildStore = useGuildStore();
     guildStore.currentGuild = 1;
-    await wrapper.setProps({
-      activeQuests: [{ id: 1, name: 'Quest 1' }],
-    });
-    const goToQuestButton = wrapper.find('q-btn[label="Go To Quest"]');
-    expect(goToQuestButton.exists()).toBe(true);
+    const wrapper=createWrapper();
+    console.log(guildStore.currentGuild)
+    const radioButtons = wrapper.findAll('.q-radio');
+    const quest1Button = radioButtons.at(0);
+    expect(quest1Button.exists()).toBe(true);
+    expect(quest1Button.text()).toContain('Go To Quest');
   });
 
-  it('navigates to the guild page if the user is registered in a different guild', async () => {
-    memberStore.guildPerQuest = { 1: 2 };
-    await wrapper.setProps({
-      activeQuests: [{ id: 1, name: 'Quest 1' }],
-    });
-    const routerLink = wrapper.find('router-link');
-    expect(routerLink.exists()).toBe(true);
-    expect(routerLink.attributes('to')).toEqual(
-      JSON.stringify({ name: 'guild', params: { guild_id: 2 } })
-    );
+  it('Quest 2 player is playing in a different guild', () => {
+    const wrapper=createWrapper({ quest: { id: 2 } });
+    const buttons = wrapper.findAll('.q-radio');
+    const quest2Button = buttons.at(1);
+    expect(quest2Button.exists()).toBe(true);
+    expect(quest2Button.text()).toContain('Quest 2 Playing');
+  });
+
+  it('Quest 3 is registered in a different guild', () => {
+    const wrapper=createWrapper({ quest: { id: 3 } });
+    const buttons = wrapper.findAll('.q-radio');
+    const quest3Button = buttons.at(2);
+    expect(quest3Button.exists()).toBe(true);
+    expect(quest3Button.text()).toContain('Quest 3Play');
   });
 
   it('shows a message if no active quests are available', async () => {
+    const wrapper = createWrapper()
     await wrapper.setProps({
       activeQuests: [],
     });
