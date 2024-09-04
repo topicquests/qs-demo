@@ -44,7 +44,7 @@ export const useGuildStore = defineStore('guild', {
   state: () => baseState,
 
   getters: {
-    getCurrentGuild: (state: GuildsState): GuildData | undefined => {
+    getCurrentGuild: (state: GuildsState): Partial<GuildData> | undefined => {
       if (typeof state.currentGuild === 'number') {
         return state.guilds[state.currentGuild];
       } else {
@@ -63,10 +63,10 @@ export const useGuildStore = defineStore('guild', {
         ),
       );
     },
-    isGuildMember: (state: GuildsState) => (guild_id: number) => {
+    isGuildMember: (state: GuildsState) => (guild_id: number):Partial<GuildMembership> => {
       const memberId = useMemberStore().getUserId;
       return state.guilds[guild_id].guild_membership?.find(
-        (m: GuildMembership) =>
+        (m: Partial<GuildMembership>) =>
           m.member_id == memberId &&
           m.status == registration_status_enum.confirmed,
       );

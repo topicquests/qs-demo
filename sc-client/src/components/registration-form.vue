@@ -137,7 +137,7 @@ function validateEmail() {
     console.log('Email Error:', emailError.value);
 }
 
-defineExpose({ getFormData, validateEmail });
+defineExpose({ getFormData, validateEmail, formdata });
 </script>
 
 <style>

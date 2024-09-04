@@ -1,0 +1,46 @@
+import { Guild, Member } from "src/types";
+
+export const mockGuild: Guild = {
+  id: undefined,
+  handle: undefined,
+  slug: undefined,
+  name: undefined,
+  description: undefined,
+  creator: undefined,
+  public: undefined,
+  open_for_applications: undefined,
+  created_at: undefined,
+  updated_at: undefined,
+  application_needs_approval: undefined,
+  default_role_id: undefined,
+  guild_membership: undefined,
+  game_play: undefined,
+  casting: undefined,
+}
+export const mockMember: Member = {
+  id: undefined,
+  email: undefined,
+  handle: undefined,
+  slug: undefined,
+  permissions: undefined,
+  guild_membership: undefined,
+  quest_membership: undefined,
+  casting: undefined,
+  casting_role: undefined,
+  guild_member_available_role: undefined,
+  password: undefined,
+  created_at: undefined,
+  updated_at: undefined,
+  name: undefined,
+  confirmed: undefined,
+  last_login: undefined,
+  last_login_email_sent: undefined,
+}
+export const mockGuildMembership = {
+  guild_id: undefined,
+  member_id: undefined,
+  permissions: undefined,
+  status: undefined,
+  created_at: undefined,
+  updated_at: undefined,
+}

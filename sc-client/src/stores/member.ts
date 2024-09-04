@@ -8,7 +8,7 @@ import { api, token_store, TOKEN_EXPIRATION } from '../boot/axios';
 import { useMembersStore } from './members';
 
 export interface MemberState {
-  member?: Member;
+  member?: Partial<Member>;
   token?: string;
   tokenExpiry?: number;
   isAuthenticated: boolean;

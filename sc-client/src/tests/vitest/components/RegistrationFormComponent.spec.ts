@@ -1,25 +1,48 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { describe, it, expect} from 'vitest';
-import { Quasar } from 'quasar';
-import RegistrationComponent from '../../../components/registration-form.vue';
+import RegistrationForm from '../../../components/registration-form.vue';
+import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 
-describe('RegistrationComponent', () => {
-  it('calls validateEmail on blur event and sets emailError correctly', async () => {
-    const wrapper = mount(RegistrationComponent,{
-      global: {
-        plugins: [Quasar],
-      },
-      $q: {
-        dark: { isActive: false },
-      },
-    });
+installQuasarPlugin()
 
-    console.log(wrapper.html());
-    const emailInput = wrapper.find("input[name = 'email']");
-    expect(emailInput.exists()).toBe(true);
-    await emailInput.setValue('invalid-email');
-    await emailInput.trigger('blur');
-    const emailErrorSpan = wrapper.find('.text-red');
-    expect(emailErrorSpan.text()).toBe('Invalid email format');
+describe('RegistrationForm', () => {
+  let wrapper;
+  beforeEach(() => {
+    wrapper = mount(RegistrationForm);
+
   });
+  it('renders the form correctly', () => {
+    expect(wrapper.find('input[name="email"]').exists()).toBe(true);
+    expect(wrapper.find('input[name="name"]').exists()).toBe(true);
+    expect(wrapper.find('input[name="handle"]').exists()).toBe(true);
+    expect(wrapper.find('input[name="password"]').exists()).toBe(true);
+    expect(wrapper.find('button[name="registerButton"]').exists()).toBe(true);
+  });
+  it('emits doRegister event with form data when Get Started button is clicked', async () => {
+    const formdata = wrapper.vm.formdata;
+    const formData = {
+      email: 'test@example.com',
+      name: 'Test Name',
+      handle: 'testHandle',
+      password: 'password123',
+    };
+    Object.assign(formdata, formData);
+    await wrapper.find('button[name="registerButton"]').trigger('click');
+    expect(wrapper.emitted('doRegister')).toBeTruthy();
+    expect(wrapper.emitted('doRegister')?.[0]).toEqual([formdata]);
+  });
+  it('toggles password visibility', async () => {
+    console.log(wrapper.html())
+    const passwordInput = wrapper.find('input[type="password"]');
+    await passwordInput.setValue('password')
+    const iconElement = wrapper.findAll('i.q-icon').at(5);
+    expect(iconElement.exists()).toBe(true);
+    expect(iconElement.text()).toBe('visibility_off');
+    await iconElement.trigger('click');
+    expect(passwordInput.attributes('type')).toBe('text');
+    await iconElement.trigger('click');
+    expect(passwordInput.attributes('type')).toBe('password');
+  });
+
+
 });

@@ -32,18 +32,14 @@
 import { computed } from 'vue';
 import { useGuildStore } from '../stores/guilds';
 import { useMemberStore } from '../stores/member';
-import { GuildData, PublicMember } from '../types';
 
 const guildStore = useGuildStore();
 const memberStore = useMemberStore();
 
-const currentGuild = computed<GuildData>({
-  get: () => {
-    return guildStore.getCurrentGuild;
-  },
-  set: () => {},
-});
-const member = computed<PublicMember>(() => memberStore.member);
+const currentGuild = computed(() =>
+  guildStore.getCurrentGuild
+);
+const member = computed(() => memberStore.member);
 const isMember = computed<boolean>({
   get: () => {
     return !!guildStore.isGuildMember(currentGuild.value?.id);
