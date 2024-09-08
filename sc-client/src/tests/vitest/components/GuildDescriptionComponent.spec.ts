@@ -4,7 +4,6 @@ import GuildDescriptionComponent from '../../../components/guild-description.vue
 import { createTestingPinia } from '@pinia/testing';
 import { useGuildStore } from '../../../stores/guilds';
 import { mockGuild, mockGuildMembership, mockMember} from './mocks/StoreMocks';
-import {  GuildData, PublicMember } from '../../../types';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { useMemberStore } from 'src/stores/member';
 
@@ -87,7 +86,6 @@ describe('GuildDescriptionComponent', () => {
       },
     });
     await wrapper.vm.$nextTick();
-    console.log(wrapper.html());
     const joinBtn = wrapper.findComponent({ name: 'QBtn' });
     expect(joinBtn.exists()).toBe(true);
     expect(joinBtn.text()).toBe('Join Guild');
@@ -124,11 +122,13 @@ describe('GuildDescriptionComponent', () => {
       },
     });
     await wrapper.vm.$nextTick();
+    console.log(guildStore.guilds)
     expect(wrapper.text()).toContain('guild closed');
   });
 
   it('renders login/register message when no member and open for applications', async () => {
     guildStore = useGuildStore();
+    memberStore = useMemberStore();
     guildStore.$patch({
       currentGuild: 1,
       guilds: {1:
@@ -140,22 +140,23 @@ describe('GuildDescriptionComponent', () => {
         }
       }
     });
+    memberStore.$patch({
+      member: undefined,
+    })
     const wrapper = mount(GuildDescriptionComponent, {
       global: {
         plugins: [
           createTestingPinia({}),
-        ],
+        ]
       },
       initialState: {
         guild: {
-          fullFetch: false,
-          fullGuilds: {},
           guilds: {1: mockGuild} ,
         },
         member: {
-          member: undefined,
-        },
-      },
+          member: undefined
+        }
+      }
     });
     await wrapper.vm.$nextTick();
     expect(wrapper.find('span').text()).toBe('login or register to join');

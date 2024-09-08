@@ -1,14 +1,14 @@
 import { Guild, Member } from "src/types";
 
 export const mockGuild: Guild = {
-  id: undefined,
-  handle: undefined,
+  id: 1,
+  handle: 'TestGuild',
   slug: undefined,
-  name: undefined,
-  description: undefined,
+  name: 'Test Guild',
+  description: 'This is a test guild',
   creator: undefined,
   public: undefined,
-  open_for_applications: undefined,
+  open_for_applications: true,
   created_at: undefined,
   updated_at: undefined,
   application_needs_approval: undefined,
@@ -18,9 +18,9 @@ export const mockGuild: Guild = {
   casting: undefined,
 }
 export const mockMember: Member = {
-  id: undefined,
-  email: undefined,
-  handle: undefined,
+  id: 1,
+  email: 'johnsmith@email.com',
+  handle: 'JohnSmith',
   slug: undefined,
   permissions: undefined,
   guild_membership: undefined,
@@ -31,14 +31,14 @@ export const mockMember: Member = {
   password: undefined,
   created_at: undefined,
   updated_at: undefined,
-  name: undefined,
-  confirmed: undefined,
+  name: 'John Smith',
+  confirmed: true,
   last_login: undefined,
   last_login_email_sent: undefined,
 }
 export const mockGuildMembership = {
-  guild_id: undefined,
-  member_id: undefined,
+  guild_id: 1,
+  member_id: 1,
   permissions: undefined,
   status: undefined,
   created_at: undefined,
