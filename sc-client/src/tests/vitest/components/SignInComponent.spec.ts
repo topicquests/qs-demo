@@ -12,7 +12,6 @@ describe('SignInComponent', () => {
   });
 
   it('validate form exist', async () => {
-    console.log(wrapper.html())
     const form = wrapper.findComponent({ name: 'QForm' });
     expect(form.exists()).toBe(true);
   });

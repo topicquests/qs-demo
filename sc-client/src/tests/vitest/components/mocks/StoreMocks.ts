@@ -1,6 +1,6 @@
-import { Guild, Member } from "src/types";
+import { GuildData, GuildMembership, Member } from "src/types";
 
-export const mockGuild: Guild = {
+export const mockGuild: GuildData = {
   id: 1,
   handle: 'TestGuild',
   slug: undefined,
@@ -8,15 +8,33 @@ export const mockGuild: Guild = {
   description: 'This is a test guild',
   creator: undefined,
   public: undefined,
-  open_for_applications: true,
+  open_for_applications: false,
   created_at: undefined,
   updated_at: undefined,
   application_needs_approval: undefined,
   default_role_id: undefined,
-  guild_membership: undefined,
+  guild_membership: [],
   game_play: undefined,
   casting: undefined,
+  member_count: 0,
+  member_request_count: 0,
+  is_member: false,
+  is_admin: false,
+  last_node_published_at: "",
+  node_count: 0,
+  ongoing_quests_count: 0,
+  finished_quests_count: 0,
+  recruiting_for_quest_count: 0
 }
+export const mockGuildMembership: GuildMembership = {
+  guild_id: 1,
+  member_id: 1,
+  permissions: undefined,
+  status: undefined,
+  created_at: undefined,
+  updated_at: undefined,
+}
+
 export const mockMember: Member = {
   id: 1,
   email: 'johnsmith@email.com',
@@ -35,12 +53,4 @@ export const mockMember: Member = {
   confirmed: true,
   last_login: undefined,
   last_login_email_sent: undefined,
-}
-export const mockGuildMembership = {
-  guild_id: 1,
-  member_id: 1,
-  permissions: undefined,
-  status: undefined,
-  created_at: undefined,
-  updated_at: undefined,
 }

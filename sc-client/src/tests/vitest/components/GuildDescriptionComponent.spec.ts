@@ -42,7 +42,6 @@ describe('GuildDescriptionComponent', () => {
       },
     });
     await wrapper.vm.$nextTick();
-    console.log(wrapper.html())
     expect(wrapper.find('h1').text()).toContain('Test Guild');
     expect(wrapper.find('.content').html()).toContain('This is a test guild');
   });

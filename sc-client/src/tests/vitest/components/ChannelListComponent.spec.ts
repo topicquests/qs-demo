@@ -33,7 +33,6 @@ describe('ChannelListComponent', () => {
     const wrapper = createWrapper()
     wrapper.vm.ready=false;
     await nextTick();
-    console.log(wrapper.html())
     const qCard = wrapper.findComponent({name: 'QCard'})
     expect(qCard.exists()).toBe(false)
   })
@@ -41,7 +40,6 @@ describe('ChannelListComponent', () => {
     const wrapper = createWrapper();
     wrapper.vm.ready=true
     await wrapper.vm.$nextTick();
-    console.log(wrapper.html())
     const qCard = wrapper.findComponent({name: 'QCard'})
     expect(qCard.exists()).toBe(true);
     const routerLink = wrapper.findComponent({ name: 'RouterLink' });
@@ -55,7 +53,6 @@ describe('ChannelListComponent', () => {
     const wrapper = createWrapper({quest_id: undefined})
     wrapper.vm.ready = true;
     await wrapper.vm.$nextTick();
-    console.log(wrapper.html())
     const qCard = wrapper.findComponent({name: 'QCard'})
     expect(qCard.exists()).toBe(true);
     const routerLink = wrapper.findComponent({ name: 'RouterLink' });
@@ -69,7 +66,6 @@ describe('ChannelListComponent', () => {
     const wrapper = createWrapper({inPage:true})
     wrapper.vm.ready = true;
     await wrapper.vm.$nextTick();
-    console.log(wrapper.html());
     const pTag = wrapper.find('p');
     expect(pTag.exists()).toBe(true);
     expect(pTag.text()).toBe('Test');

@@ -46,14 +46,12 @@ describe('GuildCardComponent', () => {
   })
   it('show guild description if showDescription is true', () => {
     const wrapper = createWrapper();
-    console.log(wrapper.html())
     const description = wrapper.findComponent('.q-editor')
     expect(description.exists()).toBe(true)
   })
 
   it('does not show guild description if showDescription is false', () => {
     const wrapper = createWrapper({showDescription:false});
-    console.log(wrapper.html())
     const description = wrapper.findComponent('.q-editor')
     expect(description.exists()).toBe(false)
   })

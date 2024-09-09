@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import RegistrationForm from '../../../components/registration-form.vue';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
@@ -32,7 +32,6 @@ describe('RegistrationForm', () => {
     expect(wrapper.emitted('doRegister')?.[0]).toEqual([formdata]);
   });
   it('toggles password visibility', async () => {
-    console.log(wrapper.html())
     const passwordInput = wrapper.find('input[type="password"]');
     await passwordInput.setValue('password')
     const iconElement = wrapper.findAll('i.q-icon').at(5);
