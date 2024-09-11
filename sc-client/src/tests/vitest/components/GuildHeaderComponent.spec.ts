@@ -3,7 +3,6 @@ import { mount } from '@vue/test-utils';
 import { createTestingPinia } from '@pinia/testing';
 import GuildHeaderComponent from '../../../components/guild-header.vue';
 import { mockGuild, mockMember } from './mocks/StoreMocks';
-import { createRouter, createMemoryHistory } from 'vue-router';
 
 describe('GuildHeaderComponent', () => {
   it('renders guild-header component', async () => {

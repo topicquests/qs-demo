@@ -1,4 +1,4 @@
-import { GuildData, GuildMembership, Member } from "src/types";
+import { GamePlay, GuildData, GuildMembership, Member, QuestData } from "src/types";
 
 export const mockGuild: GuildData = {
   id: 1,
@@ -35,6 +35,15 @@ export const mockGuildMembership: GuildMembership = {
   updated_at: undefined,
 }
 
+export const mockGamePlay: GamePlay = {
+  quest_id: 1,
+  guild_id: 1,
+  status: "request",
+  game_status: "confirmed",
+  created_at: "",
+  updated_at: ""
+}
+
 export const mockMember: Member = {
   id: 1,
   email: 'johnsmith@email.com',
@@ -53,4 +62,31 @@ export const mockMember: Member = {
   confirmed: true,
   last_login: undefined,
   last_login_email_sent: undefined,
+}
+
+export const mockQuest: QuestData = {
+  last_node_published_at: "",
+  node_count: 0,
+  confirmed_guild_count: 0,
+  interested_guild_count: 0,
+  player_count: 0,
+  is_playing: false,
+  my_confirmed_guild_count: 0,
+  my_recruiting_guild_count: 0,
+  is_quest_member: false,
+  id: 1,
+  handle: "TestQuest",
+  slug: "",
+  name: "Test Quest",
+  creator: 0,
+  public: true,
+  turn_based: false,
+  status: "ongoing",
+  start: "",
+  end: "",
+  created_at: "",
+  updated_at: "",
+  quest_membership: [],
+  casting:[],
+  game_play:[],
 }

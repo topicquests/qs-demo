@@ -102,7 +102,7 @@ export const useQuestStore = defineStore('quest', {
     getCurrentGamePlay: (state: QuestsState): GamePlay | undefined => {
       if (state.currentQuest) {
         const quest = state.quests[state.currentQuest];
-        const currentGuild: GuildData = useGuildStore().getCurrentGuild!;
+        const currentGuild: Partial<GuildData> = useGuildStore().getCurrentGuild!;
         if (currentGuild) {
           return quest?.game_play?.find(
             (gp: GamePlay) => gp.guild_id == currentGuild.id,

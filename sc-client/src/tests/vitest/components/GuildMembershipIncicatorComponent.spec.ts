@@ -21,7 +21,6 @@ describe('GuildMembershipIndicatorComponent', () => {
          guild: mockGuild
       },
       global: {
-
         plugins: [
           createTestingPinia({
             initialState: {
