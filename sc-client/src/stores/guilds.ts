@@ -44,7 +44,7 @@ export const useGuildStore = defineStore('guild', {
   state: () => baseState,
 
   getters: {
-    getCurrentGuild: (state: GuildsState): Partial<GuildData> | undefined => {
+    getCurrentGuild: (state: GuildsState): GuildData | undefined => {
       if (typeof state.currentGuild === 'number') {
         return state.guilds[state.currentGuild];
       } else {

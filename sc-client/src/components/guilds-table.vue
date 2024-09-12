@@ -282,7 +282,7 @@ function lastMoveFull(row: GuildData) {
 // Lifecycle Hooks
 onBeforeMount(async () => {
   if (GuildsTableProp.selectable) {
-    let guild = guildStore.getCurrentGuild;
+    let guild: GuildData = guildStore.getCurrentGuild;
     if (!guild && questStore.getCurrentQuest) {
       const guild_id = guildIfPlaying(questStore.getCurrentQuest.id);
       if (guild_id) {
