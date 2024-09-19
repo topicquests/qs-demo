@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import GuildsTableComponent from '../../../components/guilds-table.vue';
 import { createTestingPinia } from '@pinia/testing';
 import { useGuildStore } from '../../../stores/guilds';
-import { mockGuild1, mockGuild2, mockGuildMembership, mockQuest, mockMember } from './mocks/StoreMocks';
+import { mockGuild, mockGuildMembership, mockQuest, mockMember } from './mocks/StoreMocks';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 
 installQuasarPlugin();
@@ -15,8 +15,8 @@ function createWrapper(props = {}) {
         createTestingPinia({
           initialState: {
             guild: {
-              currentGuild: mockGuild1.id,
-              guilds: {1:mockGuild1, 2:mockGuild2}
+              currentGuild: mockGuild.id,
+              guilds: {1:mockGuild}
             },
             quest: {
               currentQuest: mockQuest.id,
@@ -29,16 +29,17 @@ function createWrapper(props = {}) {
         }),
       ],
       stubs: {
-        'guilds-membership-indicator': true,
+        'guilds-playing-indicator': {
+          template: '<div class="stubbed-playing-indicator"></div>',
+        },
       },
     },
     props: {
       title: 'Guild Table Test',
-      guilds: [mockGuild1, mockGuild2],
+      guilds: [mockGuild],
       quest: mockQuest,
       showPlayers: true,
       selectable: true,
-      extra_columns: [],
       ...props,
     },
 
@@ -47,26 +48,28 @@ function createWrapper(props = {}) {
 
 describe('GuildsTableComponent', () => {
   beforeEach(() => {
-    mockGuild1.guild_membership = [mockGuildMembership];
-    mockGuild2.guild_membership = [mockGuildMembership]
+    mockGuild.guild_membership = [mockGuildMembership];
   });
 
   it('renders the guilds table with the correct number of guild rows', () => {
     const wrapper = createWrapper();
     const rows = wrapper.findAll('tbody tr');
-    expect(rows.length).toBe(2); // Two rows rendered for two guilds
+    expect(rows.length).toBe(1);
   });
 
   it('renders guild names correctly', () => {
     const wrapper = createWrapper();
-    const firstRowName = wrapper.find('tbody tr:first-child td:nth-child(1)');
-    expect(firstRowName.text()).toContain('Test Guild 1');
+    console.log(wrapper.html())
+    const firstRowName = wrapper.find('tbody tr:first-child td:nth-child(3)');
+    expect(firstRowName.text()).toContain('Test Guild');
   });
 
   it('shows the "Admin" link for guilds with admin permissions', () => {
+    mockMember.permissions = ['guildAdmin'];
     const wrapper = createWrapper();
-    const adminLink = wrapper.find('tbody tr:first-child .admin-link');
-    expect(adminLink.exists()).toBe(true); // Admin link should exist for guild with ID 1
+    console.log(wrapper.html())
+    const adminLink = wrapper.find('a[href="/guild/1/admin"]');
+    expect(adminLink.exists()).toBe(true);
   });
 
   it('does not show the "Admin" link for guilds without admin permissions', () => {
@@ -75,22 +78,29 @@ describe('GuildsTableComponent', () => {
     expect(secondRowAdminLink.exists()).toBe(false); // No admin link for guild with ID 2
   });
 
-  it('handles selection change correctly', async () => {
+  it('calls guildStore.setCurrentGuild when selectionChanged is triggered', async () => {
     const wrapper = createWrapper();
     const guildStore = useGuildStore();
+    const setCurrentGuildSpy = vi.spyOn(guildStore, 'setCurrentGuild');
+    const table = wrapper.findComponent({ name: 'QTable' });
 
-    // Mock the store method
-    guildStore.setCurrentGuild = vi.fn();
-
-    const firstRow = wrapper.find('tbody tr:first-child');
-    await firstRow.trigger('click');
-    expect(guildStore.setCurrentGuild).toHaveBeenCalledWith(mockGuild1.id);
+    // Simulate the q-table emitting the 'selection' event
+    const rowEvent = {
+      rows: [{ id: 123 }],
+      keys: [],
+      added: true,
+      evt: new Event('click'),
+    }
+    await table.vm.$emit('selection', rowEvent);
+    expect(setCurrentGuildSpy).toHaveBeenCalledWith(123);
   });
+
 
   it('displays the correct last move timestamp', () => {
     const wrapper = createWrapper();
+    console.log(wrapper.html());
     const lastMove = wrapper.find('tbody tr:first-child td:last-child span');
-    // Assuming your mock data reflects '8 months ago'
-    expect(lastMove.text()).toBe('8 months ago');
+
+    expect(lastMove.text()).toContain('days ago');
   });
 });

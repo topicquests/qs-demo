@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import GuildDescriptionComponent from '../../../components/guild-description.vue'; // Replace with your component path
 import { createTestingPinia } from '@pinia/testing';
 import { useGuildStore } from '../../../stores/guilds';
-import { mockGuild, mockGuildMembership, mockMember} from './mocks/StoreMocks';
+import { mockGuild, mockMember} from './mocks/StoreMocks';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { useMemberStore } from 'src/stores/member';
 
@@ -12,79 +12,50 @@ describe('GuildDescriptionComponent', () => {
   let guildStore;
   let memberStore;
   it('renders correctly when currentGuild is set', async () => {
-    guildStore = useGuildStore()
-    guildStore.$patch({
-      currentGuild: 1,
-      guilds: {1:{
-        id: 1,
-        name: 'Test Guild',
-        description: 'This is a test guild',
-      }
-    }
-    })
     const wrapper = mount(GuildDescriptionComponent, {
       global: {
         plugins: [
           createTestingPinia({
-            createSpy: vi.fn,
+            initialState: {
+              guild: {
+                fullFetch: false,
+                fullGuilds: {},
+                currentGuild: 1,
+                guilds: {1: mockGuild},
+              },
+              member: {
+                member: mockMember,
+              },
+            },
           }),
         ],
       },
-      initialState: {
-        guild: {
-          fullFetch: false,
-          fullGuilds: {},
-          guilds: {1: mockGuild} ,
-        },
-        member: {
-          member: mockMember,
-        },
-      },
     });
-    await wrapper.vm.$nextTick();
     expect(wrapper.find('h1').text()).toContain('Test Guild');
     expect(wrapper.find('.content').html()).toContain('This is a test guild');
   });
   it('renders join to guild button', async () => {
-    guildStore = useGuildStore();
-    memberStore = useMemberStore();
-    const updatedMembership = [{ ...mockGuildMembership, guild_id: 1 }];
-    memberStore.$patch({
-      member: {
-        id: 1,
-        handle: 'TestUser',
-      }
-    })
-    guildStore.$patch({
-      currentGuild: 1,
-      guilds: {1:
-        {
-          id: 1,
-          name: 'Test Guild',
-          description: 'This is a test guild',
-          open_for_applications: true,
-          guild_membership: updatedMembership,
-        }
-      }
-    });
+    mockGuild.open_for_applications=true;
     const wrapper = mount(GuildDescriptionComponent, {
       global: {
         plugins: [
-          createTestingPinia({}),
+          createTestingPinia({
+            initialState: {
+              guild: {
+                fullFetch: false,
+                fullGuilds: {},
+                guilds: {1: mockGuild},
+                currentGuild: 1,
+              },
+              member: {
+                member: mockMember,
+              },
+            },
+          }),
         ],
       },
-      initialState: {
-        guild: {
-          fullFetch: false,
-          fullGuilds: {},
-          guilds: {1: mockGuild} ,
-        },
-        member: {
-          member: mockMember,
-        },
-      },
+
     });
-    await wrapper.vm.$nextTick();
     const joinBtn = wrapper.findComponent({ name: 'QBtn' });
     expect(joinBtn.exists()).toBe(true);
     expect(joinBtn.text()).toBe('Join Guild');

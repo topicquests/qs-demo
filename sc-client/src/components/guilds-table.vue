@@ -207,37 +207,32 @@ const currentQuest = computed({
   get: () => questStore.getCurrentQuest,
   set: () => {},
 });
-const hasGuildAdminPermission = computed(() => (id) => {
+const hasGuildAdminPermission = computed(() => (id:number) => {
   if (!id) {
     console.warn('Guild ID is undefined or invalid:', id);
     return false;
   }
-
   const guildPermission = baseStore.hasPermission(
     permission_enum.guildAdmin,
     id,
   );
   return guildPermission || false;
 });
-
 const guildData = computed((): Partial<GuildData[]> => {
   return GuildsTableProp.guilds.map((guild: GuildData) => guildRow(guild));
 });
-const selectionChanged = computed(
-  () =>
-    (rowEvent: {
-      rows: readonly any[];
-      keys: readonly any[];
-      added: boolean;
-      evt: Event;
-    }) => {
-      if (rowEvent.added) {
-        guildStore.setCurrentGuild(rowEvent.rows[0].id);
-      } else {
-        guildStore.setCurrentGuild(true);
-      }
-    },
-);
+function selectionChanged(rowEvent: {
+  rows: readonly any[];
+  keys: readonly any[];
+  added: boolean;
+  evt: Event;
+}) {
+  if (rowEvent.added) {
+    guildStore.setCurrentGuild(rowEvent.rows[0].id);
+  } else {
+    guildStore.setCurrentGuild(true);
+  }
+}
 
 // Functions
 function numPlayers(guild: Guild) {
