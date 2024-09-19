@@ -20,7 +20,7 @@ export interface RoleNodeConstraintState {
 }
 
 const baseState: RoleState = {
-  role: [],
+  role: {},
   fullFetch: false,
   fullRole: {},
 };

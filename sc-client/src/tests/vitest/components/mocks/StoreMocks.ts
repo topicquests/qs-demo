@@ -1,4 +1,4 @@
-import { Casting, GamePlay, GuildData, GuildMembership, Member, QuestData } from "src/types";
+import { Casting, GamePlay, GuildData, GuildMembership, Member, QuestData, Role } from "src/types";
 import { registration_status_enum } from "src/enums";
 export const mockCasting: Casting = {
   guild_id: 1,
@@ -8,6 +8,19 @@ export const mockCasting: Casting = {
   status: "request",
   created_at: "",
   updated_at: ""
+}
+export const mockRole: Role = {
+  id: 1,
+  name: "Researcher",
+  guild_id: null,
+  max_pub_state: "guild_draft",
+  permissions: null,
+  role_draft_target_role_id:null,
+  role_node_constraint:[{max_pub_state: 'proposed',
+    node_type: 'reference',
+    role_id:1,
+    role_draft_target_role_id:null
+  }]
 }
 export const mockGuildMembership: GuildMembership = {
   guild_id: 1,
@@ -65,7 +78,7 @@ export const mockMember: Member = {
     mockCasting
   ],
   casting_role: undefined,
-  guild_member_available_role: undefined,
+  guild_member_available_role: [],
   password: undefined,
   created_at: undefined,
   updated_at: undefined,

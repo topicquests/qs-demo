@@ -1,5 +1,5 @@
 <template>
-  <q-card style="min-width: 350px" v-if="ready">
+  <q-card style="min-width: 350px">
     <div v-if="availableRoles.length">
       <q-card-section>
         <div class="text-h6">Available Roles</div>
@@ -17,6 +17,7 @@
     </div>
     <div v-else>
       <div class="text-h6">Please ask your guild leader give you roles</div>
+      {{ availableRoles }}
     </div>
     <q-card-actions align="right" class="text-primary">
       <q-btn flat label="Cancel" v-close-popup="true"></q-btn>
@@ -42,7 +43,6 @@ const memberStore = useMemberStore();
 const membersStore = useMembersStore();
 const roleStore = useRoleStore();
 const questStore = useQuestStore();
-const ready = ref(false);
 const roleId = ref<number | undefined>(undefined);
 
 const availableRoles = computed((): Role[] => {
@@ -85,6 +85,7 @@ async function ensureData() {
       guildId: MemberGameRegistrationProp.guildId!,
     }),
   ]);
+
 }
 
 onBeforeUpdate(async () => {
@@ -93,7 +94,6 @@ onBeforeUpdate(async () => {
 
 onBeforeMount(async () => {
   await ensureData();
-  ready.value = true;
 });
 </script>
 <style lang="css"></style>
