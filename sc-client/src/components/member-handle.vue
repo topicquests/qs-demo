@@ -12,7 +12,7 @@ import { useMemberStore } from '../stores/member';
 import { onBeforeMount, ref } from 'vue';
 
 const memberStore = useMemberStore();
-let ready = ref(false);
+const ready = ref(false);
 
 onBeforeMount(async () => {
   await memberStore.ensureLoginUser;
