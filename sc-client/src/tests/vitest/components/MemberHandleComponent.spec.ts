@@ -4,7 +4,6 @@ import memberHandleComponent from "src/components/member-handle.vue";
 import { mount } from "@vue/test-utils";
 import { createTestingPinia } from "@pinia/testing";
 import { mockMember } from "./mocks/StoreMocks";
-import { nextTick } from "process";
 
 installQuasarPlugin();
 
@@ -26,7 +25,6 @@ describe('MemberHandleComponent', () => {
         ]
       },
     });
-    console.log(wrapper.html())
     await wrapper.vm.$nextTick();
     expect(wrapper.text()).toContain('JohnSmith')
   })

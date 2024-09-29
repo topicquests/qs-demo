@@ -36,7 +36,9 @@
         />
       </template>
       <template v-else>
-        <span v-html="description" class="node-card-details" />
+        <div class="scrollable-description">
+          <span v-html="description" class="node-card-details" />
+        </div>
       </template>
     </section>
     <section v-if="NodeFormProps.editing">
@@ -282,5 +284,11 @@ defineExpose({
 .scrollable-div {
   max-height: 200px;
   overflow-y: scroll;
+}
+.scrollable-description {
+  max-height: 200px; /* Set the maximum height you want */
+  overflow-y: auto; /* This adds the vertical scrollbar when content overflows */
+  padding: 10px; /* Optional padding */
+  border: 1px solid #ccc; /* Optional border */
 }
 </style>

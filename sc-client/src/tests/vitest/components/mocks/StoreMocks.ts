@@ -1,4 +1,4 @@
-import { Casting, GamePlay, GuildData, GuildMembership, Member, QuestData, Role } from "src/types";
+import { Casting, ConversationNode, GamePlay, GuildData, GuildMembership, Member, QuestData, Role } from "src/types";
 import { registration_status_enum } from "src/enums";
 export const mockCasting: Casting = {
   guild_id: 1,
@@ -65,6 +65,23 @@ export const mockGuild: GuildData = {
   ongoing_quests_count: 0,
   finished_quests_count: 0,
   recruiting_for_quest_count: 0
+}
+export const mockNode: ConversationNode= {
+  id: 1,
+  quest_id: 1,
+  guild_id: null,
+  creator_id: 1,
+  ancestry: "1",
+  node_type: "question",
+  status: "proposed",
+  created_at: "2024-08-02T09:25:27.964354-07:00",
+  published_at: "",
+  updated_at: "2024-08-02T09:25:27.964354-07:00",
+  title: "Test Node",
+  description: "Test node description",
+  url: null,
+  meta: "conversation",
+  draft_for_role_id: null
 }
 export const mockMember: Member = {
   id: 1,

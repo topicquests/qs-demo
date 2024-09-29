@@ -35,7 +35,7 @@ function createWrapper(props = {}) {
 }
 describe('GuildCardComponent', () => {
   beforeEach(() => {
-    global.document.execCommand = vi.fn();
+    document.execCommand = vi.fn();
   });
   it('if guild name exist displays', () => {
     const wrapper = createWrapper();

@@ -16,7 +16,6 @@ describe('SidebarMenu Component', () => {
         mocks: {
           checkIfAuthenticated: () => false,
           checkForPermission: () => false,
-
         },
       },
     });
