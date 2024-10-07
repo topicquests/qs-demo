@@ -19,7 +19,7 @@ function createWrapper(props= {}) {
     },
   })
 }
-describe('NodeForm.vue', () => {
+describe('NodeForm component', () => {
   beforeEach(() => {
     global.document.execCommand = vi.fn();
   });

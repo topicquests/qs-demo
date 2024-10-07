@@ -83,6 +83,22 @@ export const mockNode: ConversationNode= {
   meta: "conversation",
   draft_for_role_id: null
 }
+export const mockChannel: ConversationNode={
+  id: 2,
+  quest_id: 1,
+  creator_id: 1,
+  ancestry: "",
+  node_type: "question",
+  status: "obsolete",
+  created_at: "",
+  published_at: "",
+  updated_at: "",
+  title: "",
+  description: "",
+  url: "",
+  meta: "meta",
+  draft_for_role_id: 0
+}
 export const mockMember: Member = {
   id: 1,
   email: 'johnsmith@email.com',
@@ -111,7 +127,7 @@ export const mockQuest: QuestData = {
   confirmed_guild_count: 0,
   interested_guild_count: 0,
   player_count: 0,
-  is_playing: false,
+  is_playing: true,
   my_confirmed_guild_count: 0,
   my_recruiting_guild_count: 0,
   is_quest_member: false,

@@ -191,8 +191,8 @@ export const useChannelStore = defineStore('channel', {
           this.currentGuild = firstNode!.guild_id;
           this.channels = {};
         }
-        const nodes: ConversationMap = Object.fromEntries(
-          res.data.map((node: ConversationNode) => [node.id, node]),
+        const nodes: Partial<ConversationNode> = Object.fromEntries(
+          res.data.map((node: Partial<ConversationNode>) => [node.id, node]),
         );
         const channel = nodes[channel_id];
         if (channel.meta != 'channel' || channel.parent_id != null)
@@ -203,7 +203,7 @@ export const useChannelStore = defineStore('channel', {
       }
       return [];
     },
-    async createChannelNode(node: Partial<ConversationNode>) {
+    async createChannelNode(node: ConversationNode) {
       const res: AxiosResponse<ConversationNode[]> = await api.post(
         '/conversation_node',
         node,

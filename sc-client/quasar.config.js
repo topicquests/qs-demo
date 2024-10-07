@@ -57,10 +57,13 @@ export default configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
+      sourcemap: true,
       target: {
         node: 'node18',
       },
-
+      server: {
+        sourcemap: true, // Enable source maps during development
+      },
       vueRouterMode: 'history', // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
@@ -82,7 +85,6 @@ export default configure(function (/* ctx */) {
 
       vitePlugins: [
         [
-          '@intlify/vite-plugin-vue-i18n',
           {
             // if you want to use Vue I18n Legacy API, you need to set `compositionOnly: false`
             // compositionOnly: false,
