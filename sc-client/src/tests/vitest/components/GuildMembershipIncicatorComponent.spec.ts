@@ -40,7 +40,6 @@ describe('GuildMembershipIndicatorComponent', () => {
   it('show Open if open_for_application is true', () => {
     mockGuildMembership.status = registration_status_enum.confirmed;
     mockGuild.open_for_applications = true;
-    console.log(mockGuild)
     const wrapper = mount(guildsMembershipIndicatorComponent, {
       props: {
          guild: mockGuild

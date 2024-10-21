@@ -92,7 +92,6 @@ describe('GuildDescriptionComponent', () => {
       },
     });
     await wrapper.vm.$nextTick();
-    console.log(guildStore.guilds)
     expect(wrapper.text()).toContain('guild closed');
   });
 

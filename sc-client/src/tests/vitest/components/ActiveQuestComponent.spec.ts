@@ -71,7 +71,6 @@ describe('ActiveQuestComponent.vue', () => {
     const guildStore = useGuildStore();
     guildStore.currentGuild = 1;
     const wrapper=createWrapper();
-    console.log(guildStore.currentGuild)
     const radioButtons = wrapper.findAll('.q-radio');
     const quest1Button = radioButtons.at(0);
     expect(quest1Button.exists()).toBe(true);

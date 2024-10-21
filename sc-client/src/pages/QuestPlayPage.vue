@@ -6,7 +6,10 @@
           <member></member>
         </div>
         <quest-details></quest-details>
-        <quest-actions></quest-actions>
+        <quest-actions
+          :myPlayingGuilds="myPlayingGuilds"
+          :questId="questId">
+        </quest-actions>
         <div class="row justify-center q-mt-lg">
           <router-link
             :to="{
@@ -55,7 +58,7 @@ const mySelectedPlayingGuildId = ref<number | undefined>(undefined);
 const selectedNodeId = ref<number | undefined>(undefined);
 
 // Variables
-let myPlayingGuilds: Guild[] = [];
+let myPlayingGuilds: GuildData[] = [];
 
 // Lifecycle Hooks
 onMounted(async () => {

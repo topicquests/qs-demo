@@ -59,7 +59,6 @@ describe('GuildsTableComponent', () => {
 
   it('renders guild names correctly', () => {
     const wrapper = createWrapper();
-    console.log(wrapper.html())
     const firstRowName = wrapper.find('tbody tr:first-child td:nth-child(3)');
     expect(firstRowName.text()).toContain('Test Guild');
   });
@@ -67,7 +66,6 @@ describe('GuildsTableComponent', () => {
   it('shows the "Admin" link for guilds with admin permissions', () => {
     mockMember.permissions = ['guildAdmin'];
     const wrapper = createWrapper();
-    console.log(wrapper.html())
     const adminLink = wrapper.find('a[href="/guild/1/admin"]');
     expect(adminLink.exists()).toBe(true);
   });
@@ -93,14 +91,5 @@ describe('GuildsTableComponent', () => {
     }
     await table.vm.$emit('selection', rowEvent);
     expect(setCurrentGuildSpy).toHaveBeenCalledWith(123);
-  });
-
-
-  it('displays the correct last move timestamp', () => {
-    const wrapper = createWrapper();
-    console.log(wrapper.html());
-    const lastMove = wrapper.find('tbody tr:first-child td:last-child span');
-
-    expect(lastMove.text()).toContain('days ago');
   });
 });

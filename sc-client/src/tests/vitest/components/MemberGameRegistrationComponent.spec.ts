@@ -38,8 +38,6 @@ describe('memberGameRegistrationComponent', () => {
     // Access the role store to verify it has no roles
     const roleStore = useRoleStore();
     expect(roleStore.getRoles).toHaveLength(0); // Expect no roles available
-    console.log(wrapper.html())
-
     // Assert the DOM reflects that no roles are available (e.g., no options shown)
     expect(wrapper.html()).toContain('ask');
   });
@@ -70,7 +68,6 @@ describe('memberGameRegistrationComponent', () => {
     });
     const roleStore = useRoleStore();
     expect(roleStore.getRoles).toHaveLength(1);
-    console.log(wrapper.html())
     expect(wrapper.html()).toContain('Available Roles');
   });
 });

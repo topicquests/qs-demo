@@ -40,6 +40,16 @@ const routes = [
     name: 'guild_admin',
     component: () => import('../src/pages/GuildAdmin.vue'),
   },
+  {
+    path: '/quest/:quest_id/edit',
+    name: 'quest_edit',
+    component: () => import('../src/pages/QuestEdit.vue'),
+  },
+  {
+    path: '/guild',
+    name: 'guild_list',
+    component: () => import('../src/pages/GuildList.vue'),
+  },
 ];
 
 // Create router instance

@@ -11,6 +11,12 @@
 import { configure } from 'quasar/wrappers';
 import { resolve } from 'path';
 
+if (process.env.WEBSOCKET_URL) {
+  console.log('Websocket set:', process.env.WEBSOCKET_URL);
+} else {
+  console.log('use port 3006');
+}
+
 const server_url = process.env.SERVER_URL || 'http://localhost:3000';
 const ws_url = process.env.WEBSOCKET_URL || 'ws://localhost:4000';
 

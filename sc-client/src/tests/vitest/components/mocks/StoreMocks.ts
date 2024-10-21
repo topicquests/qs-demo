@@ -1,4 +1,4 @@
-import { Casting, ConversationNode, GamePlay, GuildData, GuildMembership, Member, QuestData, Role } from "src/types";
+import { Casting, ConversationNode, GamePlay, GuildData, GuildMembership, Member, QuestData, QuestMembership, Role } from "src/types";
 import { registration_status_enum } from "src/enums";
 export const mockCasting: Casting = {
   guild_id: 1,
@@ -29,6 +29,14 @@ export const mockGuildMembership: GuildMembership = {
   status: registration_status_enum.confirmed,
   created_at: undefined,
   updated_at: undefined,
+}
+export const mockQuestMembership: QuestMembership = {
+  quest_id: 1,
+  member_id: 1,
+  permissions: [],
+  confirmed: true,
+  created_at: "",
+  updated_at: ""
 }
 export const mockGamePlay: GamePlay = {
   quest_id: 1,
@@ -105,11 +113,9 @@ export const mockMember: Member = {
   handle: 'JohnSmith',
   slug: undefined,
   permissions: [],
-  guild_membership: undefined,
+  guild_membership: [],
   quest_membership: undefined,
-  casting: [
-    mockCasting
-  ],
+  casting: undefined,
   casting_role: undefined,
   guild_member_available_role: [],
   password: undefined,
@@ -143,7 +149,7 @@ export const mockQuest: QuestData = {
   end: "",
   created_at: "",
   updated_at: "",
-  quest_membership: [],
+  quest_membership: [mockQuestMembership],
   casting:[
     mockCasting,
   ],

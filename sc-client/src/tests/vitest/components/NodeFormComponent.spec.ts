@@ -27,7 +27,6 @@ describe('NodeForm component', () => {
     const wrapper = createWrapper()
     const qInput = wrapper.findComponent({ name: 'q-input' });
     expect(qInput.exists()).toBe(true);
-    console.log(wrapper.html())
     const titleInput = wrapper.find('input[aria-label="Node title"]');
     expect((titleInput.element as HTMLInputElement).value).toBe('Test Node');
     const img = wrapper.find('.q-field__prepend img');
@@ -36,7 +35,6 @@ describe('NodeForm component', () => {
   });
   it('displays URL in q-input when editable, or as a link when not editable', async () => {
     let wrapper = createWrapper({editing: true});
-    console.log(wrapper.html());
     const editor = wrapper.findComponent({ name: 'QEditor' });
     expect(editor.exists()).toBe(true);
     expect(editor.props('modelValue')).toBe('Test node description');
@@ -65,7 +63,7 @@ describe('NodeForm component', () => {
   })
   it('Conditionaly display meta checkbox if allowChangeMeta',() => {
     const wrapper = createWrapper({allowChangeMeta: false});
-    console.log(wrapper.html())
+
     const meta = wrapper.find('.q-checkbox')
     expect(meta.exists()).toBe(false)
   })

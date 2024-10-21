@@ -129,7 +129,6 @@ import { DateTime } from 'luxon';
 import { useQuestStore } from '../stores/quests';
 import { useMemberStore } from '../stores/member';
 import { useBaseStore } from '../stores/baseStore';
-import type { QTable } from 'quasar';
 import { QTableProps } from 'quasar';
 import { permission_enum, quest_status_type } from '../enums';
 import { GuildMembership, Quest, QuestData } from '../types';
