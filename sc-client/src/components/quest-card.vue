@@ -128,6 +128,8 @@ function getLastActivity() {
     if (newestDate) {
       return newestDate.updated_at;
     }
+    else
+      return "No initial date"
   }
 }
 </script>

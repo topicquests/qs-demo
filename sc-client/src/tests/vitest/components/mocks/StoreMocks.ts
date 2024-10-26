@@ -46,6 +46,22 @@ export const mockGamePlay: GamePlay = {
   created_at: "",
   updated_at: ""
 }
+export const mockConversation: ConversationNode = {
+  id: 1,
+  quest_id: 1,
+  creator_id: 0,
+  ancestry: "",
+  node_type: "reference",
+  status: "guild_draft",
+  created_at: "",
+  published_at: "",
+  updated_at: "",
+  title: "",
+  description: "",
+  url: "",
+  meta: "channel",
+  draft_for_role_id: 0
+}
 export const mockGuild: GuildData = {
   id: 1,
   handle: 'TestGuild',
@@ -141,6 +157,7 @@ export const mockQuest: QuestData = {
   handle: "TestQuest",
   slug: "",
   name: "Test Quest",
+  description: "This is a test quest",
   creator: 0,
   public: true,
   turn_based: false,
