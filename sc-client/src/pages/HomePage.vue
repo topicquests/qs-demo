@@ -1,10 +1,10 @@
 <template>
   <div>
     <q-page>
-      <div class="container q-pa-md">
+      <div class="container q-pa-xs">
         <div class="row justify-center text-center">
-          <h1 class="text-h1 q-pt-lg q-pr-sm q-pl-sm">SenseCraft</h1>
-          <h3 class="text-h3 q-pt-lg q-pb-lg">
+          <h1 class="text-h1 q-pt-sm q-pr-sm q-pl-sm q-mb-sm q-mt-sm">SenseCraft</h1>
+          <h3 class="text-h3 q-pb-md q-mt-sm q-mb-sm">
             Where teams co-construct structured conversation
           </h3>
         </div>
@@ -14,18 +14,18 @@
             style="width: 100%; height: auto"
           />
         </q-card>
-        <div class="row gradient justify-center" style="width: 100%">
-          <q-card class="q-mt-lg q-mb-xl" style="width: 100%">
+        <div class="row gradient justify-center q-pt-lg q-pb-lg-xl" style="width: 100%; height: 550px">
+          <q-card class="q-mt-md q-mb-xl q-pb-xs" style="width: 98%; height: 72%">
             <div class="row q-gutter-md no-wrap" style="align-items: flex-start;">
               <!-- Column 1: Description Text -->
               <div class="col-12 col-md-4">
-                <div class="description-text q-pt-md q-pb-md">
-                  SenseCraft is an RPG where teams co-create structured dialogues. Quest creators ask deep questions through quests, and guild members take on roles to build a shared conversation tree. In SenseCraft, players collaborate to shape meaningful conversations. Quests enable high-level inquiries, while guild members assume roles to enrich the shared dialogue tree. Experience SenseCraft, an RPG fostering collaborative discussions. Compete against other guilds in related quests. Quests prompt profound questions, with guild members playing specific roles in shaping the conversation tree. Join SenseCraft for role-playing and structured conversations.
+                <div class="description-text q-pt-sm q-pb-sm q-pl-md">
+                  SenseCraft is an RPG where teams co-create structured dialogues. Quest creators ask deep questions through quests, and guild members take on roles to build a shared conversation tree. In SenseCraft, players collaborate to shape meaningful conversations. Quests enable high-level inquiries, while guild members assume roles to enrich the shared dialogue tree. Experience SenseCraft, an RPG fostering collaborative discussions. Compete against other guilds in related quests. Join SenseCraft for role-playing and structured conversations.
                 </div>
               </div>
 
               <!-- Column 2: Video -->
-              <div class="col-12 col-md-4">
+              <div class="col-12 col-md-4 q-mt-md">
                 <div
                   id="Container"
                   style="
@@ -35,28 +35,24 @@
                     width: 100%;
                   "
                 >
-                  <iframe
-                    width="100%"
-                    height="100%"
-                    src="https://www.youtube.com/embed/WPF64UXFER0"
-                    frameborder="0"
-                    allowfullscreen
-                    style="position: absolute; top: 0; left: 0"
-                  ></iframe>
+                <img
+                src="../statics/democratic_leadership_style_discussed.jpg"
+                style="width: 100%; height: 350px"
+                class="q-mt-md"
+              />
                 </div>
               </div>
 
               <!-- Column 3: Quest List -->
               <div class="col-12 col-md-3">
-                <div class="q-pa-md">
-                  <h4 class="text-h5 text-center">Available Quests</h4>
-                  <ul>
+                <div class="q-pa-xs">
+                  <h4 class="text-h6 text-center q-mt-sm q-mb-sm">Available Quests</h4>
+                  <ul class="q-mt-sm q-mb-sm">
                     <li
                       v-for="quest in getFilteredQuests"
                       :key="quest.id"
-                      class="q-mt-md q-pb-xs"
                     >
-                      <q-card class=" quest-card q-pa-md">
+                      <q-card class="quest-card q-pa-sm">
                         <div class="quest-description">{{ quest.name }}</div>
                       </q-card>
                     </li>
@@ -83,7 +79,7 @@ const questStore = useQuestStore();
 
 const questStatus = ref<quest_status_type | string>('ongoing');
 
-const getFilteredQuests = computed((): QuestData[] => { 
+const getFilteredQuests = computed((): QuestData[] => {
     return questStore.getQuestsByStatus(questStatus.value);
 });
 
