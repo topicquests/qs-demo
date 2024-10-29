@@ -41,7 +41,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useQuestStore } from '../stores/quests';
 import { useGuildStore } from '../stores/guilds';
 import { useMemberStore } from '../stores/member';
-import { Guild, GuildMembership } from '../types';
+import { GuildData, GuildMembership } from '../types';
 
 // Stores
 const questStore = useQuestStore();

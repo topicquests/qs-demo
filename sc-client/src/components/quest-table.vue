@@ -12,7 +12,6 @@
         </q-select>
       </div>
     </div>
-
     <q-table
       class="quest-table"
       :title="title"
@@ -23,11 +22,28 @@
       <template v-slot:body-cell-info="props">
         <q-td :props="props">
           <div>
-            <q-btn icon="info" dense flat size="sm"
-              ><q-tooltip max-width="25rem"
-                ><div v-html="props.row.description" class="tooltip"></div>
-              </q-tooltip>
-            </q-btn>
+            <q-btn
+              v-if="props.row.description"
+              class="q-ml-xs"
+              size="sm"
+              :flat="true"
+              icon="info"
+              @click="showDialog = true"
+            />
+            <q-dialog v-model="showDialog" persistent>
+              <q-card style="max-height: 1000px">
+                <q-card-section>
+                  <div class="text-h6">Quest Information</div>
+                  <div>{{ props.row.name }}</div>
+                </q-card-section>
+                <q-card-section>
+                  <div v-html="props.row.description"></div>
+                </q-card-section>
+                <q-card-actions align="right">
+                  <q-btn flat label="Close" color="primary" v-close-popup />
+                </q-card-actions>
+              </q-card>
+            </q-dialog>
           </div>
         </q-td>
       </template>
@@ -228,6 +244,7 @@ const baseStore = useBaseStore();
 // Reactive Variables
 const questStatus = ref<quest_status_type | string>();
 const questStatusOptions = ref<quest_status_type[]>([]);
+const showDialog = ref(false)
 
 // Computed Properties
 const getFilteredQuests = computed((): QuestData[] => {

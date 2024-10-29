@@ -23,7 +23,6 @@
                   SenseCraft is an RPG where teams co-create structured dialogues. Quest creators ask deep questions through quests, and guild members take on roles to build a shared conversation tree. In SenseCraft, players collaborate to shape meaningful conversations. Quests enable high-level inquiries, while guild members assume roles to enrich the shared dialogue tree. Experience SenseCraft, an RPG fostering collaborative discussions. Compete against other guilds in related quests. Join SenseCraft for role-playing and structured conversations.
                 </div>
               </div>
-
               <!-- Column 2: Video -->
               <div class="col-12 col-md-4 q-mt-md">
                 <div
@@ -77,10 +76,10 @@ import { quest_status_type } from 'src/enums';
 
 const questStore = useQuestStore();
 
-const questStatus = ref<quest_status_type | string>('ongoing');
-
 const getFilteredQuests = computed((): QuestData[] => {
-    return questStore.getQuestsByStatus(questStatus.value);
+  return questStore.getQuests.filter((quest) =>
+    quest.status === 'ongoing' || quest.status === 'registration'
+  );
 });
 
 onBeforeMount(async () => {
