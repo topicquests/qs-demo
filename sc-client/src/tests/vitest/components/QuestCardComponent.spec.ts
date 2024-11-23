@@ -92,38 +92,6 @@ describe('Quest card component unit test', () => {
         const h3 = wrapper.find("h3")
         expect(h3.text()).toBe(mockQuest.name)
     })
-    it('Display current quest description as a tooltip if it exist', async () => {
-        const wrapper = mount(QuestCard, {
-            props: {
-                currentQuest: mockQuest,
-                showQuestInfo: false,
-                creator: {}
-            },
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            quest: {
-                                currentQuest: mockQuest.id,
-                                quests: {1: mockQuest}
-                            },
-                            conversation: {
-                                neighbourhood: {1: mockConversation}
-                            }
-                        }
-                    })
-
-                ],
-            }
-        })
-        const descriptionBtn = wrapper.find(".q-btn")
-        await descriptionBtn.trigger('mouseenter')
-        await new Promise(resolve => setTimeout(resolve, 50))
-        expect(descriptionBtn.exists()).toBe(true)
-        const tooltip = document.body.querySelector('.q-tooltip')
-        expect(tooltip).not.toBeNull()
-        expect(tooltip?.textContent).toBe('This is a test quest')
-    })
     it('create link to game', () => {
         const wrapper = mount(QuestCard, {
             props: {

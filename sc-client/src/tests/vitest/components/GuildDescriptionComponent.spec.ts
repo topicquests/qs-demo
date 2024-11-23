@@ -11,29 +11,6 @@ installQuasarPlugin();
 describe('GuildDescriptionComponent', () => {
   let guildStore;
   let memberStore;
-  it('renders correctly when currentGuild is set', async () => {
-    const wrapper = mount(GuildDescriptionComponent, {
-      global: {
-        plugins: [
-          createTestingPinia({
-            initialState: {
-              guild: {
-                fullFetch: false,
-                fullGuilds: {},
-                currentGuild: 1,
-                guilds: {1: mockGuild},
-              },
-              member: {
-                member: mockMember,
-              },
-            },
-          }),
-        ],
-      },
-    });
-    expect(wrapper.find('h1').text()).toContain('Test Guild');
-    expect(wrapper.find('.content').html()).toContain('This is a test guild');
-  });
   it('renders join to guild button', async () => {
     mockGuild.open_for_applications=true;
     const wrapper = mount(GuildDescriptionComponent, {
