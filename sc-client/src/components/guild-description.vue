@@ -19,14 +19,16 @@
     <div class="row justify-center">
       <div class="column guild-description-col">
         <q-card class="q-mb-md">
-          <div class="content-container">
-            <div class="content" v-html="currentGuild?.description"></div>
+          <div >
+            <!-- Apply a custom class to this div for description-specific styling -->
+            <div class="guild-description" v-html="currentGuild?.description"></div>
           </div>
         </q-card>
       </div>
     </div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { computed } from 'vue';
@@ -58,3 +60,10 @@ const joinToGuild = async () => {
   isMember.value = true;
 };
 </script>
+<style scoped>
+.guild-description {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+}
+</style>

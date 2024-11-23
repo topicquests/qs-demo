@@ -3,7 +3,7 @@
     <div v-if="activeQuests && activeQuests.length > 0">
       <div v-for="quest in activeQuests" :key="quest.id">
         <q-radio
-          v-model="questStore.currentQuest"
+          v-model="quest_id"
           color="black"
           :val="quest.id"
           :label="quest.name"
@@ -60,35 +60,40 @@
     <q-dialog v-model="prompt" persistent>
       <member-game-registration
         :guildId="ActiveQuestsProps.guildId!"
-        :questId="ActiveQuestsProps.questId"
+        :questId="quest_id"
       />
     </q-dialog>
   </div>
-</template>
+</template>085988
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useQuestStore } from '../stores/quests';
+import { computed, ref } from 'vue';
 import { useMemberStore } from '../stores/member';
 import { useGuildStore } from '../stores/guilds';
-import { Quest } from '../types';
+import { Quest, QuestData } from '../types';
 import memberGameRegistration from '../components/member_game_registration.vue';
 import { useRouter } from 'vue-router';
 
 // Props
 const ActiveQuestsProps = defineProps<{
   isMember: boolean;
-  activeQuests: Partial<Quest>;
+  activeQuests: QuestData[];
   questId?: number;
   guildId?: number;
 }>();
-const questStore = useQuestStore();
+
+// Stores
 const memberStore = useMemberStore();
 const guildStore = useGuildStore();
 const router = useRouter();
 
 const prompt = ref(false);
+const quest_id = ref(ActiveQuestsProps.questId); // Use this ref for mutable quest ID state
+
+// If you need a computed version, you can name it differently
+const computedQuestId = computed(() => quest_id.value);
 </script>
+
 
 <style scoped>
 /* Add your styles here if needed */

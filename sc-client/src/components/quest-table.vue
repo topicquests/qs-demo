@@ -327,18 +327,26 @@ q-td {
   padding: 1em;
 }
 
-.quest-table thead tr:first-child th:first-child {
+.quest-table thead  {
   /* bg color is important for th; just specify one */
-  background-color: ivory;
+  background-color: rgb(126, 126, 54);
 }
-
 .quest-table td:nth-child(1) {
   max-width: 5px;
 }
+.quest-table tbody tr:nth-child(odd) {
+  background-color: #d3cccc; /* Light gray for odd rows */
+}
+.quest-table tbody tr:nth-child(even) {
+  background-color: #ffffff; /* White for even rows */
+}
+
+
 
 .quest-table td:nth-child(2) {
   max-width: 300px;
 }
+
 
 @media only screen and (max-width: 1000px) {
   .quest-table td:nth-child(2) {

@@ -2,7 +2,7 @@
   <div>
     <q-card>
       <q-table
-        class="guilds-table"
+        class="guilds-table q-mt-xl"
         :title="title"
         :rows="guildData"
         :columns="columns"
@@ -311,6 +311,9 @@ onBeforeMount(async () => {
 });
 </script>
 <style>
+q-td {
+  font-size: 30%;
+}
 .guilds-table {
   text-align: center;
   font-size: 1em;
@@ -321,16 +324,20 @@ onBeforeMount(async () => {
   font-size: 11pt;
   padding: 1em;
 }
-.guilds-table thead tr:first-child th:first-child {
-  /* bg color is important for
-th; just specify one */
-  background-color: ivory;
-}
-.guilds-table td:nth-child(1) {
+.guilds-table thead {
+  /* bg color is important for th; just specify one */
+  background-color: rgb(126, 126, 54);
+  }ilds-table td:nth-child(1) {
   max-width: 5px;
 }
 .guilds-table td:nth-child(2) {
   max-width: 300px;
+}
+.guilds-table tbody tr:nth-child(odd) {
+  background-color: #d3cccc; /* Light gray for odd rows */
+}
+.guilds-table tbody tr:nth-child(even) {
+  background-color: #ffffff; /* White for even rows */
 }
 @media only screen and (max-width: 1000px) {
   .guilds-table td:nth-child(2) {
