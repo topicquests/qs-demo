@@ -161,29 +161,19 @@ export const useRoleStore = defineStore('role', {
       return res.data;
     },
     async updateRole(data: Partial<Role>) {
-      if (!data.id) {
-        throw new Error('Role ID is required to update the role.');
-      }
-      const filteredData = filterKeys(data, rolePatchKeys);
-      try {
-        const res: AxiosResponse<Role[]> = await api.patch(
-          `/role?id=eq.${data.id}`,
-          filteredData
+      const params = Object();
+      params.id = data.id;
+      data = filterKeys(data, rolePatchKeys);
+      const res: AxiosResponse<Role[]> = await api.patch(
+          `/role?id=eq.${params.id}`,
+          data
         );
         if (res.status === 200 && Array.isArray(res.data) && res.data.length > 0) {
-          let role = res.data[0];
-          if (typeof role.id === 'number') {
-            role = Object.assign({}, this.role[role.id], role);
-            this.role = { ...this.role, [role.id]: role };
-          }
-        } else {
-          console.warn('No role data returned from the server.');
+          const role = res.data[0];
+          this.role = { ...this.role, [role.id]: role };
+          this.fullRole = {...this.fullRole!, [role.id]: true };
         }
-      } catch (error) {
-          console.error('Error updating role:', error);
-        throw error;
-      }
-    },
+      },
 
     async deleteRole(id: number): Promise<void> {
       const res: AxiosResponse = await api.delete(`roles/${id}`);
@@ -193,7 +183,7 @@ export const useRoleStore = defineStore('role', {
         console.error(`Failed to delete role with ID ${id}.`);
       }
     },
-    async createRoleNodeConstraintBase(
+     async createRoleNodeConstraintBase(
       data: Partial<RoleNodeConstraint>,
     ): Promise<RoleNodeConstraint> {
       const res: AxiosResponse<RoleNodeConstraint[]> = await api.post(

@@ -53,9 +53,11 @@ import roleCard from 'src/components/role-card.vue';
 import roleNodeConstraintCard from 'src/components/role-node-constraint-card.vue';
 import roleNodeConstraintTable from 'src/components/role-node-constraint-table.vue';
 import { useRoute } from 'vue-router';
+import { useQuasar } from 'quasar';
 
 const roleStore = useRoleStore();
 const route = useRoute();
+const $q = useQuasar();
 
 const role_id = ref(0);
 const ready = ref(false);
@@ -78,14 +80,14 @@ watch(
   { immediate: true }
 );
 
-async function updateCurrentRole(role: Role) {
+async function updateCurrentRole(role: Partial<Role>) {
   try {
     await roleStore.updateRole(role);
     await roleStore.fetchRoles();
-    this.$q.notify({ message: `Role updated`, color: 'positive' });
+      $q.notify({ message: `Role updated`, color: 'positive' });
   } catch (err) {
     console.error('Error updating role:', err);
-    this.$q.notify({ message: `Error updating role`, color: 'negative' });
+      $q.notify({ message: `Error updating role`, color: 'negative' });
   }
 }
 
@@ -93,10 +95,10 @@ async function deleteRoleById(role: Role) {
   try {
     await roleStore.deleteRole(role.id);
     await roleStore.fetchRoles();
-    this.$q.notify({ message: `Role deleted`, color: 'positive' });
+    $q.notify({ message: `Role deleted`, color: 'positive' });
   } catch (err) {
     console.error('Error deleting role:', err);
-    this.$q.notify({ message: `Error deleting role`, color: 'negative' });
+    $q.notify({ message: `Error deleting role`, color: 'negative' });
   }
 }
 
