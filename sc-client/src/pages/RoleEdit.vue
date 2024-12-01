@@ -13,15 +13,15 @@
     </div>
     <div class="row justify-center">
       <role-card
-        v-bind:role="roleStore.getRoleById(role_id)"
-        v-bind:edit="true"
+        :role="role"
+        :edit="true"
         v-on:updateCurrentRole="updateCurrentRole"
         v-on:deleteRoleById="deleteRoleById"
       ></role-card>
       <div class="col-4 q-ml-md">
         <div>
           <role-node-constraint-card
-            v-bind:roleNodeConstraint="newRoleNodeConstraintCard"
+            :roleNodeConstraint="newRoleNodeConstraintCard"
             v-on:addRoleNodeConstraint_="addRoleNodeConstraint_"
             v-on:updateRoleNodeConstraint_="updateRoleNodeConstraint_"
             v-on:deleteRoleNodeConstraint_="deleteRoleNodeConstraint_"
@@ -35,7 +35,7 @@
     <div class="row justify-center q-mt-xs q-pt-none">
       <div class="col-6 q-pa-none">
         <role-node-constraint-table
-          v-bind:role="roleStore.getRoleById(role_id)"
+          :role="roleStore.getRoleById(role_id)"
           v-on:editRoleNodeConstraint="editRoleNodeConstraint"
         ></role-node-constraint-table>
       </div>
@@ -44,90 +44,89 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue';
+import { computed, onBeforeMount, ref, watch } from 'vue';
 import scoreboard from '../components/score-board.vue';
 import member from '../components/member-handle.vue';
 import { useRoleStore } from '../stores/role';
 import { Role, RoleNodeConstraint } from '../types';
+import roleCard from 'src/components/role-card.vue';
+import roleNodeConstraintCard from 'src/components/role-node-constraint-card.vue';
+import roleNodeConstraintTable from 'src/components/role-node-constraint-table.vue';
 import { useRoute } from 'vue-router';
 
 const roleStore = useRoleStore();
 const route = useRoute();
-let newRoleNodeConstraint = false;
-let role_id: number;
+
+const role_id = ref(0);
 const ready = ref(false);
+
+const role = computed(() => roleStore.getRoleById(role_id.value) || null);
+
+const newRoleNodeConstraint = ref(false);
 let newRoleNodeConstraintCard: Partial<RoleNodeConstraint> = {
   node_type: 'question',
   max_pub_state: 'published',
 };
 
-async function updateCurrentRole(role) {
+watch(
+  role_id,
+  async (newRoleId) => {
+    if (newRoleId) {
+      await roleStore.ensureRole({ role_id: newRoleId });
+    }
+  },
+  { immediate: true }
+);
+
+async function updateCurrentRole(role: Role) {
   try {
-    await this.updateRole({ data: role });
-    await this.fetchRoles();
-    this.$q.notify({
-      message: `role updated`,
-      color: 'positive',
-    });
+    await roleStore.updateRole(role);
+    await roleStore.fetchRoles();
+    this.$q.notify({ message: `Role updated`, color: 'positive' });
   } catch (err) {
-    console.log('there was an error in updating role ', err);
-    this.$q.notify({
-      message: `There was an error updating role.`,
-      color: 'negative',
-    });
+    console.error('Error updating role:', err);
+    this.$q.notify({ message: `Error updating role`, color: 'negative' });
   }
 }
 
 async function deleteRoleById(role: Role) {
   try {
-    await this.deleteRole({ params: { id: role.id }, data: {} });
-    await this.fetchRoles();
-    this.$q.notify({
-      message: `role deleted`,
-      color: 'positive',
-    });
+    await roleStore.deleteRole(role.id);
+    await roleStore.fetchRoles();
+    this.$q.notify({ message: `Role deleted`, color: 'positive' });
   } catch (err) {
-    console.log('there was an error in deleting role ', err);
-    this.$q.notify({
-      message: `There was an error deleting role.`,
-      color: 'negative',
-    });
+    console.error('Error deleting role:', err);
+    this.$q.notify({ message: `Error deleting role`, color: 'negative' });
   }
 }
 
-async function addRoleNodeConstraint_(roleNodeConstraint: RoleNodeConstraint) {
-  roleNodeConstraint.role_id = role_id;
-  await roleStore.createRoleNodeConstraint(roleNodeConstraint);
-  newRoleNodeConstraintCard =
-    await roleStore.getRoleNodeConstraintsByRoleId(role_id)[0];
-}
-async function updateRoleNodeConstraint_(
-  roleNodeConstraint: RoleNodeConstraint,
-) {
-  roleNodeConstraint.role_id = role_id;
-  await roleStore.updateRoleNodeConstraint(roleNodeConstraint);
-  newRoleNodeConstraintCard =
-    await roleStore.getRoleNodeConstraintsByRoleId(role_id)[0];
-}
-async function deleteRoleNodeConstraint_(
-  roleNodeConstraint: RoleNodeConstraint,
-) {
-  roleNodeConstraint.role_id = role_id;
-  await roleStore.deleteRoleNodeConstraint(roleNodeConstraint);
+async function addRoleNodeConstraint_(constraint: RoleNodeConstraint) {
+  constraint.role_id = role_id.value;
+  await roleStore.createRoleNodeConstraint(constraint);
 }
 
-async function editRoleNodeConstraint(roleNodeConstraint: RoleNodeConstraint) {
-  newRoleNodeConstraintCard = roleNodeConstraint[0];
-  console.log('Edit Role Constraint', roleNodeConstraint[0]);
-  newRoleNodeConstraint = true;
+async function updateRoleNodeConstraint_(constraint: RoleNodeConstraint) {
+  constraint.role_id = role_id.value;
+  await roleStore.updateRoleNodeConstraint(constraint);
+}
+
+async function deleteRoleNodeConstraint_(constraint: RoleNodeConstraint) {
+  constraint.role_id = role_id.value;
+  await roleStore.deleteRoleNodeConstraint(constraint);
+}
+
+async function editRoleNodeConstraint(constraints: RoleNodeConstraint[]) {
+  newRoleNodeConstraintCard = constraints[0];
+  newRoleNodeConstraint.value = true;
 }
 
 onBeforeMount(async () => {
-  if (typeof route.params.role_id === 'number') {
-    role_id = Number.parseInt(route.params.role_id);
-    await roleStore.ensureRole({ role_id: role_id });
+  if (route.params.role_id) {
+    role_id.value = Number(route.params.role_id);
+    await roleStore.ensureRole({ role_id: role_id.value });
   }
   await roleStore.ensureAllRoles();
   ready.value = true;
 });
 </script>
+

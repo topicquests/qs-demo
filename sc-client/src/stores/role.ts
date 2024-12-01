@@ -65,17 +65,25 @@ export const useRoleStore = defineStore('role', {
         this.getRoleById(role_id) === undefined ||
         (full && !this.fullRole[role_id])
       ) {
-        await this.fetchRoleById({
+        await this.fetchRoleById(
+          role_id,
           full,
-          id: role_id,
-        });
+        );
       }
     },
-    async createRole(data: Role): Promise<Role> {
-      const res = await this.createRoleBase(data);
-      await this.fetchRoles();
-      return res;
+    async createRole(data: Partial<Role>): Promise<Partial<Role>> {
+      console.log("Creating role with data:", data);
+      try {
+        const res = await this.createRoleBase(data);
+        console.log("Role created successfully:", res);
+        await this.fetchRoles();
+        return res[0];
+      } catch (error) {
+        console.error("Error in createRole:", error);
+        throw error;
+      }
     },
+
     resetRole() {
       Object.assign(this, baseState);
     },
@@ -142,9 +150,9 @@ export const useRoleStore = defineStore('role', {
       return res.data;
     },
     async createRoleBase(data: Partial<Role>): Promise<Role> {
-      const res: AxiosResponse<Role> = await api.post('/role', {
+      const res: AxiosResponse<Role> = await api.post('/role',
         data,
-      });
+      );
       if (res.status == 200) {
         const role = res.data;
         if (typeof role.id == 'number')
@@ -152,29 +160,37 @@ export const useRoleStore = defineStore('role', {
       }
       return res.data;
     },
-    async updateRole(data: Partial<Role>, params) {
-      params.data = filterKeys(data, rolePatchKeys);
-      params = {
-        id: `eq.${data.id}`,
-      };
-      const res: AxiosResponse<Role[]> = await api.patch('/role', data, {
-        params,
-      });
-      if (res.status == 200) {
-        let role = res.data[0];
-        if (typeof role.id == 'number') {
-          role = Object.assign({}, this.role[role.id], role);
-          this.role = { ...this.role, [role.id]: role };
+    async updateRole(data: Partial<Role>) {
+      if (!data.id) {
+        throw new Error('Role ID is required to update the role.');
+      }
+      const filteredData = filterKeys(data, rolePatchKeys);
+      try {
+        const res: AxiosResponse<Role[]> = await api.patch(
+          `/role?id=eq.${data.id}`,
+          filteredData
+        );
+        if (res.status === 200 && Array.isArray(res.data) && res.data.length > 0) {
+          let role = res.data[0];
+          if (typeof role.id === 'number') {
+            role = Object.assign({}, this.role[role.id], role);
+            this.role = { ...this.role, [role.id]: role };
+          }
+        } else {
+          console.warn('No role data returned from the server.');
         }
+      } catch (error) {
+          console.error('Error updating role:', error);
+        throw error;
       }
     },
 
-    async deleteRole(params: Role): Promise<void> {
-      const res: AxiosResponse = await api.delete(`roles/${params.id}`);
+    async deleteRole(id: number): Promise<void> {
+      const res: AxiosResponse = await api.delete(`roles/${id}`);
       if (res.status === 204) {
-        console.log(`Role with ID ${params.id} deleted successfully.`);
+        console.log(`Role with ID ${id} deleted successfully.`);
       } else {
-        console.error(`Failed to delete role with ID ${params.id}.`);
+        console.error(`Failed to delete role with ID ${id}.`);
       }
     },
     async createRoleNodeConstraintBase(

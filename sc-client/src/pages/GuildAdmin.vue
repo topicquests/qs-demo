@@ -124,7 +124,7 @@
               color="primary"
               label="Create Guild Channel"
               @click="
-                $router.push({
+                router.push({
                   name: 'guild_channel_list',
                   params: { guild_id: String(guildId) },
                 })
@@ -246,7 +246,7 @@
                 label="New Role"
                 color="primary"
                 @click="
-                  $router.push({
+                  router.push({
                     name: 'create_guild_role',
                     params: { guildId: String(guildId) },
                   })

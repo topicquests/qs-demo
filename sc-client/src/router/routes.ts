@@ -72,6 +72,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/GuildPage.vue'),
       },
       {
+        path: "role/create/:guild_id",
+        name: "create_guild_role",
+        component: () => import("pages/CreateRole.vue"),
+      },
+      {
         path: '/guild/:guild_id/admin',
         name: 'guild_admin',
         component: () => import('pages/GuildAdmin.vue'),
