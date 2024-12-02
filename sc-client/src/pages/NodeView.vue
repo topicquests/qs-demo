@@ -36,7 +36,7 @@
     >
       <b>Edit This Node</b>
     </router-link>
-    <span v-if="isRelation" style="margen-left: 20px">
+    <span v-if="isRelation" style="margin-left: 20px">
       <br />
       <b style="margin-left: 20px">Source Node</b>
       <router-link :to="{ name: 'quest_page', params: { id: q.sourceNode } }">{{

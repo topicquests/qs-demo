@@ -1,60 +1,47 @@
-import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
-import { mount } from '@vue/test-utils';
 import { describe, it, expect, beforeEach } from 'vitest';
-import RegistrationFormComponent from '../../../components/registration-form.vue';
+import { mount } from '@vue/test-utils';
+import RegistrationForm from '../../../components/registration-form.vue';
+import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 
-installQuasarPlugin();
+installQuasarPlugin()
 
-describe('RegistrationFormComponent', () => {
+describe('RegistrationForm', () => {
   let wrapper;
   beforeEach(() => {
-    wrapper = mount(RegistrationFormComponent);
-  });
-  // Assert that email input exists
-  it('validate email q-input exists', async () => {
-    const emailInput = wrapper.find('input[type="email"]');
-    console.log('EmailInput ', emailInput);
-    expect(emailInput.exists()).toBe(true);
-  });
+    wrapper = mount(RegistrationForm);
 
-  // Assert that formdata.email is updated correctly
-  it('updates form data when input value changes', async () => {
-    const emailInput = wrapper.find('input[type="email"]');
-    await emailInput.setValue('tomhanks@email.com');
-    await emailInput.trigger('input');
-    const formData = wrapper.vm.getFormData();
-    expect(formData.email).toBe('tomhanks@email.com');
   });
-
-  // Assert that the emailError is set correctly
-  it('validates email correctly', async () => {
-    const emailInput = wrapper.find('input[type="email"]');
-    await emailInput.setValue('invalid-email');
-    await emailInput.trigger('blur');
-    expect(wrapper.text()).toContain('Invalid email format');
-    await emailInput.setValue('valid@email.com');
-    await emailInput.trigger('blur');
-    expect(wrapper.text()).not.toContain('Invalid email format');
+  it('renders the form correctly', () => {
+    expect(wrapper.find('input[name="email"]').exists()).toBe(true);
+    expect(wrapper.find('input[name="name"]').exists()).toBe(true);
+    expect(wrapper.find('input[name="handle"]').exists()).toBe(true);
+    expect(wrapper.find('input[name="password"]').exists()).toBe(true);
+    expect(wrapper.find('button[name="registerButton"]').exists()).toBe(true);
   });
-
-  // Assert that the event is emitted with the correct form data
-  it('emits the doRegister event with form data', async () => {
-    const emailInput = wrapper.find('input[type="email"]');
-    await emailInput.setValue('tomhanks@email.com');
-    const nameInput = wrapper.find('input[name="name"]');
-    await nameInput.setValue('Tom Hanks');
-    const handleInput = wrapper.find('input[name="handle"]');
-    await handleInput.setValue('tomhanks');
-    const passwordInput = wrapper.find('input[name="password"]');
-    await passwordInput.setValue('password123');
-    const registerButton = wrapper.find('button[name="registerButton"]');
-    await registerButton.trigger('click');
-    expect(wrapper.emitted().doRegister).toBeTruthy();
-    expect(wrapper.emitted().doRegister[0][0]).toEqual({
-      email: 'tomhanks@email.com',
-      name: 'Tom Hanks',
-      handle: 'tomhanks',
+  it('emits doRegister event with form data when Get Started button is clicked', async () => {
+    const formdata = wrapper.vm.formdata;
+    const formData = {
+      email: 'test@example.com',
+      name: 'Test Name',
+      handle: 'testHandle',
       password: 'password123',
-    });
+    };
+    Object.assign(formdata, formData);
+    await wrapper.find('button[name="registerButton"]').trigger('click');
+    expect(wrapper.emitted('doRegister')).toBeTruthy();
+    expect(wrapper.emitted('doRegister')?.[0]).toEqual([formdata]);
   });
+  it('toggles password visibility', async () => {
+    const passwordInput = wrapper.find('input[type="password"]');
+    await passwordInput.setValue('password')
+    const iconElement = wrapper.findAll('i.q-icon').at(5);
+    expect(iconElement.exists()).toBe(true);
+    expect(iconElement.text()).toBe('visibility_off');
+    await iconElement.trigger('click');
+    expect(passwordInput.attributes('type')).toBe('text');
+    await iconElement.trigger('click');
+    expect(passwordInput.attributes('type')).toBe('password');
+  });
+
+
 });

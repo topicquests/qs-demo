@@ -49,8 +49,8 @@ import { useQuestStore } from '../stores/quests';
 
 // Props
 const CastingRoleEditProps = defineProps<{
-  availableRoles: Role[];
-  castingRoles: Role[];
+  availableRoles: Partial<Role>[];
+  castingRoles: Partial<Role>[];
   questId: number | undefined;
   guildId: number | undefined;
 }>();
@@ -63,15 +63,15 @@ const memberStore = useMemberStore();
 const questStore = useQuestStore();
 
 // Reactive Variables
-const cr = ref<Role[]>(CastingRoleEditProps.castingRoles || []);
+const cr = ref<Partial<Role>[]>(CastingRoleEditProps.castingRoles || []);
 
 // Computed Properties
 const currentQuest = computed(() =>
-  questStore.getQuestById(CastingRoleEditProps.questId!),
+  questStore.getQuestById(CastingRoleEditProps.questId!) || { name: '' },
 );
 
 // Watches
-watch(CastingRoleEditProps, (newRole) => {
+watch(CastingRoleEditProps, (/* newRole */) => {
   const newCastingRoles = CastingRoleEditProps.castingRoles || [];
   cr.value = [...newCastingRoles];
 });

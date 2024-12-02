@@ -1,13 +1,13 @@
 <template>
   <div>
     <q-card class="q-pl-md">
-      <div v-if="guild" class="row justify-center q-pb-lg">
+      <div v-if="guild.name" class="row justify-center q-pb-lg">
         <q-input v-model="guild.name" />
       </div>
       <span class="q-ml-xl" style="font-weight: bold">Type of Guild</span>
       <div class="row justify-start">
         <q-option-group
-          v-if="guild"
+          v-if="guild.public"
           v-model="guild.public"
           :options="public_private_bool"
           color="primary"
@@ -27,7 +27,7 @@
         <section class="q-pt-lg">
           <span class="q-pl-xl" style="font-weight: bold">Invitation</span>
           <q-option-group
-            v-if="guild"
+            v-if="guild.open_for_applications"
             v-model="guild.open_for_applications"
             :options="invitation"
             color="primary"
@@ -58,7 +58,7 @@ import { waitUserLoaded } from '../app-access';
 import { public_private_bool } from '../enums';
 import { Guild } from '../types';
 import { useGuildStore } from '../stores/guilds';
-import { onBeforeMount, ref } from 'vue';
+import { onBeforeMount, ref, watch } from 'vue';
 
 const GuildCardProps = defineProps<{
   currentGuild?: Partial<Guild>;
@@ -71,13 +71,15 @@ const invitation: { label: string; value: boolean }[] = [
   { label: 'close', value: false },
 ];
 
-let guild = ref<Partial<Guild>>({});
 const description = ref<string>('');
 
-if (typeof guildStore.currentGuild === 'number')
-  guild.value.id = guildStore.currentGuild;
+const guild = ref<Partial<Guild>>(GuildCardProps.currentGuild || {});
 
-async function doSubmit() {
+  watch(() => GuildCardProps.currentGuild, (newVal) => {
+  guild.value = newVal || {};
+}, { immediate: true });
+
+const doSubmit = async () => {
   try {
     await guildStore.updateGuild(guild.value);
     $q.notify({
@@ -93,7 +95,9 @@ async function doSubmit() {
     });
   }
 }
+defineExpose({doSubmit})
 onBeforeMount(async () => {
   await waitUserLoaded();
 });
+
 </script>

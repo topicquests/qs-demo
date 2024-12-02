@@ -1,15 +1,14 @@
 import { defineStore } from 'pinia';
 import { AxiosResponse } from 'axios';
-import { Member, CastingRole, memberPatchKeys, Role } from '../types';
+import { Member, CastingRole, memberPatchKeys } from '../types';
 import { getWSClient } from '../wsclient';
 import { useBaseStore, filterKeys } from './baseStore';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
 import { api, token_store, TOKEN_EXPIRATION } from '../boot/axios';
 import { useMembersStore } from './members';
-import { LocationQueryValue } from 'vue-router';
 
 export interface MemberState {
-  member?: Member;
+  member?: Partial<Member>;
   token?: string;
   tokenExpiry?: number;
   isAuthenticated: boolean;
@@ -105,13 +104,14 @@ export const useMemberStore = defineStore('member', {
       if (!this.member) {
         const expiry =
           this.tokenExpiry || window.localStorage.getItem('tokenExpiry');
-        if (typeof expiry === 'string')
+        if (typeof expiry === 'string') {
           if (expiry && Date.now() < Number.parseInt(expiry)) {
             this.fetchLoginUser();
             if (!this.tokenExpiry) {
               // add a commit for expiry?
             }
           }
+        }
         return this.member;
       }
     },
@@ -205,7 +205,7 @@ export const useMemberStore = defineStore('member', {
         this.member.casting_role.length > 0 &&
         this.member.id == castingRole.member_id
       ) {
-        const casting_role = this.member.casting_role;
+        const { casting_role } = this.member;
         const pos = casting_role.findIndex(
           (a: CastingRole) =>
             a.role_id == castingRole.role_id &&

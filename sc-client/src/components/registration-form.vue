@@ -19,7 +19,7 @@
               <q-icon name="email" tabindex="-1" />
             </template>
           </q-input>
-          <div v-if="emailError" class="text-red">{{ emailError }}</div>
+          <span class="text-red" v-if="emailError" >{{ emailError }}</span>
         </div>
         <div class="q-mb-sm">
           <q-input
@@ -121,7 +121,6 @@ const emailError = ref<string | null>(null);
 
 // Functions
 function doRegister() {
-  console.log('Form data before emitting:', formdata.value);
   emit('doRegister', formdata.value);
 }
 
@@ -130,13 +129,15 @@ function getFormData() {
 }
 
 function validateEmail() {
+  console.log("Validate email called");
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   emailError.value = emailPattern.test(formdata.value.email || '')
     ? null
     : 'Invalid email format';
+    console.log('Email Error:', emailError.value);
 }
 
-defineExpose({ getFormData });
+defineExpose({ getFormData, validateEmail, formdata });
 </script>
 
 <style>

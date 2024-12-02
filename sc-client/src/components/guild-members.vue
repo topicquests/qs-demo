@@ -1,9 +1,9 @@
 <template>
-  <q-card id="team-card">
-    <div class="col-3">
+  <q-card id="team-card" class="q-pb-md">
+    <div class="col-3 ">
       <h3 class="text-center">Team</h3>
     </div>
-    <ul class="q-ml-md">
+    <ul >
       <li v-for="member in members" :key="member.id" class="q-ml-lg q-mr-md">
         <div class="row">
           <div class="col-4">

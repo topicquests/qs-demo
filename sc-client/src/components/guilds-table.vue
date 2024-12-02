@@ -2,7 +2,7 @@
   <div>
     <q-card>
       <q-table
-        class="guilds-table"
+        class="guilds-table q-mt-xl"
         :title="title"
         :rows="guildData"
         :columns="columns"
@@ -16,11 +16,28 @@
         <template v-slot:body-cell-info="props">
           <q-td :props="props">
             <div>
-              <q-btn icon="info" dense flat size="sm"
-                ><q-tooltip max-width="25rem"
-                  ><div v-html="props.row.description" class="tooltip"></div>
-                </q-tooltip>
-              </q-btn>
+               <q-btn
+                  v-if="props.row.description"
+                  class="q-ml-xs"
+                  size="sm"
+                  :flat="true"
+                  icon="info"
+                  @click="showDialog = true"
+                />
+                <q-dialog v-model="showDialog" persistent>
+                  <q-card style="max-height: 1000px">
+                    <q-card-section>
+                      <div class="text-h6">Guild Information</div>
+                      <div>{{ props.row.name }}</div>
+                    </q-card-section>
+                    <q-card-section>
+                      <div v-html="props.row.description"></div>
+                    </q-card-section>
+                    <q-card-actions align="right">
+                      <q-btn flat label="Close" color="primary" v-close-popup />
+                    </q-card-actions>
+                  </q-card>
+                </q-dialog>
             </div>
           </q-td>
         </template>
@@ -131,6 +148,7 @@ const extra = GuildsTableProp.extra_columns || [];
 
 // Reactive Variables
 const selectedGuild = ref<GuildRow[]>([]);
+const showDialog = ref(false);
 
 // Columns
 const columns: QTableProps['columns'] = [
@@ -207,37 +225,32 @@ const currentQuest = computed({
   get: () => questStore.getCurrentQuest,
   set: () => {},
 });
-const hasGuildAdminPermission = computed(() => (id) => {
+const hasGuildAdminPermission = computed(() => (id:number) => {
   if (!id) {
     console.warn('Guild ID is undefined or invalid:', id);
     return false;
   }
-
   const guildPermission = baseStore.hasPermission(
     permission_enum.guildAdmin,
     id,
   );
   return guildPermission || false;
 });
-
 const guildData = computed((): Partial<GuildData[]> => {
   return GuildsTableProp.guilds.map((guild: GuildData) => guildRow(guild));
 });
-const selectionChanged = computed(
-  () =>
-    (rowEvent: {
-      rows: readonly any[];
-      keys: readonly any[];
-      added: boolean;
-      evt: Event;
-    }) => {
-      if (rowEvent.added) {
-        guildStore.setCurrentGuild(rowEvent.rows[0].id);
-      } else {
-        guildStore.setCurrentGuild(true);
-      }
-    },
-);
+function selectionChanged(rowEvent: {
+  rows: readonly any[];
+  keys: readonly any[];
+  added: boolean;
+  evt: Event;
+}) {
+  if (rowEvent.added) {
+    guildStore.setCurrentGuild(rowEvent.rows[0].id);
+  } else {
+    guildStore.setCurrentGuild(true);
+  }
+}
 
 // Functions
 function numPlayers(guild: Guild) {
@@ -282,7 +295,7 @@ function lastMoveFull(row: GuildData) {
 // Lifecycle Hooks
 onBeforeMount(async () => {
   if (GuildsTableProp.selectable) {
-    let guild = guildStore.getCurrentGuild;
+    let guild: GuildData = guildStore.getCurrentGuild;
     if (!guild && questStore.getCurrentQuest) {
       const guild_id = guildIfPlaying(questStore.getCurrentQuest.id);
       if (guild_id) {
@@ -298,6 +311,9 @@ onBeforeMount(async () => {
 });
 </script>
 <style>
+q-td {
+  font-size: 30%;
+}
 .guilds-table {
   text-align: center;
   font-size: 1em;
@@ -308,16 +324,20 @@ onBeforeMount(async () => {
   font-size: 11pt;
   padding: 1em;
 }
-.guilds-table thead tr:first-child th:first-child {
-  /* bg color is important for
-th; just specify one */
-  background-color: ivory;
-}
-.guilds-table td:nth-child(1) {
+.guilds-table thead {
+  /* bg color is important for th; just specify one */
+  background-color: rgb(126, 126, 54);
+  }ilds-table td:nth-child(1) {
   max-width: 5px;
 }
 .guilds-table td:nth-child(2) {
   max-width: 300px;
+}
+.guilds-table tbody tr:nth-child(odd) {
+  background-color: #d3cccc; /* Light gray for odd rows */
+}
+.guilds-table tbody tr:nth-child(even) {
+  background-color: #ffffff; /* White for even rows */
 }
 @media only screen and (max-width: 1000px) {
   .guilds-table td:nth-child(2) {

@@ -1,10 +1,10 @@
 <template>
   <div>
     <q-page>
-      <div class="container q-pa-md">
+      <div class="container q-pa-xs">
         <div class="row justify-center text-center">
-          <h1 class="text-h1 q-pt-lg q-pr-sm q-pl-sm">SenseCraft</h1>
-          <h3 class="text-h3 q-pt-lg q-pb-lg">
+          <h1 class="text-h1 q-pt-sm q-pr-sm q-pl-sm q-mb-sm q-mt-sm">SenseCraft</h1>
+          <h3 class="text-h3 q-pb-md q-mt-sm q-mb-sm">
             Where teams co-construct structured conversation
           </h3>
         </div>
@@ -14,35 +14,50 @@
             style="width: 100%; height: auto"
           />
         </q-card>
-        <div class="row wrapper gradient justify-center" style="width: 100%">
-          <q-card class="q-mt-lg q-mb-xl">
-            <div
-              class="row justify-center text-h5 text-center text-bold q-pt-md q-mb-md gt-sm"
-            >
-              Videos to improve your communication skills
-            </div>
-            <div
-              class="row justify-center text-bold text-center q-pt-md q-mb-md lt-md"
-            >
-              Videos to improve your communication skills
-            </div>
-            <div
-              id="Container"
-              style="
-                padding-bottom: 56.25%;
-                position: relative;
-                display: block;
-                width: 100%;
-              "
-            >
-              <iframe
-                width="100%"
-                height="100%"
-                src="https://www.youtube.com/embed/WPF64UXFER0"
-                frameborder="0"
-                allowfullscreen="false"
-                style="position: absolute; top: 0; left: 0"
-              ></iframe>
+        <div class="row gradient justify-center q-pt-lg q-pb-lg-xl" style="width: 100%; height: 550px">
+          <q-card class="q-mt-md q-mb-xl q-pb-xs" style="width: 98%; height: 72%">
+            <div class="row q-gutter-md no-wrap" style="align-items: flex-start;">
+              <!-- Column 1: Description Text -->
+              <div class="col-12 col-md-4">
+                <div class="description-text q-pt-sm q-pb-sm q-pl-md">
+                  SenseCraft is an RPG where teams co-create structured dialogues. Quest creators ask deep questions through quests, and guild members take on roles to build a shared conversation tree. In SenseCraft, players collaborate to shape meaningful conversations. Quests enable high-level inquiries, while guild members assume roles to enrich the shared dialogue tree. Experience SenseCraft, an RPG fostering collaborative discussions. Compete against other guilds in related quests. Join SenseCraft for role-playing and structured conversations.
+                </div>
+              </div>
+              <!-- Column 2: Video -->
+              <div class="col-12 col-md-4 q-mt-md">
+                <div
+                  id="Container"
+                  style="
+                    padding-bottom: 56.25%;
+                    position: relative;
+                    display: block;
+                    width: 100%;
+                  "
+                >
+                <img
+                src="../statics/democratic_leadership_style_discussed.jpg"
+                style="width: 100%; height: 350px"
+                class="q-mt-md"
+              />
+                </div>
+              </div>
+
+              <!-- Column 3: Quest List -->
+              <div class="col-12 col-md-3">
+                <div class="q-pa-xs">
+                  <h4 class="text-h6 text-center q-mt-sm q-mb-sm">Available Quests</h4>
+                  <ul class="q-mt-sm q-mb-sm">
+                    <li
+                      v-for="quest in getFilteredQuests"
+                      :key="quest.id"
+                    >
+                      <q-card class="quest-card q-pa-sm">
+                        <div class="quest-description">{{ quest.name }}</div>
+                      </q-card>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </q-card>
         </div>
@@ -51,13 +66,47 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { onBeforeMount } from 'vue';
 
-onBeforeMount(async () => {});
+
+<script setup lang="ts">
+import { computed, onBeforeMount, ref } from 'vue';
+import { useQuestStore } from 'src/stores/quests';
+import { QuestData } from 'src/types';
+import { quest_status_type } from 'src/enums';
+
+const questStore = useQuestStore();
+
+const getFilteredQuests = computed((): QuestData[] => {
+  return questStore.getQuests.filter((quest) =>
+    quest.status === 'ongoing' || quest.status === 'registration'
+  );
+});
+
+onBeforeMount(async () => {
+  questStore.ensureAllQuests();
+});
 </script>
 
 <style lang="scss" scoped>
+.quest-card {
+  max-height: 200px; /* Adjust based on desired max height */
+  overflow: hidden;  /* Hide overflow if content is too long */
+}
+
+.quest-description {
+  overflow: hidden;      /* Prevents overflow */
+  text-overflow: ellipsis; /* Adds "..." if text is too long */
+  white-space: normal;   /* Ensures text wraps to the next line */
+  word-break: break-word; /* Breaks long words if needed */
+  max-height: 150px;     /* Adjust max height if needed */
+  line-height: 1.4;      /* Adjust line height for readability */
+}
+.description-text {
+  font-size: 1.1rem; /* Adjust the size as needed */
+  font-weight: 400;  /* Normal weight, you can adjust */
+  color: #333;       /* Dark color for readability */
+  line-height: 1.6;  /* Spacing for better readability */
+}
 .h1 {
   font:
     italic 20px Arial,

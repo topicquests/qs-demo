@@ -6,7 +6,10 @@
           <member></member>
         </div>
         <quest-details></quest-details>
-        <quest-actions></quest-actions>
+        <quest-actions
+          :myPlayingGuilds="myPlayingGuilds"
+          :questId="questId">
+        </quest-actions>
         <div class="row justify-center q-mt-lg">
           <router-link
             :to="{
@@ -38,7 +41,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useQuestStore } from '../stores/quests';
 import { useGuildStore } from '../stores/guilds';
 import { useMemberStore } from '../stores/member';
-import { Guild, GuildMembership } from '../types';
+import { GuildData, GuildMembership } from '../types';
 
 // Stores
 const questStore = useQuestStore();
@@ -55,7 +58,7 @@ const mySelectedPlayingGuildId = ref<number | undefined>(undefined);
 const selectedNodeId = ref<number | undefined>(undefined);
 
 // Variables
-let myPlayingGuilds: Guild[] = [];
+let myPlayingGuilds: GuildData[] = [];
 
 // Lifecycle Hooks
 onMounted(async () => {

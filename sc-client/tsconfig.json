@@ -8,7 +8,8 @@
     "baseUrl": ".",
     "esModuleInterop": true,
     "types": ["vite", "quasar", "node"],
-    "lib": ["esnext", "dom"]
+    "lib": ["esnext", "dom"],
+    "sourceMap": true
   },
   "include": [
     "src/**/*.ts",

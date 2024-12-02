@@ -27,7 +27,7 @@ export interface GuildsState {
   fullFetch: boolean;
   fullGuilds: { [key: number]: boolean };
 }
-const questStore = useQuestStore();
+
 const baseState: GuildsState = {
   currentGuild: 0,
   guilds: {},
@@ -63,10 +63,10 @@ export const useGuildStore = defineStore('guild', {
         ),
       );
     },
-    isGuildMember: (state: GuildsState) => (guild_id: number) => {
+    isGuildMember: (state: GuildsState) => (guild_id: number):Partial<GuildMembership> => {
       const memberId = useMemberStore().getUserId;
       return state.guilds[guild_id].guild_membership?.find(
-        (m: GuildMembership) =>
+        (m: Partial<GuildMembership>) =>
           m.member_id == memberId &&
           m.status == registration_status_enum.confirmed,
       );
@@ -98,6 +98,7 @@ export const useGuildStore = defineStore('guild', {
     getGuildsPlayingCurrentQuest: (
       state: GuildsState,
     ): GuildData[] | undefined => {
+      const questStore = useQuestStore();
       const quest: QuestData | undefined = questStore.getCurrentQuest;
       if (!quest) return [];
       const guildId: (number | null)[] | undefined = quest.game_play?.map(
@@ -165,6 +166,7 @@ export const useGuildStore = defineStore('guild', {
       quest_id: number;
       full?: boolean;
     }) {
+      const questStore = useQuestStore();
       await questStore.ensureQuest({
         quest_id,
         full: true,
@@ -317,7 +319,7 @@ export const useGuildStore = defineStore('guild', {
     },
     async updateGuild(data: Partial<Guild>) {
       data = filterKeys(data, guildPatchKeys);
-      const res: AxiosResponse<GuildData[]> = await api.patch('guilds', data, {
+      const res: AxiosResponse<Partial<GuildData[]>> = await api.patch('guilds', data, {
         params: { id: `eq.${data.id}` },
       });
 

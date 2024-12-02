@@ -3,7 +3,7 @@
     <div v-if="activeQuests && activeQuests.length > 0">
       <div v-for="quest in activeQuests" :key="quest.id">
         <q-radio
-          v-model="questStore.currentQuest"
+          v-model="quest_id"
           color="black"
           :val="quest.id"
           :label="quest.name"
@@ -60,35 +60,46 @@
     <q-dialog v-model="prompt" persistent>
       <member-game-registration
         :guildId="ActiveQuestsProps.guildId!"
-        :questId="ActiveQuestsProps.questId"
+        :questId="quest_id"
       />
     </q-dialog>
   </div>
-</template>
+</template>085988
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useQuestStore } from '../stores/quests';
+import { watch, ref } from 'vue';
 import { useMemberStore } from '../stores/member';
 import { useGuildStore } from '../stores/guilds';
-import { Quest } from '../types';
+import { QuestData } from '../types';
 import memberGameRegistration from '../components/member_game_registration.vue';
 import { useRouter } from 'vue-router';
+import { useQuestStore } from 'src/stores/quests';
 
 // Props
 const ActiveQuestsProps = defineProps<{
   isMember: boolean;
-  activeQuests: Quest;
+  activeQuests: QuestData[];
   questId?: number;
   guildId?: number;
 }>();
-const questStore = useQuestStore();
+
+// Stores
 const memberStore = useMemberStore();
 const guildStore = useGuildStore();
+const questStore = useQuestStore();
 const router = useRouter();
 
 const prompt = ref(false);
+const quest_id = ref(null);
+
+watch(quest_id, (newVal, oldVal) => {
+  questStore.setCurrentQuest(newVal);
+  console.log('quest_id changed from', oldVal, 'to', newVal);
+
+})
+
 </script>
+
 
 <style scoped>
 /* Add your styles here if needed */

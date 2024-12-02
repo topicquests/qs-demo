@@ -12,7 +12,6 @@
         </q-select>
       </div>
     </div>
-
     <q-table
       class="quest-table"
       :title="title"
@@ -23,11 +22,28 @@
       <template v-slot:body-cell-info="props">
         <q-td :props="props">
           <div>
-            <q-btn icon="info" dense flat size="sm"
-              ><q-tooltip max-width="25rem"
-                ><div v-html="props.row.description" class="tooltip"></div>
-              </q-tooltip>
-            </q-btn>
+            <q-btn
+              v-if="props.row.description"
+              class="q-ml-xs"
+              size="sm"
+              :flat="true"
+              icon="info"
+              @click="showDialog = true"
+            />
+            <q-dialog v-model="showDialog" persistent>
+              <q-card style="max-height: 1000px">
+                <q-card-section>
+                  <div class="text-h6">Quest Information</div>
+                  <div>{{ props.row.name }}</div>
+                </q-card-section>
+                <q-card-section>
+                  <div v-html="props.row.description"></div>
+                </q-card-section>
+                <q-card-actions align="right">
+                  <q-btn flat label="Close" color="primary" v-close-popup />
+                </q-card-actions>
+              </q-card>
+            </q-dialog>
           </div>
         </q-td>
       </template>
@@ -129,7 +145,6 @@ import { DateTime } from 'luxon';
 import { useQuestStore } from '../stores/quests';
 import { useMemberStore } from '../stores/member';
 import { useBaseStore } from '../stores/baseStore';
-import type { QTable } from 'quasar';
 import { QTableProps } from 'quasar';
 import { permission_enum, quest_status_type } from '../enums';
 import { GuildMembership, Quest, QuestData } from '../types';
@@ -229,6 +244,7 @@ const baseStore = useBaseStore();
 // Reactive Variables
 const questStatus = ref<quest_status_type | string>();
 const questStatusOptions = ref<quest_status_type[]>([]);
+const showDialog = ref(false)
 
 // Computed Properties
 const getFilteredQuests = computed((): QuestData[] => {
@@ -311,18 +327,26 @@ q-td {
   padding: 1em;
 }
 
-.quest-table thead tr:first-child th:first-child {
+.quest-table thead  {
   /* bg color is important for th; just specify one */
-  background-color: ivory;
+  background-color: rgb(126, 126, 54);
 }
-
 .quest-table td:nth-child(1) {
   max-width: 5px;
 }
+.quest-table tbody tr:nth-child(odd) {
+  background-color: #d3cccc; /* Light gray for odd rows */
+}
+.quest-table tbody tr:nth-child(even) {
+  background-color: #ffffff; /* White for even rows */
+}
+
+
 
 .quest-table td:nth-child(2) {
   max-width: 300px;
 }
+
 
 @media only screen and (max-width: 1000px) {
   .quest-table td:nth-child(2) {

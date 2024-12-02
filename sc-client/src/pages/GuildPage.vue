@@ -129,7 +129,7 @@ import {
   quest_status_enum,
   permission_enum,
 } from '../enums';
-import { Quest, GamePlay, Casting, Role, PublicMember } from '../types';
+import { Quest, GamePlay, Casting, Role, PublicMember, QuestData } from '../types';
 import { computed, ref, watch } from 'vue';
 import castingRoleEdit from '../components/casting_role_edit.vue';
 import guildMembers from '../components/guild-members.vue';
@@ -170,7 +170,7 @@ const memberPlaysQuestInThisGuild = ref(false);
 //Non Reactive Variables
 let guildGamePlays: GamePlay[] = [];
 let pastQuests: Quest[] = [];
-const activeQuests = ref<Quest[]>([]);
+const activeQuests = ref<QuestData[]>([]);
 
 //Table Columns
 const columns: QTableProps['columns'] = [
@@ -259,7 +259,7 @@ watch(
 );
 watch(
   member,
-  (newVal, oldVal) => {
+  (newVal) => {
     if (newVal) {
       getCastingRoles();
     }
@@ -352,7 +352,7 @@ async function initializeStage2() {
       playQuestIds.includes(q.id),
   );
   activeQuests.value = questStore.getQuests.filter(
-    (q: Quest) =>
+    (q: QuestData) =>
       (q.status == quest_status_enum.ongoing ||
         q.status == quest_status_enum.paused ||
         q.status == quest_status_enum.registration) &&
@@ -374,10 +374,6 @@ async function initializeQuest() {
       !guildGamePlays.find((gp: GamePlay) => gp.quest_id == quest_id)
     ) {
       quest_id = undefined;
-    }
-    if (quest_id) {
-      const gamePlay = guildGamePlays[0];
-      await questStore.setCurrentQuest(gamePlay.quest_id);
     }
     const castingList = currentQuest.value.casting;
     if (!castingList) {

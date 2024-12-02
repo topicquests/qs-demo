@@ -173,7 +173,6 @@
     </q-tree>
   </div>
 </template>
-
 <script setup lang="ts">
 import {
   Casting,
@@ -203,7 +202,20 @@ import { useQuestStore } from '../stores/quests';
 import { computed, nextTick, onBeforeMount, ref, shallowRef, watch } from 'vue';
 import { useReadStatusStore } from '../stores/readStatus';
 import { useRoleStore } from '../stores/role';
-
+// Quasar
+const $q = useQuasar();
+// Stores
+const channelStore = useChannelStore();
+const conversationStore = useConversationStore();
+const guildStore = useGuildStore();
+const questStore = useQuestStore();
+const readStatusStore = useReadStatusStore();
+const membersStore = useMembersStore();
+const roleStore = useRoleStore();
+// Emits
+const emit = defineEmits<{
+  selectionChanged: [id: number];
+}>();
 // Props
 const NodeTreeProps = defineProps<{
   currentQuestId: number | undefined;
@@ -214,24 +226,6 @@ const NodeTreeProps = defineProps<{
   hideDescription?: boolean;
   initialSelectedNodeId?: number | undefined;
 }>();
-
-// Stores
-const channelStore = useChannelStore();
-const conversationStore = useConversationStore();
-const guildStore = useGuildStore();
-const questStore = useQuestStore();
-const readStatusStore = useReadStatusStore();
-const membersStore = useMembersStore();
-const roleStore = useRoleStore();
-
-// Quasar
-const $q = useQuasar();
-
-// Emits
-const emit = defineEmits<{
-  selectionChanged: [id: number];
-}>();
-
 // Reactive Variables
 const showFocusNeighbourhood = ref(false);
 const showDraft = ref(true);
@@ -245,9 +239,16 @@ const addingChildToNodeId = ref<number | null>(null);
 const allowChangeMeta = ref(false);
 const newNode = ref<Partial<ConversationNode>>({});
 const tree = ref<QTree>();
+  const form = ref<InstanceType<typeof NodeForm> | null>(null);
 const nodeForms = shallowRef<
   Record<string, InstanceType<typeof NodeForm> | null>
 >({});
+// Non Reactive Variables
+let baseNodePubStateConstraints: publication_state_type[];
+let listenerInstalled = false;
+let selectedIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
+let childIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
+// Computed Properties
 const nodeFormRef = computed(
   () =>
     (nodeId: string | number) =>
@@ -255,19 +256,11 @@ const nodeFormRef = computed(
       nodeForms.value[`editForm_${nodeId}`] = el;
     },
 );
-const form = ref<InstanceType<typeof NodeForm> | null>(null);
-
-// Non Reactive Variables
-let baseNodePubStateConstraints: publication_state_type[];
-let listenerInstalled = false;
-let selectedIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
-let childIbisTypes: ibis_node_type_type[] = ibis_node_type_list;
-
-// Computed Properties
 const searchFilter_ = computed(() => {
   return searchFilter.value + '_';
 });
 const getMemberHandle = computed(() => (id: number) => {
+  console.log("RFan getMemberHandle")
   const member = membersStore.getMemberById(id) as PublicMember;
   if (member) {
     if (questStore.getCurrentQuest && !NodeTreeProps.channelId) {
@@ -321,19 +314,7 @@ const getNodesTree = () => {
 
 const nodesTree = ref<Partial<QTreeNode[]> | undefined | null>(getNodesTree());
 
-function checkIfExpanded(nodeId: QTreeNode): boolean {
-  const qtree = tree.value;
-  if (qtree) {
-    // For example, you can check if a node is expanded
-    const isExpanded = qtree.isExpanded(nodeId);
-    if (isExpanded) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-  return false;
-}
+
 const canEdit = computed(() => (nodeId: number): boolean => {
   const quest = questStore.getQuestById(NodeTreeProps.currentQuestId!);
   if (quest && (!quest.is_playing || quest.status == 'finished')) return false;
@@ -357,6 +338,18 @@ watch(
 );
 
 // Functions
+function checkIfExpanded(nodeId: QTreeNode): boolean {
+  const qtree = tree.value;
+  if (qtree) {
+      const isExpanded = qtree.isExpanded(nodeId);
+    if (isExpanded) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  return false;
+}
 function calcPublicationConstraints(node: Partial<ConversationNode>) {
   if (!NodeTreeProps.currentGuildId) {
     baseNodePubStateConstraints = [
@@ -509,7 +502,7 @@ function cancel() {
   addingChildToNodeId.value = null;
   newNode.value = {};
 }
-async function confirmAddChild(node: Partial<ConversationNode>) {
+async function confirmAddChild(node: ConversationNode) {
   try {
     if (NodeTreeProps.channelId) {
       await channelStore.createChannelNode(node);
@@ -738,7 +731,6 @@ async function ensureData() {
     );
   await Promise.all(promises);
 }
-
 // Lifecycle Hooks
 onBeforeMount(async () => {
   if (listenerInstalled) document.removeEventListener('keyup', keyResponder);
@@ -833,3 +825,4 @@ onBeforeMount(async () => {
   color: grey;
 }
 </style>
+
