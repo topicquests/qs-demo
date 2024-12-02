@@ -23,27 +23,27 @@
         <q-td :props="props">
           <div>
             <q-btn
-              v-if="props.row.description"
-              class="q-ml-xs"
-              size="sm"
-              :flat="true"
-              icon="info"
-              @click="showDialog = true"
-            />
-            <q-dialog v-model="showDialog" persistent>
-              <q-card style="max-height: 1000px">
-                <q-card-section>
-                  <div class="text-h6">Quest Information</div>
-                  <div>{{ props.row.name }}</div>
-                </q-card-section>
-                <q-card-section>
-                  <div v-html="props.row.description"></div>
-                </q-card-section>
-                <q-card-actions align="right">
-                  <q-btn flat label="Close" color="primary" v-close-popup />
-                </q-card-actions>
-              </q-card>
-            </q-dialog>
+            v-if="props.row.description"
+            class="q-ml-xs"
+            size="sm"
+            :flat="true"
+            icon="info"
+            @click="openDialog(props.row)"
+          />
+          <q-dialog v-model="showDialog" persistent>
+            <q-card style="max-height: 1000px">
+              <q-card-section>
+                <div class="text-h6">Quest Information</div>
+                <div>{{ selectedQuest?.name }}</div>
+              </q-card-section>
+              <q-card-section>
+                <div v-html="selectedQuest?.description"></div>
+              </q-card-section>
+              <q-card-actions align="right">
+                <q-btn flat label="Close" color="primary" @click="closeDialog" />
+              </q-card-actions>
+            </q-card>
+          </q-dialog>
           </div>
         </q-td>
       </template>
@@ -244,7 +244,8 @@ const baseStore = useBaseStore();
 // Reactive Variables
 const questStatus = ref<quest_status_type | string>();
 const questStatusOptions = ref<quest_status_type[]>([]);
-const showDialog = ref(false)
+const selectedQuest = ref<QuestData | null>(null);
+const showDialog = ref(false);
 
 // Computed Properties
 const getFilteredQuests = computed((): QuestData[] => {
@@ -271,7 +272,17 @@ const canAdminGuilds = computed((): boolean => {
   );
 });
 
-// Functions
+//Functions
+function openDialog(row: QuestData) {
+  selectedQuest.value = row;
+  showDialog.value = true;
+}
+
+function closeDialog() {
+  showDialog.value = false;
+  selectedQuest.value = null;
+}
+
 function refInterval(row: QuestData) {
   const start: number = DateTime.fromISO(row.start).millisecond;
   const end: number = DateTime.fromISO(row.end).millisecond;
