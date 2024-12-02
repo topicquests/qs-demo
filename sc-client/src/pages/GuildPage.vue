@@ -375,10 +375,6 @@ async function initializeQuest() {
     ) {
       quest_id = undefined;
     }
-    if (quest_id) {
-      const gamePlay = guildGamePlays[0];
-      await questStore.setCurrentQuest(gamePlay.quest_id);
-    }
     const castingList = currentQuest.value.casting;
     if (!castingList) {
       console.error('currentQuest.value.casting is undefined');

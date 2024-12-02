@@ -67,12 +67,13 @@
 </template>085988
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { watch, ref } from 'vue';
 import { useMemberStore } from '../stores/member';
 import { useGuildStore } from '../stores/guilds';
-import { Quest, QuestData } from '../types';
+import { QuestData } from '../types';
 import memberGameRegistration from '../components/member_game_registration.vue';
 import { useRouter } from 'vue-router';
+import { useQuestStore } from 'src/stores/quests';
 
 // Props
 const ActiveQuestsProps = defineProps<{
@@ -85,13 +86,18 @@ const ActiveQuestsProps = defineProps<{
 // Stores
 const memberStore = useMemberStore();
 const guildStore = useGuildStore();
+const questStore = useQuestStore();
 const router = useRouter();
 
 const prompt = ref(false);
-const quest_id = ref(ActiveQuestsProps.questId); // Use this ref for mutable quest ID state
+const quest_id = ref(null);
 
-// If you need a computed version, you can name it differently
-const computedQuestId = computed(() => quest_id.value);
+watch(quest_id, (newVal, oldVal) => {
+  questStore.setCurrentQuest(newVal);
+  console.log('quest_id changed from', oldVal, 'to', newVal);
+
+})
+
 </script>
 
 
