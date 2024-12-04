@@ -212,7 +212,8 @@
     </q-page-container>
     <q-footer class="footer bg-secondary">
       <p id="Pfooter">
-        Sensecraft — © <a href="http://topicquests.org">TopicQuests</a> 2022.
+        Sensecraft — © <a href="http://topicquests.org">TopicQuests</a> and
+        <a href="https://www.conversence.com">Conversence</a> 2022-2024.
         <a href="https://github.com/topicquests/sensecraft">Open Source</a>
       </p>
     </q-footer>
