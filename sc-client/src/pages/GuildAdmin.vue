@@ -173,7 +173,7 @@
 
             <guild-card
               class="guilds-card"
-              :currentGuild="{ ...guild }"
+              :currentGuild=" currentGuild "
               :showDescription="false"
             ></guild-card>
           </div>
@@ -330,6 +330,10 @@ let guildId: number | undefined = undefined;
 let confirmedPlayQuestId: number[] | GamePlay[] = [];
 
 // Computed Properties
+const currentGuild = computed({
+  get: () => guildStore.getCurrentGuild!,
+  set: (value) => guildStore.setCurrentGuild(value.id),
+});
 const member = computed(() => memberStore.member);
 const quest = computed(() => questStore.getQuests);
 const description = computed<string>({
@@ -340,10 +344,7 @@ const description = computed<string>({
     currentGuild.value.description = value;
   },
 });
-const currentGuild = computed({
-  get: () => guildStore.getCurrentGuild!,
-  set: (value) => guildStore.setCurrentGuild(value.id),
-});
+
 const activeQuests = computed((): Partial<QuestData[]> => {
   const active_quests = questStore.getQuests.filter((q: QuestData) => {
     if (typeof q.id === 'number')

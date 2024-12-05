@@ -7,7 +7,7 @@
       <span class="q-ml-xl" style="font-weight: bold">Type of Guild</span>
       <div class="row justify-start">
         <q-option-group
-          v-if="guild.public"
+          v-if="guild"
           v-model="guild.public"
           :options="public_private_bool"
           color="primary"
@@ -27,7 +27,7 @@
         <section class="q-pt-lg">
           <span class="q-pl-xl" style="font-weight: bold">Invitation</span>
           <q-option-group
-            v-if="guild.open_for_applications"
+            v-if="guild"
             v-model="guild.open_for_applications"
             :options="invitation"
             color="primary"
