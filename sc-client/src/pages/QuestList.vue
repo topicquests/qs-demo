@@ -14,7 +14,7 @@
           <div class="col-4 q-pl-md q-pb-sm" style="width: 100%">
             <q-btn
               color="primary"
-              v-if="memberStore.member"
+              v-if="checkForPermission(permission_enum.createQuest) || checkForPermission(permission_enum.superadmin)"
               label="New Quest"
               @click="
                 router.push({
@@ -48,21 +48,35 @@ import scoreboard from '../components/score-board.vue';
 import questTable from '../components/quest-table.vue';
 
 import { waitUserLoaded } from '../app-access';
-import { useMemberStore } from '../stores/member';
+import { useBaseStore } from 'src/stores/baseStore';
 import { useQuestStore } from '../stores/quests';
 import { useGuildStore } from '../stores/guilds';
+import { permission_enum } from '../enums';
 import { onBeforeMount, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import memberHandle from '../components/member-handle.vue';
 
+
 // Stores
-const memberStore = useMemberStore();
 const questStore = useQuestStore();
 const guildStore = useGuildStore();
+const baseStore = useBaseStore();
 const router = useRouter();
 
 // Reactive Variables
 const ready = ref(false);
+
+// Non Reactive Vasriables
+let hasPermission: boolean = false;
+
+// Functions
+function checkForPermission(permission_enum: permission_enum): boolean {
+  hasPermission = baseStore.hasPermission(permission_enum);
+  if (hasPermission == true) {
+    return true;
+  }
+  return false;
+}
 
 // Lifecycle Hooks
 onBeforeMount(async () => {

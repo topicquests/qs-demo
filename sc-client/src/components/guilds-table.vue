@@ -22,19 +22,19 @@
                   size="sm"
                   :flat="true"
                   icon="info"
-                  @click="showDialog = true"
+                  @click="openDialog(props.row)"
                 />
                 <q-dialog v-model="showDialog" persistent>
-                  <q-card style="max-height: 1000px">
+                  <q-card class="guild-info-dialog">
                     <q-card-section>
-                      <div class="text-h6">Guild Information</div>
-                      <div>{{ props.row.name }}</div>
+                      <div class="dialog-title">Guild Information</div>
+                      <div class="guild-name">{{ selectedGuildRow?.name }}</div>
                     </q-card-section>
                     <q-card-section>
-                      <div v-html="props.row.description"></div>
+                      <div class="guild-description" v-html="selectedGuildRow?.description"></div>
                     </q-card-section>
                     <q-card-actions align="right">
-                      <q-btn flat label="Close" color="primary" v-close-popup />
+                      <q-btn flat label="Close" color="primary" @click="closeDialog" />
                     </q-card-actions>
                   </q-card>
                 </q-dialog>
@@ -148,6 +148,7 @@ const extra = GuildsTableProp.extra_columns || [];
 
 // Reactive Variables
 const selectedGuild = ref<GuildRow[]>([]);
+  const selectedGuildRow = ref<GuildData | null>(null);
 const showDialog = ref(false);
 
 // Columns
@@ -253,6 +254,14 @@ function selectionChanged(rowEvent: {
 }
 
 // Functions
+function openDialog(row: GuildData) {
+  selectedGuildRow.value = row;
+  showDialog.value = true;
+}
+function closeDialog() {
+  showDialog.value = false;
+  selectedGuildRow.value = null;
+}
 function numPlayers(guild: Guild) {
   if (GuildsTableProp.showPlayers) {
     const quest = questStore.getCurrentQuest;
@@ -311,6 +320,43 @@ onBeforeMount(async () => {
 });
 </script>
 <style>
+.guild-info-dialog {
+  max-width: 600px; /* Adjust width */
+  max-height: 500px; /* Adjust height */
+  overflow-y: auto; /* Enable scrolling if content exceeds height */
+  border-radius: 12px;
+  background-color: #f9f9f9; /* Light background */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+.dialog-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2c3e50; /* Dark text color */
+  margin-bottom: 10px;
+}
+
+.guild-name {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #34495e;
+}
+
+.guild-description {
+  font-size: 1rem;
+  color: #606060;
+  line-height: 1.5;
+  white-space: pre-wrap; /* Preserve whitespace for formatted descriptions */
+}
+
+.q-btn {
+  font-size: 0.9rem;
+}
+
+.q-card-actions {
+  padding: 10px;
+  border-top: 1px solid #e0e0e0;
+}
 q-td {
   font-size: 30%;
 }
