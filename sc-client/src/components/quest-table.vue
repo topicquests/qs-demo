@@ -31,13 +31,13 @@
             @click="openDialog(props.row)"
           />
           <q-dialog v-model="showDialog" persistent>
-            <q-card style="max-height: 1000px">
+            <q-card class="quest-info-dialog">
               <q-card-section>
-                <div class="text-h6">Quest Information</div>
-                <div>{{ selectedQuest?.name }}</div>
+                <div class="dialog-title">Quest Information</div>
+                <div class="quest-name">{{ selectedQuest?.name }}</div>
               </q-card-section>
               <q-card-section>
-                <div v-html="selectedQuest?.description"></div>
+                <div class="quest-description" v-html="selectedQuest?.description"></div>
               </q-card-section>
               <q-card-actions align="right">
                 <q-btn flat label="Close" color="primary" @click="closeDialog" />
@@ -315,6 +315,34 @@ onBeforeMount(async () => {
 </script>
 
 <style>
+.dialog-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #d35400; /* Warm color for the title */
+  margin-bottom: 10px;
+}
+
+.quest-name {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #e67e22; /* Accent color for quest name */
+}
+
+.quest-description {
+  font-size: 1rem;
+  color: #5d4037; /* Rich brown for descriptive text */
+  line-height: 1.5;
+  white-space: pre-wrap; /* Preserve formatting for quest descriptions */
+}
+
+.q-btn {
+  font-size: 0.9rem;
+}
+
+.q-card-actions {
+  padding: 10px;
+  border-top: 1px solid #e0e0e0; /* Separator for actions */
+}
 q-td {
   font-size: 30%;
 }

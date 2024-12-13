@@ -1,62 +1,59 @@
 <template>
   <div>
     <q-page>
-      <div class="container q-pa-xs">
-        <div class="row justify-center text-center">
-          <h1 class="text-h1 q-pt-sm q-pr-sm q-pl-sm q-mb-sm q-mt-sm">SenseCraft</h1>
-          <h3 class="text-h3 q-pb-md q-mt-sm q-mb-sm">
+      <!-- Content Wrapper to control width -->
+      <div class="content-wrapper gradient">
+        <!-- Header Section -->
+        <div class="row justify-center text-center header">
+          <h1 class="title text-h1">SenseCraft</h1>
+          <h3 class="subtitle text-h3">
             Where teams co-construct structured conversation
           </h3>
         </div>
-        <q-card class="justify-center" style="width: 100%">
+
+        <!-- Image Section -->
+        <q-card class="image-card">
           <img
             src="../statics/earthrise2.png"
-            style="width: 100%; height: auto"
+            alt="Earthrise"
+            class="responsive-image"
           />
         </q-card>
-        <div class="row gradient justify-center q-pt-lg q-pb-lg-xl" style="width: 100%; height: 550px">
-          <q-card class="q-mt-md q-mb-xl q-pb-xs" style="width: 98%; height: 72%">
-            <div class="row q-gutter-md no-wrap" style="align-items: flex-start;">
+
+        <!-- Main Section -->
+        <div class="row gradient justify-center q-pt-lg q-pb-lg">
+          <q-card class="main-card">
+            <div class="row q-gutter-md no-wrap content-container">
               <!-- Column 1: Description Text -->
               <div class="col-12 col-md-4">
-                <div class="description-text q-pt-sm q-pb-sm q-pl-md">
-                  SenseCraft is an RPG where teams co-create structured dialogues. Quest creators ask deep questions through quests, and guild members take on roles to build a shared conversation tree. In SenseCraft, players collaborate to shape meaningful conversations. Quests enable high-level inquiries, while guild members assume roles to enrich the shared dialogue tree. Experience SenseCraft, an RPG fostering collaborative discussions. Compete against other guilds in related quests. Join SenseCraft for role-playing and structured conversations.
+                <div class="description-text">
+                  SenseCraft is an RPG where teams co-create structured dialogues. Quest creators ask deep questions through quests, and guild members take on roles to build a shared conversation tree. Players collaborate to shape meaningful conversations, compete in quests, and foster collaborative discussions. Join SenseCraft for structured conversations and role-playing.
                 </div>
               </div>
-              <!-- Column 2: Video -->
-              <div class="col-12 col-md-4 q-mt-md">
-                <div
-                  id="Container"
-                  style="
-                    padding-bottom: 56.25%;
-                    position: relative;
-                    display: block;
-                    width: 100%;
-                  "
-                >
+
+              <!-- Column 2: Image -->
+              <div class="col-12 col-md-4">
                 <img
-                src="../statics/democratic_leadership_style_discussed.jpg"
-                style="width: 100%; height: 350px"
-                class="q-mt-md"
-              />
-                </div>
+                  src="../statics/democratic_leadership_style_discussed.jpg"
+                  alt="Leadership Discussion"
+                  class="content-image"
+                />
               </div>
 
               <!-- Column 3: Quest List -->
               <div class="col-12 col-md-3">
-                <div class="q-pa-xs">
-                  <h4 class="text-h6 text-center q-mt-sm q-mb-sm">Available Quests</h4>
-                  <ul class="q-mt-sm q-mb-sm">
-                    <li
-                      v-for="quest in getFilteredQuests"
-                      :key="quest.id"
-                    >
-                      <q-card class="quest-card q-pa-sm">
-                        <div class="quest-description">{{ quest.name }}</div>
-                      </q-card>
-                    </li>
-                  </ul>
-                </div>
+                <q-card class="available-quests-card">
+                  <div class="q-pa-xs">
+                    <h4 class="quest-title">Available Quests</h4>
+                    <ul>
+                      <li v-for="quest in getFilteredQuests" :key="quest.id">
+                        <q-card class="quest-card">
+                          <div class="quest-description">{{ quest.name }}</div>
+                        </q-card>
+                      </li>
+                    </ul>
+                  </div>
+                </q-card>
               </div>
             </div>
           </q-card>
@@ -68,11 +65,12 @@
 
 
 
+
+
 <script setup lang="ts">
 import { computed, onBeforeMount, ref } from 'vue';
 import { useQuestStore } from 'src/stores/quests';
 import { QuestData } from 'src/types';
-import { quest_status_type } from 'src/enums';
 
 const questStore = useQuestStore();
 
@@ -87,71 +85,177 @@ onBeforeMount(async () => {
 });
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
+body {
+  background-color: #485c12; /* Replace this with your desired color */
+}
+
+/* Content Wrapper */
+.content-wrapper {
+  width: 80%; /* Takes up 80% of the width */
+   max-width: 1800px;  /*Optional: Add a max width to avoid excessive stretching on large screens */
+  margin: 0 auto; /* Center the content horizontally */
+}
+
+/* General Styles */
+.container {
+  max-width: 100%;
+}
+
+/* Header Section */
+.header {
+  display: flex; /* Enable Flexbox */
+  flex-direction: column; /* Stack title and subtitle vertically */
+  align-items: center; /* Center items horizontally */
+  justify-content: center;
+}
+
+.title {
+  color: #2c3e50;
+  font-weight: bold;
+  font-size: 3.5rem;
+  margin-top:.2em;
+  margin-bottom: .2em;
+  white-space: nowrap;
+}
+
+.subtitle {
+  color: #34495e;
+  font-style: italic;
+  margin-top:.2em;
+  margin-bottom: .2em;
+  font-size: 1.8rem;
+}
+
+/* Image Section */
+.image-card {
+  margin: 20px auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.responsive-image {
+  width: 100%;
+  height: auto;
+}
+
+/* Gradient Section */
+.gradient {
+  background: linear-gradient(90deg, rgba(0, 212, 255, 1) 35%, rgba(9, 9, 121, 1) 100%);
+  width: 100%;
+  padding: 30px 0;
+}
+
+/* Main Card */
+.main-card {
+  width: 100%;
+  padding: 20px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.content-container {
+  align-items: flex-start;
+}
+
+/* Column 1: Description Text */
+.description-text {
+  font-size: 1rem;
+  color: #2c3e50;
+  line-height: 1.6;
+  padding: 10px;
+}
+
+/* Column 2: Image */
+.content-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Column 3: Available Quests */
+.available-quests-card {
+  padding: 8px;
+  border-radius: 12px;
+  background-color: #fdf9e6;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.quest-title {
+  text-align: center;
+  color: #d35400;
+  font-weight: bold;
+  font-size: 22px;
+  margin-bottom: .2em;
+  margin-top: .2em;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
 .quest-card {
-  max-height: 200px; /* Adjust based on desired max height */
-  overflow: hidden;  /* Hide overflow if content is too long */
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+  padding: 2px;
 }
 
 .quest-description {
-  overflow: hidden;      /* Prevents overflow */
-  text-overflow: ellipsis; /* Adds "..." if text is too long */
-  white-space: normal;   /* Ensures text wraps to the next line */
-  word-break: break-word; /* Breaks long words if needed */
-  max-height: 150px;     /* Adjust max height if needed */
-  line-height: 1.4;      /* Adjust line height for readability */
-}
-.description-text {
-  font-size: 1.1rem; /* Adjust the size as needed */
-  font-weight: 400;  /* Normal weight, you can adjust */
-  color: #333;       /* Dark color for readability */
-  line-height: 1.6;  /* Spacing for better readability */
-}
-.h1 {
-  font:
-    italic 20px Arial,
-    sans-serif;
-}
-.wrapper {
-  display: flex;
-}
-.signin-card {
-  align-items: flex-end;
-  padding-left: 2em;
-  padding-top: 2em;
-}
-.earth-image {
-  align-items: center;
-}
-.youtube {
-  justify-content: center;
-  width: 50%;
-  height: 50%;
-}
-.gradient {
-  background: rgb(2, 0, 36);
-  background: linear-gradient(
-    90deg,
-    rgba(0, 212, 255, 1) 35%,
-
-    rgba(9, 9, 121, 1) 100%
-  );
-  height: 100%;
+  text-align: center;
+  color: #34495e;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
-video.youtube {
-  width: 90%;
-  height: auto;
-}
-#scoreboard {
-  width: 900px;
-  border: 1px solid blue;
-}
+/* Responsive Styles */
 @media only screen and (max-width: 600px) {
-  h1 {
-    font:
-      italic 46px Arial,
-      sans-serif;
+  .content-wrapper {
+    width: 90%; /* Slightly reduce width on small screens */
+  }
+
+  .description-text {
+    font-size: 0.9rem;
+  }
+
+  .quest-title {
+    font-size: 1rem;
+  }
+
+  .quest-card {
+    padding: 6px;
+  }
+  @media only screen and (max-width: 768px) {
+    /* Adjust content-container for column layout */
+    .content-container {
+      flex-direction: column; /* Stack items vertically */
+      align-items: center; /* Center items horizontally */
+    }
+
+    /* Adjust child columns to occupy full width */
+    .col-12 {
+      width: 100%; /* Make all columns occupy the full width */
+      margin-bottom: 20px; /* Add spacing between sections */
+    }
+
+    .content-image {
+      max-width: 80%; /* Optional: Restrict image size on smaller screens */
+      margin: 0 auto; /* Center the image horizontally */
+    }
+
+    .available-quests-card {
+      width: 90%; /* Optional: Restrict card size for better spacing */
+      margin: 0 auto; /* Center the card horizontally */
+    }
   }
 }
 </style>
+
+
