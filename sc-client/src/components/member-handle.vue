@@ -27,5 +27,6 @@ onBeforeMount(async () => {
   text-align: right;
   font-size: 1.2em;
   font-family: Arial, Helvetica, sans-serif;
+  color: red;
 }
 </style>

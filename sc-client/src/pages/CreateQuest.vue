@@ -1,5 +1,5 @@
 <template>
-  <q-page class="bg-secondary">
+  <q-page class="bg-secondary create-quest-page">
     <div class="row justify-center">
       <q-card class="create-quest-card q-mt-md q-pa-md">
         <div>
@@ -87,11 +87,21 @@ onBeforeMount(async () => {
 </script>
 
 <style>
+.create-quest-page {
+  background: url('../statics/images/questBackgroundImage.jpg') no-repeat center center fixed !important;
+  background-size: cover;
+  min-height: 100vh;
+  padding: 0rem;
+  box-sizing: border-box;
+}
 .create-quest-card {
   width: 75%;
+  background-color:transparent;
 }
+
 .quest-card-1 {
   width: 60%;
+  background-color: transparent;
 }
 .details {
   max-width: 960px;
@@ -107,16 +117,19 @@ onBeforeMount(async () => {
 @media only screen and (max-width: 1300px) {
   .create-quest-card {
     width: 80%;
+    background-color: transparent;
   }
 }
 @media only screen and (max-width: 800px) {
   .create-quest-card {
     width: 98%;
+    background-color: transparent;
   }
 }
 @media only screen and (max-width: 1200px) {
   .quest-card-1 {
     width: 98%;
+    background-color: transparent;
   }
 }
 

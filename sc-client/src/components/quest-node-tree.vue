@@ -30,7 +30,7 @@ const selectionChanged = (selectedNodeId: number) => {
   router.push({
     name: selectedNodeId ? 'quest_page_node' : 'quest_page',
     params: {
-      quest_id: String(questNodeTreeProps.questId.value),
+      quest_id: String(questNodeTreeProps.questId),
       node_id: selectedNodeId
         ? String(questNodeTreeProps.selectedNodeId)
         : undefined,

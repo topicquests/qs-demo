@@ -207,7 +207,7 @@ const $q = useQuasar();
 
 async function doUpdateServerData() {
   try {
-    await serverDataStore.updateServerData({ data: serverData });
+    await serverDataStore.updateServerData(serverData.value );
     $q.notify({ type: 'positive', message: 'Server data updated' });
   } catch (err) {
     $q.notify({
@@ -236,23 +236,65 @@ async function doResetDefaultAll() {
 </script>
 <style>
 #card {
-  border-radius: 10px;
-}
-input[type='text'] {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 14px;
-}
-input[type='textaerea'] {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 14px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+  margin: auto;
+  max-width: 800px;
 }
 
-input[type='password'] {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 14px;
+.q-card-section {
+  padding: 16px;
 }
-input[type='url'] {
+
+.q-input {
+  border: 1px solid #ccc;
+  border-radius: 8px;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.q-input .q-field__control {
+  min-height: 36px;
+}
+
+.q-checkbox {
+  margin-top: 8px;
+}
+
+.row.justify-center.q-pb-lg {
+  margin-top: 16px;
+}
+
+.q-btn {
+  border-radius: 8px;
+  font-size: 14px;
+  padding: 6px 12px;
+  min-width: 120px;
+  text-transform: none;
+}
+
+.q-btn.align-center.q-mr-md {
+  margin-right: 8px;
+}
+
+textarea {
+  resize: vertical;
+}
+
+@media only screen and (max-width: 768px) {
+  #card {
+    max-width: 100%;
+    margin: 8px;
+  }
+
+  .q-input {
+    width: 100% !important;
+  }
+
+  .q-btn {
+    min-width: unset;
+  }
 }
 </style>

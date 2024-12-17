@@ -1,9 +1,9 @@
 <template>
-  <q-page class="bg-secondary" v-if="ready">
+  <q-page class="bg-secondary guild-page" v-if="ready">
     <div class="row justify-center">
       <q-card class="guild-card q-mt-md q-pa-md">
         <div class="col-12 justify-center">
-          <q-card class="q-mt-md q-pa-md">
+          <q-card class="q-mt-md q-pa-md" style="background-color: transparent;">
             <div class="row justify-end" style="width: 92%">
               <member-handle></member-handle>
             </div>
@@ -12,7 +12,11 @@
                 <scoreboard></scoreboard>
               </div>
             </div>
-            <guild-header></guild-header>
+            <div class="row justify-center ">
+              <div class="col-10 justify-center">
+              <guild-header class="guild-header"></guild-header>
+            </div>
+            </div>
             <guild-description></guild-description>
             <div class="row">
               <div class="col-12 items-center">
@@ -422,25 +426,42 @@ onBeforeMount(async () => {
 </script>
 
 <style lang="scss">
+.guild-page {
+  background: url('../statics/images/questBackgroundImage.jpg') no-repeat center center fixed !important;
+  background-size: cover;
+  min-height: 100vh;
+  padding: 0rem;
+  box-sizing: border-box;
+}
 .guild-description-col {
   width: 100%;
 }
 
 .guild-card {
-  width: 50%;
+  width: 60%;
+  background-color: transparent;
 }
 .active-quest-header {
   text-decoration: underline;
   font-family: Arial, Helvetica, sans-serif;
   color: $primary;
 }
+.scoreboard-guild-header-container {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+}
+
 .guild-header {
-  background-color: azure;
-  width: 92%;
+  width: 100%;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 11pt;
+  background-color: azure;
+  align-self: flex-end;
 }
-.guild-name {
+guild-name {
   text-align: center;
   font-size: 40px;
   background-color: azure;
@@ -458,7 +479,7 @@ onBeforeMount(async () => {
 }
 #radio {
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 11pt;
+  font-size: 12pt;
   width: 100%;
 }
 #radio-btn {
@@ -483,11 +504,13 @@ onBeforeMount(async () => {
 @media only screen and (max-width: 1300px) {
   .guild-card {
     width: 70%;
+    background-color: transparent;
   }
 }
 @media only screen and (max-width: 800px) {
   .guild-card {
     width: 98%;
+    background-color: transparent;
   }
 }
 @media only screen and (max-width: 800px) {
@@ -514,8 +537,7 @@ onBeforeMount(async () => {
   width: 100%;
   box-shadow: 0 60px 20px 0 rgb(151, 146, 146);
   border: 50px solid #ccc;
-  max-height: 300px; /*
-Set the maximum height you desire */
+  max-height: 300px;
   overflow-y: auto;
 }
 .content {

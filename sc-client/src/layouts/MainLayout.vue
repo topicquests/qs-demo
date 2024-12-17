@@ -153,3 +153,91 @@ onBeforeMount(async () => {
   isAuthenticated.value = memberStore.isAuthenticated;
 });
 </script>
+<style>
+#leftDrawer, #rightDrawer {
+  border-radius: 10px;
+}
+
+.q-header {
+  background-color: #0f12da;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  height: 75px;
+}
+
+.q-toolbar {
+  padding: 0 16px;
+}
+
+#home_image {
+  width: 50px;
+  margin-right: 8px;
+}
+
+.q-btn {
+  border-radius: 12px;
+  font-size: 14px;
+  padding: 4px 12px;
+  min-width: 120px;
+  text-transform: none;
+}
+
+.q-btn.q-mr-sm {
+  margin-right: 8px;
+}
+
+.q-btn.flat {
+  background-color: transparent;
+}
+
+.q-drawer {
+  background-color: #1e1e1e;
+  color: white;
+  border-radius: 10px;
+}
+
+.q-drawer .q-scroll-area {
+  padding-top: 16px;
+}
+
+footer#Pfooter {
+  font-size: 14px;
+  color: white;
+  padding: 16px 0;
+  text-align: center;
+}
+
+footer#Pfooter a {
+  color: #4caf50;
+  text-decoration: none;
+}
+
+footer#Pfooter a:hover {
+  text-decoration: underline;
+}
+
+@media only screen and (max-width: 768px) {
+  #home_image {
+    display: none;
+  }
+  .q-btn {
+    font-size: 12px;
+    padding: 4px 12px;
+    min-width: unset;
+  }
+  .q-toolbar-title {
+    display: flex;
+    justify-content: center;
+  }
+  #leftDrawer, #rightDrawer {
+    width: 250px;
+  }
+  .q-drawer {
+    width: 80%;
+  }
+  footer#Pfooter {
+    font-size: 12px;
+    padding: 8px 0;
+  }
+}
+</style>

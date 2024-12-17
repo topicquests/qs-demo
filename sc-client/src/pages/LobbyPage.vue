@@ -1,5 +1,5 @@
 <template>
-  <q-page class="bg-secondary" v-if="ready">
+  <q-page class="bg-secondary lobby-page" v-if="ready">
     <div class="row justify-center">
       <q-card class="lobby-card q-mt-md q-pa-md">
         <div>
@@ -110,8 +110,16 @@ p {
   background-color: lightgrey;
   font-size: 15pt;
 }
+.lobby-page {
+  background: url('../statics/images/questBackgroundImage.jpg') no-repeat center center fixed !important;
+  background-size: cover;
+  min-height: 100vh;
+  padding: 0rem;
+  box-sizing: border-box;
+}
 
 .lobby-card {
+  background-color: transparent;
   width: 60%;
 }
 

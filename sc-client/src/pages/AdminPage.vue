@@ -1,5 +1,5 @@
 <template>
-  <q-page class="bg-secondary" v-if="ready">
+  <q-page class="bg-secondary admin-page" v-if="ready">
     <div class="row justify-center q-gutter-md">
       <q-card class="admin-card q-mt-md q-pa-md">
         <div>
@@ -52,6 +52,8 @@
         <div class="row q-mt-sm">
           <div class="col-3 q-mt-md">
             <q-btn
+              dense
+              unelevated
               color="primary"
               label="Update"
               v-bind:disabled="!userIsSuperAdmin"
@@ -61,9 +63,11 @@
         </div>
         <div>
           <div class="row">
-            <div class="col-6 q-pt-lg q-pb-sm">
+            <div class="col-6 q-pt-sm q-pb-sm">
               <q-btn
                 v-if="memberStore.member"
+                dense
+                unelevated
                 id="newRoleBtn"
                 color="primary"
                 label="New Role"
@@ -202,31 +206,101 @@ onBeforeMount(async () => {
 });
 </script>
 <style>
+.admin-page {
+  width: 100%;
+  background: url('../statics/images/questBackgroundImage.jpg') no-repeat center center fixed !important;
+  background-size: cover;
+  min-height: 100vh;
+  padding: 1rem;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: flex-start; /* Align to the top to allow natural height */
+}
+
+
+/* Card Styling */
 .admin-card {
-  width: 60%;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.9); /* Slight transparency */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  border-radius: 8px; /* Rounded corners */
+  transition: transform 0.3s, box-shadow 0.3s; /* Smooth hover effect */
 }
+
+.admin-card:hover {
+  transform: translateY(-4px); /* Slight lift on hover */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Form Controls */
 #qselect {
-  width: 10%;
+  width: 100%; /* Full width for better alignment */
 }
-#permissions {
-  border: 1px solid blue;
-  background-color: lightyellow;
+
+.q-checkbox {
+  margin: 0.5rem 0; /* Spacing between checkboxes */
 }
+
+.q-select,
+.q-btn {
+  border-radius: 6px; /* Rounded corners */
+}
+
+/* Section Styling */
+#permissions,
 #roles {
-  border: 1px solid blue;
-  background-color: lightyellow;
+  border: 1px solid #3f51b5; /* Blue border */
+  background-color: #f8f9fa; /* Light gray background */
+  border-radius: 6px; /* Rounded corners */
+  padding: 1rem;
+  margin-top: 1rem;
 }
+
+#permissions h3,
+#roles h3 {
+  color: #3f51b5; /* Title color */
+  margin-bottom: 0.5rem;
+}
+
+/* Buttons */
+.q-btn {
+  margin: 0.5rem 0;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.q-btn:hover {
+  background-color: #1976d2; /* Darker blue */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Role Table Section */
 #newRoleBtn {
-  margin-bottom: 4px;
+  margin-bottom: 1rem;
 }
+
+/* Scoreboard Section */
+.scoreboard {
+  margin-bottom: 1rem;
+}
+
+/* Responsive Design */
 @media only screen and (max-width: 1300px) {
   .admin-card {
     width: 80%;
   }
 }
+
 @media only screen and (max-width: 800px) {
   .admin-card {
     width: 95%;
+    padding: 1rem;
+  }
+
+  #permissions,
+  #roles {
+    padding: 0.5rem;
   }
 }
 </style>
+
