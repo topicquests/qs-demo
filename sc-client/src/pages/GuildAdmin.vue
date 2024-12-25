@@ -29,6 +29,9 @@
                 <q-editor
                   v-model="description"
                   class="admin-content guild-description-col"
+                  :toolbar="[
+                  ['bold', 'italic', 'underline', 'strike', 'undo', 'redo']
+                  ]"
                 >
                 </q-editor>
               </div>
