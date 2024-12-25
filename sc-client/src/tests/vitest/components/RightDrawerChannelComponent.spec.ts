@@ -1,9 +1,16 @@
 import { mount } from '@vue/test-utils';
 import RightDrawer from '../../../components/right-drawer.vue'; // Adjust the path to your component
 import ChannelList from '../../../components/ChannelListComponent.vue'; // Import the actual ChannelList component
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { GuildData } from '../../../types';
 import { Quasar } from 'quasar';
+
+// Mock getWSClient to return a mocked object with setDefaultGuild
+vi.mock('src/wsclient', () => ({
+  getWSClient: vi.fn(() => ({
+    setDefaultGuild: vi.fn(),
+  })),
+}));
 
 describe('RightDrawer', () => {
   it('passes props to ChannelList correctly', () => {

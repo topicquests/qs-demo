@@ -19,7 +19,7 @@
             label="Email"
           >
             <template v-slot:prepend>
-              <q-icon name="email" :tabindex="-1" />
+              <q-icon name="email"/>
             </template>
           </q-input>
         </div>

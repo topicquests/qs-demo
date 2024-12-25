@@ -30,10 +30,13 @@
     <section>
       <template v-if="NodeFormProps.editing">
         <q-editor
-          v-model="description"
-          style="width: 98%"
-          class="q-editor node-card-details scrollable-div"
-        />
+        v-model="description"
+        style="width: 98%"
+        class="q-editor node-card-details scrollable-div"
+        :toolbar="[
+          ['bold', 'italic', 'underline', 'strike', 'undo', 'redo']
+        ]"
+      />
       </template>
       <template v-else>
         <div class="scrollable-description">
@@ -246,7 +249,7 @@ defineExpose({
   setFocus,
 });
 </script>
-<style>
+<style scoped>
 #node-card {
   text-align: center;
   border: 3px solid black;
@@ -290,5 +293,13 @@ defineExpose({
   overflow-y: auto; /* This adds the vertical scrollbar when content overflows */
   padding: 10px; /* Optional padding */
   border: 1px solid #ccc; /* Optional border */
+}
+@media (max-width: 600px) {
+  .q-editor__toolbar .q-btn--strike, /* Strike-through button */
+  .q-editor__toolbar .q-btn--link,  /* Link button */
+  .q-editor__toolbar .q-btn--quote, /* Quote button */
+  .q-editor__toolbar .q-btn--image  /* Image button */ {
+    display: none !important; /* Ensure it overrides Quasar's styles */
+  }
 }
 </style>

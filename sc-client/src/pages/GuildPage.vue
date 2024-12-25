@@ -127,7 +127,7 @@ import guildHeader from '../components/guild-header.vue';
 import guildDescription from '../components/guild-description.vue';
 import activeQuest from '../components/active-quests.vue';
 import { waitUserLoaded } from '../app-access';
-import { useRoute } from 'vue-router';
+import { onBeforeRouteLeave, useRoute } from 'vue-router';
 import {
   registration_status_enum,
   quest_status_enum,
@@ -149,6 +149,7 @@ import { useRoleStore } from '../stores/role';
 import { useChannelStore } from '../stores/channel';
 import { useConversationStore } from '../stores/conversation';
 import { storeToRefs } from 'pinia';
+import { useReadStatusStore } from 'src/stores/readStatus';
 
 // Route
 const route = useRoute();
@@ -162,6 +163,7 @@ const questStore = useQuestStore();
 const roleStore = useRoleStore();
 const channelStore = useChannelStore();
 const conversationStore = useConversationStore();
+const readStatusStore = useReadStatusStore();
 
 //Reactive Variables
 const isMember = ref(false);
@@ -226,12 +228,15 @@ const currentQuestId = computed(() => questStore.currentQuest);
 const currentGuild = computed(() => guildStore.getCurrentGuild);
 const currentQuest = computed(() => questStore.getCurrentQuest);
 const currentGuildId = computed<number>(() => guildStore.currentGuild);
-const playingQuestInGuild = computed(() =>
-  questStore.isPlayingQuestInGuild(
-    currentQuest.value!.id,
-    currentGuild.value!.id,
-  ),
-);
+const playingQuestInGuild = computed(() => {
+  if( currentGuild.value) {
+    return questStore.isPlayingQuestInGuild(
+      currentQuest.value!.id,
+      currentGuild.value!.id,
+   )}
+   return false;
+})
+
 const availableRoles = computed<Role[]>(() => {
   if (!member || !member.value?.id || !guildId.value) {
     return [];
@@ -273,6 +278,14 @@ watch(
     deep: true,
   },
 );
+  //Lifecycle Hooks
+  onBeforeMount(async () => {
+  await initialize();
+});
+  onBeforeRouteLeave((to, from, next) => {
+    guildStore.setCurrentGuild(0);
+    next();
+});
 
 // Functions
 async function getCastingRoles() {
@@ -303,6 +316,7 @@ function checkPermissions() {
     canRegisterToQuest.value;
   }
 }
+
 async function castingRoleAdded(role_id: number) {
   const guild_id = guildId.value;
   const quest_id: number | undefined = questStore.currentQuest;
@@ -328,13 +342,14 @@ async function initialize() {
   }
   const guild_id = guildId.value;
   await waitUserLoaded();
-  guildStore.setCurrentGuild(guild_id!);
   await Promise.all([
     questStore.ensureAllQuests(),
     roleStore.ensureAllRoles(),
     channelStore.ensureChannels(guild_id!),
     membersStore.ensureMembersOfGuild({ guildId: guild_id }),
   ]);
+  guildStore.setCurrentGuild(guild_id!);
+  channelStore.setCurrentGuild(guild_id!)
   await initializeStage2();
   ready.value = true;
 }
@@ -417,12 +432,8 @@ async function initializeQuest() {
     }
     return 'success';
   }
-}
 
-//Lifecycle Hooks
-onBeforeMount(async () => {
-  await initialize();
-});
+}
 </script>
 
 <style lang="scss">

@@ -61,15 +61,16 @@
         </div>
         <div v-if="checkIfAuthenticated && showTree && currentGuild">
           <q-btn
-            flat
-            dense
-            round
-            aria-label="Tree View"
-            @click="toggleNav"
-            id="channel_list"
-          >
-            <q-icon name="menu" />
-          </q-btn>
+          flat
+          dense
+          round
+          :color="hasUnreadChannels ? 'blue' : 'white'"
+          aria-label="Tree View"
+          @click="toggleNav"
+          id="channel_list"
+        >
+          <q-icon name="menu" />
+        </q-btn>
         </div>
       </q-toolbar>
     </q-header>
@@ -110,11 +111,15 @@ import { useQuestStore } from '../stores/quests';
 import { useQuasar } from 'quasar';
 import drawer_menu from '../components/drawer_menu.vue';
 import right_drawer from '../components/right-drawer.vue';
+import { useChannelStore } from 'src/stores/channel';
+import { useReadStatusStore } from 'src/stores/readStatus';
 
 const router = useRouter();
 const memberStore = useMemberStore();
 const guildStore = useGuildStore();
 const questStore = useQuestStore();
+const channelStore = useChannelStore();
+const readStatusStore = useReadStatusStore();
 const $q = useQuasar();
 const leftDrawer = ref(false);
 const isAuthenticated = ref(false);
@@ -126,6 +131,15 @@ const currentQuest = computed(() => questStore.getCurrentQuest);
 const checkIfAuthenticated = computed(
   (): boolean => memberStore.isAuthenticated,
 );
+const hasUnreadChannels = computed(() => {
+  const channels = channelStore.getChannelsByGuildId;
+  if (!channels) return false;
+
+  return channels.some((channel) => {
+    const unreadCount = readStatusStore.getUnreadStatusCount(channel.id);
+    return unreadCount > 0;
+  });
+});
 function goTo(newRoute: string): void {
   router.push({ name: newRoute });
 }
@@ -150,6 +164,10 @@ function closeNav() {
   rightDrawer.value = false;
 }
 onBeforeMount(async () => {
+
+  readStatusStore.ensureAllChannelReadStatus();
+  channelStore.ensureChannels(channelStore.getChannelsCurrentGuildId)
+
   isAuthenticated.value = memberStore.isAuthenticated;
 });
 </script>

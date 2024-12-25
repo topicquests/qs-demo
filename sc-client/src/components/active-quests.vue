@@ -93,10 +93,8 @@ const router = useRouter();
 const prompt = ref(false);
 const quest_id = ref(null);
 
-watch(quest_id, (newVal, oldVal) => {
+watch(quest_id, (newVal) => {
   questStore.setCurrentQuest(newVal);
-  console.log('quest_id changed from', oldVal, 'to', newVal);
-
 })
 
 </script>

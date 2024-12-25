@@ -1,6 +1,5 @@
 <template>
-  <div style="width: 100%; padding: 0; margin: 0">
-    <div style="width: 100%">
+  <div class="row justify-center" style="width: 100%; padding: 0; margin: 0">
       <node-tree
         :currentQuestId="questId"
         :currentGuildId="guildId"
@@ -10,7 +9,6 @@
         :isChannel="false"
         :editable="true"
       />
-    </div>
   </div>
 </template>
 

@@ -96,7 +96,7 @@ export class WSClient {
           // TODO
         } else {
           await this.conversationStore.fetchConversationNode({
-            params: { id },
+            id ,
           });
         }
         break;

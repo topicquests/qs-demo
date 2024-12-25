@@ -10,33 +10,6 @@ installQuasarPlugin({
     components: {QTooltip},
 });
 
-function createWrapper(props = {}) {
-    return  mount(QuestCard, {
-        props: {
-            currentQuest: mockQuest,
-            showQuestInfo: false,
-            creator: {},
-            ...props
-        },
-        global: {
-            plugins: [
-                createTestingPinia({
-                    initialState: {
-                        quest: {
-                            currentQuest: mockQuest.id,
-                            quests: {1: mockQuest}
-                        },
-                        conversation: {
-                            neighbourhood: {1: mockConversation}
-                        }
-                    }
-                })
-
-            ],
-        }
-    })
-}
-
 describe('Quest card component unit test', () => {
     it('show quest avatar', () => {
         const wrapper = mount(QuestCard, {

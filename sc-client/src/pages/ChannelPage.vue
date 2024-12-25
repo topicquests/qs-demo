@@ -42,7 +42,7 @@
               guild_id: guildId,
             },
           }"
-          >{{ currentGuild.name }}</router-link
+          >{{ currentGuild!.name }}</router-link
         >
         (<router-link
           :to="{
@@ -58,7 +58,8 @@
     <div class="row justify-center q-mt-lg">
       <div class="col-6 q-md q-mr-lg">
         <node-tree
-          v-on:updateTree="selectionChanged"
+          :initialSelectedNodeId="selectedNodeId"
+          @tree-selection="selectionChanged"
           :currentGuildId="guildId"
           :currentQuestId="questId"
           :channelId="channelId!"
@@ -75,71 +76,83 @@
 <script setup lang="ts">
 import nodeTree from '../components/node-tree.vue';
 import { waitUserLoaded } from '../app-access';
-import { onBeforeMount, ref } from 'vue';
+import { computed, onBeforeMount, ref } from 'vue';
 import { useGuildStore } from '../stores/guilds';
 import { useQuestStore } from '../stores/quests';
-import { useRoute } from 'vue-router';
+import { onBeforeRouteLeave, useRoute } from 'vue-router';
 import { useChannelStore } from '../stores/channel';
 import { useRoleStore } from '../stores/role';
 
-/*
-  meta: (c) => ({
-    // todo: not reactive because not computed
-    title: `${c.getCurrentQuest ? "Game" : "Guild"} Channel - ${
-      c.getChannelById(c.channelId)?.title
-    }`,
-  }),
-})
-*/
+// Stores
 const guildStore = useGuildStore();
 const questStore = useQuestStore();
 const channelStore = useChannelStore();
 const roleStore = useRoleStore();
+
+// Router
 const route = useRoute();
-//const ibis_node_type_list: ibis_node_type_type = ibis_node_type_list;
-//const publication_state_list: publication_state_type = publication_state_list;
-//const public_private_bool: publication_state_type = public_private_bool;
-const guildId = ref<number>();
-const questId = ref<number>();
-const channelId = ref<number>();
+
+// Reactive variables
+const guildId = ref<number | null>(null);
+const questId = ref<number | null>(null);
+const channelId = ref<number | null>(null);
 let selectedNodeId: number | null = null;
 const ready = ref(false);
-const currentGuild = guildStore.getCurrentGuild!;
-const currentQuest = questStore.getCurrentQuest!;
+
+// Computed properties
+const currentGuild = computed(() => guildStore.getCurrentGuild!);
+const currentQuest = computed(() => questStore.getCurrentQuest!);
 const roles = roleStore.getRoles!;
 
+// Lifecycle Hooks
+onBeforeMount(async () => {
+  await initialize();
+});
+onBeforeRouteLeave((to, from, next) => {
+    guildStore.setCurrentGuild(0);
+    next();
+});
+
+// Functions
 function selectionChanged(id: number) {
   selectedNodeId = id;
 }
 
 async function initialize() {
-  if (typeof route.params.guild_id === 'string')
-    guildId.value = Number.parseInt(route.params.guild_id);
-  if (typeof route.params.quest_id === 'string')
-    questId.value = Number.parseInt(route.params.quest_id);
-  if (typeof route.params.channel_id === 'string')
-    channelId.value = Number.parseInt(route.params.channel_id);
-  channelStore.setCurrentChannel(channelId.value!);
-  await waitUserLoaded();
-  const promises = [];
-  guildStore.setCurrentGuild(guildId.value!);
-  questStore.setCurrentQuest(questId.value!);
-  if (questId.value) {
-    promises.push(questStore.ensureQuest({ quest_id: questId.value }));
-    promises.push(channelStore.ensureChannels(guildId.value!));
+  try {
+    if (typeof route.params.guild_id === 'string')
+      guildId.value = Number.parseInt(route.params.guild_id);
+    if (typeof route.params.quest_id === 'string')
+      questId.value = Number.parseInt(route.params.quest_id);
+    if (typeof route.params.channel_id === 'string')
+      channelId.value = Number.parseInt(route.params.channel_id);
+    if (channelId.value) {
+      channelStore.setCurrentChannel(channelId.value);
+    }
+    await waitUserLoaded();
+    guildStore.setCurrentGuild(guildId.value!);
+    if (questId.value) {
+      questStore.setCurrentQuest(questId.value);
+      await Promise.all([
+        questStore.ensureQuest({ quest_id: questId.value }),
+        channelStore.ensureChannels(guildId.value!),
+      ]);
+    }
+
+    await Promise.all([
+      guildStore.ensureGuild(guildId.value!),
+      channelStore.ensureChannels(guildId.value!),
+      roleStore.ensureAllRoles(),
+      channelStore.ensureChannelConversation(channelId.value!, guildId.value!),
+    ]);
+
+    ready.value = true;
+  } catch (error) {
+    console.error("Failed to initialize data:", error);
   }
-  promises.push(channelStore.ensureChannels(guildId.value!));
-  promises.push(guildStore.ensureGuild(guildId.value!));
-  promises.push(roleStore.ensureAllRoles());
-  promises.push(
-    channelStore.ensureChannelConversation(channelId.value!, guildId.value!),
-  );
-  await Promise.all(promises);
-  ready.value = true;
 }
-onBeforeMount(async () => {
-  await initialize();
-});
+
+
 </script>
 
 <style scoped>

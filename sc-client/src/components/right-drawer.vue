@@ -8,12 +8,12 @@
       />
     </div>
     <div
-      v-if="shouldShowGuildChannels && shouldShowGameChannels"
+      v-if="canShowBothChannels"
       class="q-pa-md q-gutter-sm"
     >
       <channel-list
-        v-bind:guild_id="rightDrawerProps.currentGuild.id"
-        v-bind:quest_id="rightDrawerProps.currentQuest.id"
+        :guild_id="rightDrawerProps.currentGuild.id"
+        :quest_id="rightDrawerProps.currentQuest.id"
         :inPage="false"
         title="Game Channels"
       />
@@ -23,13 +23,24 @@
 <script setup lang="ts">
 import { GuildData, QuestData } from '../types';
 import channelList from '../components/ChannelListComponent.vue';
-import { computed } from 'vue';
+import { computed, onBeforeMount } from 'vue';
+import { useReadStatusStore } from 'src/stores/readStatus';
+import { useChannelStore } from 'src/stores/channel';
+
+const readStatusStore = useReadStatusStore();
+const channelStore = useChannelStore();
 
 const rightDrawerProps = defineProps<{
   currentQuest?: QuestData;
   currentGuild?: GuildData;
 }>();
 
+
 const shouldShowGuildChannels = computed(() => !!rightDrawerProps.currentGuild);
-const shouldShowGameChannels = computed(() => !!rightDrawerProps.currentGuild && !!rightDrawerProps.currentQuest);
+const canShowBothChannels = computed(() => !!rightDrawerProps.currentGuild && !!rightDrawerProps.currentQuest);
+
+onBeforeMount(async() => {
+  readStatusStore.ensureAllChannelReadStatus();
+  channelStore.ensureChannels(channelStore.getChannelsCurrentGuildId)
+})
 </script>
