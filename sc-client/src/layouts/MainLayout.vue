@@ -64,13 +64,16 @@
           flat
           dense
           round
-          :color="hasUnreadChannels ? 'blue' : 'white'"
+          :color="hasUnreadChannels ? 'red' : 'green'"
           aria-label="Tree View"
           @click="toggleNav"
           id="channel_list"
         >
           <q-icon name="menu" />
         </q-btn>
+          <q-tooltip anchor="top middle" self="bottom middle" class="custom-tooltip">
+            Guild and Quest conversations
+          </q-tooltip>
         </div>
       </q-toolbar>
     </q-header>
@@ -85,6 +88,7 @@
     >
       <right_drawer :currentGuild="currentGuild" :currentQuest="currentQuest">
       </right_drawer>
+
     </q-drawer>
     <q-drawer v-model="leftDrawer" :breakpoint="500" bordered :overlay="true">
       <q-scroll-area class="fit">
@@ -103,8 +107,9 @@
   </q-layout>
 </template>
 <script setup lang="ts">
-import { computed, onBeforeMount, ref } from 'vue';
-import { useRouter } from 'vue-router';
+// Imports
+import { computed, onBeforeMount, ref, watch } from 'vue';
+import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import { useMemberStore } from '../stores/member';
 import { useGuildStore } from '../stores/guilds';
 import { useQuestStore } from '../stores/quests';
@@ -114,34 +119,77 @@ import right_drawer from '../components/right-drawer.vue';
 import { useChannelStore } from 'src/stores/channel';
 import { useReadStatusStore } from 'src/stores/readStatus';
 
+// Router
 const router = useRouter();
+
+//Stores
 const memberStore = useMemberStore();
 const guildStore = useGuildStore();
 const questStore = useQuestStore();
 const channelStore = useChannelStore();
 const readStatusStore = useReadStatusStore();
+
+// Quasar
 const $q = useQuasar();
+
+// Reactive variables
 const leftDrawer = ref(false);
 const isAuthenticated = ref(false);
 const rightDrawer = ref(false);
 const showTree = ref(true);
+
+// Computed properties
 const currentGuild = computed(() => guildStore.getCurrentGuild);
 const currentQuest = computed(() => questStore.getCurrentQuest);
-
 const checkIfAuthenticated = computed(
   (): boolean => memberStore.isAuthenticated,
 );
 const hasUnreadChannels = computed(() => {
-  const channels = channelStore.getChannelsByGuildId;
-  if (!channels) return false;
-
-  return channels.some((channel) => {
-    const unreadCount = readStatusStore.getUnreadStatusCount(channel.id);
-    return unreadCount > 0;
-  });
+  if(channelStore.getCurrentChannel  && channelStore.getCurrentGuild) {
+    const channels = channelStore.getChannelsByGuildId;
+    if (!channels) {
+      return false;
+    }
+    return channels.some((channel) => {
+      const unreadCount = readStatusStore.getUnreadStatusCount(channel.id);
+      return unreadCount > 0;
+    });
+  }
+  return false;
 });
+
+// Watches
+watch( currentGuild,
+  () => {
+    if(currentGuild.value) {
+      channelStore.ensureChannels(currentGuild.value.id);
+      checkForUnreadNodes();
+      hasUnreadChannels
+    }
+  }
+)
+
+// Lifecycles
+onBeforeMount(async () => {
+  isAuthenticated.value = memberStore.isAuthenticated;
+});
+onBeforeRouteLeave((to, from, next) => {
+    guildStore.setCurrentGuild(0);
+    next();
+});
+
+// Functions
 function goTo(newRoute: string): void {
   router.push({ name: newRoute });
+}
+function checkForUnreadNodes(): boolean {
+  channelStore.setCurrentGuild(currentGuild.value.id);
+  const channels = channelStore.getChannelsByGuildId;
+  const hasUnreadNodes = channels.some((channel) => {
+    const isRead = readStatusStore.getNodeReadStatus(channel.id); // Call getter
+    return !isRead;
+  });
+  return hasUnreadNodes;
 }
 async function onLogout() {
   rightDrawer.value = false;
@@ -163,17 +211,23 @@ function toggleNav() {
 function closeNav() {
   rightDrawer.value = false;
 }
-onBeforeMount(async () => {
 
-  readStatusStore.ensureAllChannelReadStatus();
-  channelStore.ensureChannels(channelStore.getChannelsCurrentGuildId)
-
-  isAuthenticated.value = memberStore.isAuthenticated;
-});
 </script>
 <style>
 #leftDrawer, #rightDrawer {
   border-radius: 10px;
+}
+.custom-tooltip {
+  background-color: #333 !important;
+  color: white !important;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.custom-tooltip::before {
+  border-top-color: #333 !important;
 }
 
 .q-header {

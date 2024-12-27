@@ -149,7 +149,6 @@ import { useRoleStore } from '../stores/role';
 import { useChannelStore } from '../stores/channel';
 import { useConversationStore } from '../stores/conversation';
 import { storeToRefs } from 'pinia';
-import { useReadStatusStore } from 'src/stores/readStatus';
 
 // Route
 const route = useRoute();
@@ -163,7 +162,6 @@ const questStore = useQuestStore();
 const roleStore = useRoleStore();
 const channelStore = useChannelStore();
 const conversationStore = useConversationStore();
-const readStatusStore = useReadStatusStore();
 
 //Reactive Variables
 const isMember = ref(false);

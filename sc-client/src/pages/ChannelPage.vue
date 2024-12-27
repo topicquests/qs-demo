@@ -4,55 +4,39 @@
       <h3 v-if="questId">
         Channel of guild
         <router-link
-          :to="{
-            name: 'guild',
-            params: {
-              guild_id: guildId,
-            },
-          }"
-          >{{ currentGuild.name }}</router-link
+          v-if="guildId && currentGuild?.name"
+          :to="{ name: 'guild', params: { guild_id: guildId } }"
         >
+          {{ currentGuild.name }}
+        </router-link>
         in quest
         <router-link
-          :to="{
-            name: 'quest_page',
-            params: {
-              guild_id: guildId,
-            },
-          }"
-          >{{ currentQuest.name }}</router-link
+          v-if="guildId && currentQuest?.name"
+          :to="{ name: 'quest_page', params: { guild_id: guildId } }"
         >
-        (<router-link
-          :to="{
-            name: 'game_channel_list',
-            params: {
-              guild_id: guildId,
-              quest_id: questId,
-            },
-          }"
-          >more</router-link
-        >)
+          {{ currentQuest.name }}
+        </router-link>
+        <router-link
+          v-if="guildId && questId"
+          :to="{ name: 'game_channel_list', params: { guild_id: guildId, quest_id: questId } }"
+        >
+          more
+        </router-link>
       </h3>
       <h3 v-else>
         Channel of guild
         <router-link
-          :to="{
-            name: 'guild',
-            params: {
-              guild_id: guildId,
-            },
-          }"
-          >{{ currentGuild!.name }}</router-link
+          v-if="guildId && currentGuild?.name"
+          :to="{ name: 'guild', params: { guild_id: guildId } }"
         >
+          {{ currentGuild.name }}
+        </router-link>
         (<router-link
-          :to="{
-            name: 'guild_channel_list',
-            params: {
-              guild_id: guildId,
-            },
-          }"
-          >more</router-link
-        >)
+          v-if="guildId"
+          :to="{ name: 'guild_channel_list', params: { guild_id: guildId } }"
+        >
+          more
+        </router-link>)
       </h3>
     </div>
     <div class="row justify-center q-mt-lg">
@@ -62,7 +46,7 @@
           @tree-selection="selectionChanged"
           :currentGuildId="guildId"
           :currentQuestId="questId"
-          :channelId="channelId!"
+          :channelId="channelId"
           :isChannel="true"
           :roles="roles"
           :editable="true"
@@ -71,7 +55,11 @@
       </div>
     </div>
   </q-page>
+  <div v-else class="row justify-center">
+    <p>Loading data, please wait...</p>
+  </div>
 </template>
+
 
 <script setup lang="ts">
 import nodeTree from '../components/node-tree.vue';
@@ -100,8 +88,8 @@ let selectedNodeId: number | null = null;
 const ready = ref(false);
 
 // Computed properties
-const currentGuild = computed(() => guildStore.getCurrentGuild!);
-const currentQuest = computed(() => questStore.getCurrentQuest!);
+const currentGuild = computed(() => guildStore.getCurrentGuild);
+const currentQuest = computed(() => questStore.getCurrentQuest);
 const roles = roleStore.getRoles!;
 
 // Lifecycle Hooks

@@ -15,11 +15,11 @@ export interface ReadStatusState {
 }
 const baseState: ReadStatusState = {
   fullFetch: false,
-  readStatus: undefined,
+  readStatus: {},
 };
 const clearBaseState: ReadStatusState = {
   fullFetch: false,
-  readStatus: undefined,
+  readStatus: {},
 };
 
 export const useReadStatusStore = defineStore('readStatus', {
@@ -39,14 +39,16 @@ export const useReadStatusStore = defineStore('readStatus', {
           } else return true;
         }
       },
-    getUnreadStatusCount: (state: ReadStatusState) => (node_id: number) => {
-      if (state.readStatus) {
-        const unreadStatusCount: number =
-          state.readStatus[node_id].node_count -
-          state.readStatus[node_id].read_count;
-        return unreadStatusCount;
-      }
-    },
+      getUnreadStatusCount: (state: ReadStatusState) => (node_id: number) => {
+        if (state.readStatus && state.readStatus[node_id]) {
+          const unreadStatusCount: number =
+            state.readStatus[node_id].node_count -
+            state.readStatus[node_id].read_count;
+          return unreadStatusCount;
+        }
+        return 0;
+      },
+
     getNodeStatusCount: (state: ReadStatusState) => (node_id: number) => {
       if (state.readStatus) {
         return state.readStatus[node_id].node_count;
@@ -113,7 +115,6 @@ export const useReadStatusStore = defineStore('readStatus', {
     async fetchReadStatus(params: { rootid: number }) {
       const res: AxiosResponse<ReadStatusData[]> = await api.post(
         'rpc/unread_status_list',
-
         params,
       );
       if (res.status == 200) {

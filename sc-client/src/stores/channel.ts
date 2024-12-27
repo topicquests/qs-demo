@@ -47,6 +47,7 @@ export const useChannelStore = defineStore('channel', {
       Object.values(state.channels).filter(
         (c: ConversationNode) => c.quest_id == undefined,
       ),
+    getCurrentGuild: (state: ChannelState) => state.currentGuild,
     getChannelsCurrentGuildId: (state: ChannelState) => state.currentGuild,
 
     getGameChannels: (state: ChannelState): ConversationNode[] =>
@@ -77,11 +78,18 @@ export const useChannelStore = defineStore('channel', {
         );
       }
     },
+<<<<<<< HEAD
     getChannelsByGuildId: (state: ChannelState) => {
       if (state.currentGuild) {
         return Object.values(state.channelData).filter(
           (n) => n.guild_id == state.currentGuild,
         );
+=======
+    getChannelsByGuildId: (state: ChannelState):ConversationNode[] => {
+    if (state.currentGuild) {
+      return Object.values(state.channels).filter(
+        (n) => n.guild_id == state.currentGuild)
+>>>>>>> 4acd5ee (Color change of right drawer icon when unread channel nodes)
       }
     },
     getCurrentChannel: (state: ChannelState) => state.currentChannel,
@@ -146,6 +154,9 @@ export const useChannelStore = defineStore('channel', {
         await this.fetchChannelConversation(channel_id);
       }
     },
+    async ensureAllChannels() {
+      await this.fetchAllChannels();
+    },
     resetChannel() {
       Object.assign(this, clearBaseState);
     },
@@ -185,6 +196,22 @@ export const useChannelStore = defineStore('channel', {
             guildStore.currentGuild = res.data[0].guild_id;
             this.channelData = {};
           }
+          this.channels = Object.fromEntries(
+            res.data.map((node: ConversationNode) => [node.id, node]),
+          );
+        }
+      }
+    },
+    async fetchAllChannels() {
+      const params = {
+        meta: 'eq.channel',
+      };
+      const res: AxiosResponse<ConversationNode[]> = await api.get(
+        '/conversation_node',
+        { params },
+      );
+      if (res.status == 200) {
+        if (res.data.length > 0) {
           this.channels = Object.fromEntries(
             res.data.map((node: ConversationNode) => [node.id, node]),
           );
