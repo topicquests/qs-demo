@@ -93,8 +93,14 @@ export const useChannelStore = defineStore('channel', {
                 return node.creator_id == userId;
                 // TODO: role_draft
               } else if (node.status == publication_state_enum.guild_draft) {
-                const casting = questStore.castingInQuest(node.guild_id);
-                return casting?.guild_id == node.guild_id;
+                if (node.quest_id) {
+                  const casting = questStore.castingInQuest(
+                    node.guild_id,
+                    userId,
+                  );
+                  return casting?.guild_id == node.guild_id;
+                }
+                return true;
               }
             } else if (node.status == publication_state_enum.proposed) {
               return baseStore.hasPermission(
