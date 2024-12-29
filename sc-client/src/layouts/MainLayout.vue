@@ -168,6 +168,16 @@ watch( currentGuild,
     }
   }
 )
+watch( currentQuest,
+  () => {
+    if(currentQuest.value) {
+      channelStore.ensureChannels(currentQuest.value.id);
+      checkForUnreadNodes();
+      hasUnreadChannels
+    }
+  }
+)
+
 
 // Lifecycles
 onBeforeMount(async () => {
@@ -175,6 +185,7 @@ onBeforeMount(async () => {
 });
 onBeforeRouteLeave((to, from, next) => {
     guildStore.setCurrentGuild(0);
+    questStore.setCurrentQuest(0)
     next();
 });
 
@@ -186,7 +197,7 @@ function checkForUnreadNodes(): boolean {
   channelStore.setCurrentGuild(currentGuild.value.id);
   const channels = channelStore.getChannelsByGuildId;
   const hasUnreadNodes = channels.some((channel) => {
-    const isRead = readStatusStore.getNodeReadStatus(channel.id); // Call getter
+    const isRead = readStatusStore.getNodeReadStatus(channel.id);
     return !isRead;
   });
   return hasUnreadNodes;

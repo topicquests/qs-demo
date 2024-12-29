@@ -98,6 +98,7 @@ onBeforeMount(async () => {
 });
 onBeforeRouteLeave((to, from, next) => {
     guildStore.setCurrentGuild(0);
+    questStore.setCurrentQuest(0);
     next();
 });
 
