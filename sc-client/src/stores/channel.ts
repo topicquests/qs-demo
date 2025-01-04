@@ -12,6 +12,7 @@ import { useMemberStore } from './member';
 import { useQuestStore } from './quests';
 import { useBaseStore, filterKeys } from './baseStore';
 import { useGuildStore } from './guilds';
+import { stat } from 'fs';
 
 interface ChannelMap {
   [key: number]: ConversationMap;
@@ -50,6 +51,13 @@ export const useChannelStore = defineStore('channel', {
     getCurrentGuild: (state: ChannelState) => state.currentGuild,
     getChannelsCurrentGuildId: (state: ChannelState) => state.currentGuild,
 
+    getRootGuildChannels: (state: ChannelState): ConversationNode[] =>
+      Object.values(state.channels).filter(
+        (c: ConversationNode) =>
+          c.guild_id == state.currentGuild &&
+          c.parent_id == null &&
+          c.quest_id == undefined,
+      ),
     getGameChannels: (state: ChannelState): ConversationNode[] =>
       Object.values(state.channels).filter(
         (c: ConversationNode) => c.quest_id != undefined,
@@ -78,18 +86,11 @@ export const useChannelStore = defineStore('channel', {
         );
       }
     },
-<<<<<<< HEAD
-    getChannelsByGuildId: (state: ChannelState) => {
+    getChannelsByGuildId: (state: ChannelState): ConversationNode[] => {
       if (state.currentGuild) {
-        return Object.values(state.channelData).filter(
+        return Object.values(state.channels).filter(
           (n) => n.guild_id == state.currentGuild,
         );
-=======
-    getChannelsByGuildId: (state: ChannelState):ConversationNode[] => {
-    if (state.currentGuild) {
-      return Object.values(state.channels).filter(
-        (n) => n.guild_id == state.currentGuild)
->>>>>>> 4acd5ee (Color change of right drawer icon when unread channel nodes)
       }
     },
     getCurrentChannel: (state: ChannelState) => state.currentChannel,

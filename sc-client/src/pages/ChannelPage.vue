@@ -124,13 +124,11 @@ async function initialize() {
       questStore.setCurrentQuest(questId.value);
       await Promise.all([
         questStore.ensureQuest({ quest_id: questId.value }),
-        channelStore.ensureChannels(guildId.value!),
       ]);
     }
 
     await Promise.all([
       guildStore.ensureGuild(guildId.value!),
-      channelStore.ensureChannels(guildId.value!),
       roleStore.ensureAllRoles(),
       channelStore.ensureChannelConversation(channelId.value!, guildId.value!),
     ]);

@@ -25,6 +25,9 @@ const clearBaseState: ReadStatusState = {
 export const useReadStatusStore = defineStore('readStatus', {
   state: () => baseState,
   getters: {
+    getReadStatus: (state: ReadStatusState): ReadStatusMap | undefined => {
+      return state.readStatus;
+    },
     getNodeReadStatus:
       (state: ReadStatusState) =>
       (node_id: number): boolean => {
@@ -56,6 +59,14 @@ export const useReadStatusStore = defineStore('readStatus', {
     },
   },
   actions: {
+    async ensureReadStatusByGuild() {
+      const channelStore = useChannelStore();
+      const channels = channelStore.getChannels;
+      const readStatus = await this.fetchAllReadStatus();
+      const guildReadStaus = readStatus.filter(
+        (c) => channels.some((r) => c.node_id == r.id))
+        this.readStatus = guildReadStaus;
+    },
     async ensureAllQuestsReadStatus() {
       const conversationStore = useConversationStore();
       if (conversationStore.conversationRoot) {
@@ -64,6 +75,14 @@ export const useReadStatusStore = defineStore('readStatus', {
         const rootid: number = cn.id;
         await this.fetchReadStatus({ rootid });
       }
+    },
+
+    async ensureReadStatusOfGuild() {
+      const channelStore = useChannelStore();
+      if(channelStore.getCurrentGuild) {
+        await this.fetchReadStatus()
+      }
+
     },
     async ensureAllChannelReadStatus() {
       const channelStore = useChannelStore();
@@ -95,7 +114,7 @@ export const useReadStatusStore = defineStore('readStatus', {
     },
     async updateReadStatus(data: Partial<ReadStatusData>) {
       const res: AxiosResponse<ReadStatusData[]> = await api.patch(
-        `/readstatus/${data.node_id}`,
+        `/read_status/${data.node_id}`,
         data,
       );
       if (res.status == 200) {
@@ -123,6 +142,14 @@ export const useReadStatusStore = defineStore('readStatus', {
         );
       }
     },
+    async fetchAllReadStatus() {
+      const res: AxiosResponse<ReadStatusData[]> = await api.get(
+        '/read_status');
+        if (res.status == 200) {
+          return res.data;
+        }
+    },
+
     async CreateOrUpdateReadStatus(data: {
       nodeid: number;
       new_status: boolean;

@@ -149,6 +149,7 @@ import { useRoleStore } from '../stores/role';
 import { useChannelStore } from '../stores/channel';
 import { useConversationStore } from '../stores/conversation';
 import { storeToRefs } from 'pinia';
+import { useReadStatusStore } from '../stores/readStatus';
 
 // Route
 const route = useRoute();
@@ -161,6 +162,7 @@ const membersStore = useMembersStore();
 const questStore = useQuestStore();
 const roleStore = useRoleStore();
 const channelStore = useChannelStore();
+const readStatusStore = useReadStatusStore();
 const conversationStore = useConversationStore();
 
 //Reactive Variables
@@ -349,6 +351,7 @@ async function initialize() {
   ]);
   guildStore.setCurrentGuild(guild_id!);
   channelStore.setCurrentGuild(guild_id!)
+  readStatusStore.ensureReadStatusByGuild(),
   await initializeStage2();
   ready.value = true;
 }

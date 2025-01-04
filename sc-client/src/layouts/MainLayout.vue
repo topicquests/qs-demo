@@ -118,6 +118,7 @@ import drawer_menu from '../components/drawer_menu.vue';
 import right_drawer from '../components/right-drawer.vue';
 import { useChannelStore } from 'src/stores/channel';
 import { useReadStatusStore } from 'src/stores/readStatus';
+import { read } from 'fs';
 
 // Router
 const router = useRouter();
@@ -145,25 +146,17 @@ const checkIfAuthenticated = computed(
   (): boolean => memberStore.isAuthenticated,
 );
 const hasUnreadChannels = computed(() => {
-  if(channelStore.getCurrentChannel  && channelStore.getCurrentGuild) {
-    const channels = channelStore.getChannelsByGuildId;
-    if (!channels) {
-      return false;
-    }
-    return channels.some((channel) => {
-      const unreadCount = readStatusStore.getUnreadStatusCount(channel.id);
-      return unreadCount > 0;
-    });
-  }
-  return false;
+  const readStatus = readStatusStore.getReadStatus;
+  if (!readStatus) return false;
+
+  return Object.values(readStatus).some((entry) => !entry.status);
 });
+
 
 // Watches
 watch( currentGuild,
   () => {
     if(currentGuild.value) {
-      channelStore.ensureChannels(currentGuild.value.id);
-      checkForUnreadNodes();
       hasUnreadChannels
     }
   }
@@ -171,8 +164,6 @@ watch( currentGuild,
 watch( currentQuest,
   () => {
     if(currentQuest.value) {
-      channelStore.ensureChannels(currentQuest.value.id);
-      checkForUnreadNodes();
       hasUnreadChannels
     }
   }
@@ -192,15 +183,6 @@ onBeforeRouteLeave((to, from, next) => {
 // Functions
 function goTo(newRoute: string): void {
   router.push({ name: newRoute });
-}
-function checkForUnreadNodes(): boolean {
-  channelStore.setCurrentGuild(currentGuild.value.id);
-  const channels = channelStore.getChannelsByGuildId;
-  const hasUnreadNodes = channels.some((channel) => {
-    const isRead = readStatusStore.getNodeReadStatus(channel.id);
-    return !isRead;
-  });
-  return hasUnreadNodes;
 }
 async function onLogout() {
   rightDrawer.value = false;

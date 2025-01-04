@@ -70,7 +70,7 @@ guildStore.setCurrentGuild(ChannelListProps.guild_id);
 const getChannels = computed(() => {
   const channels = ChannelListProps.quest_id
     ? channelStore.getGameChannelsOfQuest(ChannelListProps.quest_id!)
-    : channelStore.getGuildChannels;
+    : channelStore.getRootGuildChannels;
   return channels
 });
 async function ensureData() {

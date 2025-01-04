@@ -158,20 +158,40 @@ const node = ref<Partial<ConversationNode> | defaultNodeType>({});
 let pub_state_list: publication_state_type[] = publication_state_list;
 
 // Computed Properties
-const selectedNodeType = computed(() => {
-  if (selectedNode.value && isValidNodeType(selectedNode.value)) {
-    return selectedNode.value;
-  } else {
-    return undefined;
-  }
+const selectedNodeType = computed<string | undefined>({
+  get() {
+    if (selectedNode.value && isValidNodeType(selectedNode.value)) {
+      return selectedNode.value;
+    } else {
+      return undefined;
+    }
+  },
+  set(value) {
+    if (value && isValidNodeType(value)) {
+      selectedNode.value = value;
+    } else {
+      selectedNode.value = undefined;
+    }
+  },
 });
-const selectedStatusType = computed(() => {
-  if (selectedStatus.value && isValidNodeStatus(selectedStatus.value)) {
-    return selectedStatus.value;
-  } else {
-    return undefined;
-  }
+
+const selectedStatusType = computed<string | undefined>({
+  get() {
+    if (selectedStatus.value && isValidNodeStatus(selectedStatus.value)) {
+      return selectedStatus.value;
+    } else {
+      return undefined;
+    }
+  },
+  set(value) {
+    if (value && isValidNodeStatus(value)) {
+      selectedStatus.value = value;
+    } else {
+      selectedStatus.value = undefined;
+    }
+  },
 });
+
 const roles = computed(() => NodeFormProps.roles);
 const description = computed<string>({
   get() {

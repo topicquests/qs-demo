@@ -24,10 +24,8 @@
 import { GuildData, QuestData } from '../types';
 import channelList from '../components/ChannelListComponent.vue';
 import { computed, onBeforeMount } from 'vue';
-import { useReadStatusStore } from 'src/stores/readStatus';
 import { useChannelStore } from 'src/stores/channel';
 
-const readStatusStore = useReadStatusStore();
 const channelStore = useChannelStore();
 
 const rightDrawerProps = defineProps<{
@@ -40,7 +38,6 @@ const shouldShowGuildChannels = computed(() => !!rightDrawerProps.currentGuild);
 const canShowBothChannels = computed(() => !!rightDrawerProps.currentGuild && !!rightDrawerProps.currentQuest);
 
 onBeforeMount(async() => {
-  readStatusStore.ensureAllChannelReadStatus();
   channelStore.ensureChannels(channelStore.getChannelsCurrentGuildId)
 })
 </script>
