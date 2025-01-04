@@ -29,6 +29,34 @@ RETURNS TABLE (
     GROUP BY cn.id, rs.status;
 $$ LANGUAGE SQL;
 
+
+CREATE OR REPLACE FUNCTION public.guild_unread_channels(member_id integer, guild_id integer, quest_id integer)
+RETURNS TABLE (
+  root_id integer,
+  quest_id integer,
+  read_status boolean,
+  count integer
+) AS $$
+  SELECT
+      subltree(cn.ancestry, 0, 1)::varchar::integer as root_id,
+      cn.quest_id,
+      coalesce(rs.status, false) as read_status,
+      count(cn.id) as count
+  FROM
+      conversation_node cn
+  LEFT OUTER JOIN
+      read_status rs
+  ON
+      cn.id = rs.node_id
+      AND rs.member_id = guild_unread_channels.member_id
+      AND rs.status
+  WHERE
+      cn.guild_id = guild_unread_channels.guild_id
+      AND cn.meta = 'channel'
+      AND (cn.quest_id = guild_unread_channels.quest_id OR cn.quest_id IS NULL)
+  GROUP BY subltree(cn.ancestry, 0, 1), cn.quest_id, coalesce(rs.status, false);
+$$ LANGUAGE SQL;
+
 CREATE OR REPLACE FUNCTION public.node_shown_time(node_id integer, seconds float) RETURNS interval AS $$
     INSERT INTO read_status (node_id, member_id, seconds_shown) VALUES (node_shown_time.node_id, current_member_id(), make_interval(secs=>seconds))
     ON CONFLICT (node_id, member_id) DO UPDATE SET
