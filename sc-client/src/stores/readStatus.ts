@@ -5,6 +5,8 @@ import { useConversationStore } from './conversation';
 import { useChannelStore } from './channel';
 import { api } from '../boot/axios';
 import { AxiosResponse } from 'axios';
+import { useGuildStore } from './guilds';
+import { useQuestStore } from './quests';
 
 export interface ReadStatusMap {
   [key: number]: ReadStatusData;
@@ -76,6 +78,39 @@ export const useReadStatusStore = defineStore('readStatus', {
         await this.fetchReadStatus({ rootid });
       }
     },
+    async ensureGuildUnreadChannels() {
+      try {
+        const memberStore = useMemberStore();
+        const guildStore = useGuildStore();
+        const questStore = useQuestStore();
+
+        const member_id = memberStore.getUser.id;
+        const guild_id = guildStore.getCurrentGuild.id;
+        const quest_id = questStore.getCurrentQuest?.id ?? null;
+
+        if (!member_id || !guild_id) {
+          console.warn("Missing member_id or guild_id. Cannot fetch unread channels.");
+          return;
+        }
+
+        const unreadChannels = await this.fetchGuildUnreadChannels({
+          member_id,
+          guild_id,
+          quest_id,
+        });
+
+        if (unreadChannels) {
+          this.readStatus = Object.fromEntries(
+            unreadChannels.map((channel) => [channel.node_id, channel])
+          );
+          console.log("Unread channels successfully updated.");
+        } else {
+          console.warn("No unread channels were returned.");
+        }
+      } catch (error) {
+        console.error("Error ensuring guild unread channels:", error);
+      }
+    },
 
     async ensureReadStatusOfGuild() {
       const channelStore = useChannelStore();
@@ -142,6 +177,21 @@ export const useReadStatusStore = defineStore('readStatus', {
         );
       }
     },
+    async fetchGuildUnreadChannels(params: { member_id: number; guild_id: number; quest_id: number }) {
+      try {
+        const res: AxiosResponse<any[]> = await api.post('rpc/guild_unread_channels', params);
+        if (res.status === 200) {
+          return res.data;
+        } else {
+          console.error("Failed to fetch guild unread channels. Server responded with:", res.status);
+          return [];
+        }
+      } catch (error) {
+        console.error("Error fetching guild unread channels:", error);
+        return [];
+      }
+    },
+
     async fetchAllReadStatus() {
       const res: AxiosResponse<ReadStatusData[]> = await api.get(
         '/read_status');

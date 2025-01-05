@@ -262,6 +262,7 @@ watch(
     if (currentQuestId.value) {
       getCastingRoles();
       initializeQuest();
+      readStatusStore.ensureGuildUnreadChannels();
     }
   },
   { immediate: true },
@@ -351,7 +352,7 @@ async function initialize() {
   ]);
   guildStore.setCurrentGuild(guild_id!);
   channelStore.setCurrentGuild(guild_id!)
-  readStatusStore.ensureReadStatusByGuild(),
+  readStatusStore.ensureGuildUnreadChannels();
   await initializeStage2();
   ready.value = true;
 }
