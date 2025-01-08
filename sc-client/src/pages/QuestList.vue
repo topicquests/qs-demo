@@ -101,7 +101,7 @@ onBeforeMount(async () => {
 
 .quest-card {
   width: 75%;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color:transparent;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   padding: 1.5rem;

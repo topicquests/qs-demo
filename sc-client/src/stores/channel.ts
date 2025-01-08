@@ -47,6 +47,16 @@ export const useChannelStore = defineStore('channel', {
       Object.values(state.channels).filter(
         (c: ConversationNode) => c.quest_id == undefined,
       ),
+    getCurrentGuild: (state: ChannelState) => state.currentGuild,
+    getChannelsCurrentGuildId: (state: ChannelState) => state.currentGuild,
+
+    getRootGuildChannels: (state: ChannelState): ConversationNode[] =>
+      Object.values(state.channels).filter(
+        (c: ConversationNode) =>
+          c.guild_id == state.currentGuild &&
+          c.parent_id == null &&
+          c.quest_id == undefined,
+      ),
     getGameChannels: (state: ChannelState): ConversationNode[] =>
       Object.values(state.channels).filter(
         (c: ConversationNode) => c.quest_id != undefined,
@@ -75,10 +85,23 @@ export const useChannelStore = defineStore('channel', {
         );
       }
     },
+    getChannelsByGuildId: (state: ChannelState): ConversationNode[] => {
+      if (state.currentGuild) {
+        return Object.values(state.channels).filter(
+          (n) => n.guild_id == state.currentGuild,
+        );
+      }
+    },
     getCurrentChannel: (state: ChannelState) => state.currentChannel,
     getChannelNode:
       (state: ChannelState) => (channel_id: number, node_id: number) =>
         state.channelData[channel_id]?.[node_id],
+    getChannelOfNode: (state: ChannelState) => (node_id: number) => {
+      for (const channel_id of Object.keys(state.channelData)) {
+        const channel = state.channelData[channel_id];
+        if (channel[node_id]) return channel_id;
+      }
+    },
     canEdit:
       (state: ChannelState) => (channel_id?: number, node_id?: number) => {
         const memberStore = useMemberStore();
@@ -120,6 +143,9 @@ export const useChannelStore = defineStore('channel', {
     setCurrentChannel(channel_id: number) {
       this.currentChannel = channel_id;
     },
+    setCurrentGuild(guild_id: number) {
+      this.currentGuild = guild_id;
+    },
     async ensureChannels(guild_id: number) {
       if (guild_id != this.currentGuild) {
         await this.fetchChannels(guild_id);
@@ -134,6 +160,9 @@ export const useChannelStore = defineStore('channel', {
         await this.fetchChannelConversation(channel_id);
       }
     },
+    async ensureAllChannels() {
+      await this.fetchAllChannels();
+    },
     resetChannel() {
       Object.assign(this, clearBaseState);
     },
@@ -142,17 +171,17 @@ export const useChannelStore = defineStore('channel', {
       if (!node.parent_id) {
         this.channels = { ...this.channels, [channel_id]: node };
       }
-      if (node.parent_id && this.channelData[channel_id] == undefined) {
-        console.log('Missing channel');
-        return;
+      if (node.parent_id && !this.channelData[channel_id]) {
+        console.error('Missing channel');
+        this.channelData[channel_id] = {};
       }
-      const channelData = { ...this.channelData[channel_id], [node.id]: node };
-      this.channelData = {
-        ...this.channelData,
-        [channel_id]: channelData,
-      };
+      if (!this.channelData[channel_id]) {
+        this.channelData[channel_id] = {};
+      }
+      this.channelData[channel_id][node.id] = node;
       this.currentChannel = channel_id;
     },
+
     async fetchChannels(guild_id: number) {
       const params = {
         guild_id: `eq.${guild_id}`,
@@ -173,6 +202,22 @@ export const useChannelStore = defineStore('channel', {
             guildStore.currentGuild = res.data[0].guild_id;
             this.channelData = {};
           }
+          this.channels = Object.fromEntries(
+            res.data.map((node: ConversationNode) => [node.id, node]),
+          );
+        }
+      }
+    },
+    async fetchAllChannels() {
+      const params = {
+        meta: 'eq.channel',
+      };
+      const res: AxiosResponse<ConversationNode[]> = await api.get(
+        '/conversation_node',
+        { params },
+      );
+      if (res.status == 200) {
+        if (res.data.length > 0) {
           this.channels = Object.fromEntries(
             res.data.map((node: ConversationNode) => [node.id, node]),
           );
@@ -221,12 +266,12 @@ export const useChannelStore = defineStore('channel', {
       }
     },
     async updateChannelNode(data: Partial<ConversationNode>) {
+      const params = Object();
+      params.id = data.id;
       data = filterKeys(data, conversationNodePatchKeys);
       const res: AxiosResponse<ConversationNode[]> = await api.patch(
-        '/conversation_node/${params.id}',
-        {
-          data,
-        },
+        `/conversation_node?id=eq.${params.id}`,
+        data,
       );
       if (res.status == 200) {
         const node = res.data[0];

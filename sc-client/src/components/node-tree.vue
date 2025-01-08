@@ -1,6 +1,6 @@
 <template>
   <div class="q-pb-xl" v-if="ready">
-    <div class="row justify-end" style="background-color: #d3d3d3">
+    <div class="row justify-end" style="width: 100%; background-color: #d3d3d3">
       <q-btn icon="menu" :flat="true" :dense="true">
         <q-menu>
           <q-list>
@@ -63,7 +63,7 @@
       :filter="searchFilter_"
     >
       <template v-slot:default-header="prop">
-        <div class="row items-center" :ref="'node_' + prop.node.id">
+        <div class="row items-center" v-if="prop.node.id" :ref="'node_' + prop.node.id">
           <q-icon :name="prop.node.icon" class="q-mr-sm" />
           <span
             :class="
@@ -93,7 +93,6 @@
             >&nbsp;{{ threats[prop.node.id] }}]</span
           >
           <q-btn
-            size="xs"
             :flat="true"
             v-if="
               editable &&
@@ -105,7 +104,6 @@
             @click="editNode(prop.node.id)"
           />
           <q-btn
-            size="xs"
             :flat="true"
             v-if="
               editable &&
@@ -239,7 +237,7 @@ const addingChildToNodeId = ref<number | null>(null);
 const allowChangeMeta = ref(false);
 const newNode = ref<Partial<ConversationNode>>({});
 const tree = ref<QTree>();
-  const form = ref<InstanceType<typeof NodeForm> | null>(null);
+const form = ref<InstanceType<typeof NodeForm> | null>(null);
 const nodeForms = shallowRef<
   Record<string, InstanceType<typeof NodeForm> | null>
 >({});
@@ -260,7 +258,6 @@ const searchFilter_ = computed(() => {
   return searchFilter.value + '_';
 });
 const getMemberHandle = computed(() => (id: number) => {
-  console.log("RFan getMemberHandle")
   const member = membersStore.getMemberById(id) as PublicMember;
   if (member) {
     if (questStore.getCurrentQuest && !NodeTreeProps.channelId) {
@@ -509,17 +506,13 @@ async function confirmAddChild(node: ConversationNode) {
     } else {
       await conversationStore.createConversationNode(node);
     }
-    addingChildToNodeId.value = null;
-    newNode.value = {};
+    cancel();
+    nodesTree.value = getNodesTree();
+  } catch (error) {
+    console.error("Error adding child node:", error);
     $q.notify({
-      message: `Added node to conversation`,
-      color: 'positive',
-    });
-  } catch (err) {
-    console.log('there was an error in adding node ', err);
-    $q.notify({
-      message: `There was an error adding new node.`,
-      color: 'negative',
+      type: "negative",
+      message: "Failed to add node. Please try again.",
     });
   }
 }
@@ -530,6 +523,8 @@ async function confirmEdit(node: Partial<ConversationNode>) {
     } else {
       await conversationStore.updateConversationNode(node);
     }
+    cancel();
+    nodesTree.value = getNodesTree();
     editingNodeId.value = null;
     $q.notify({
       message: `node updated`,
@@ -645,7 +640,6 @@ function hiddenByCollapse(qnode: QTreeNode) {
   return false;
 }
 function inSearchFilter(qnode: QTreeNode) {
-  // assume searchFilter not empty
   if (filterMethod(qnode, searchFilter_.value)) return true;
   for (const child of qnode.children || []) {
     if (inSearchFilter(child)) return true;
@@ -654,22 +648,23 @@ function inSearchFilter(qnode: QTreeNode) {
 }
 function scrollToNode(id: number | null, later: number | null = null): void {
   if (id === null) {
-    console.warn('scrollToNode called with null id.');
+    console.warn('[scrollToNode] Called with null id. No action will be taken.');
     return;
   }
   if (later !== null) {
     setTimeout(() => scrollToNode(id, null), later);
-  } else {
-    nextTick(() => {
-      const element = document.querySelector<HTMLElement>(`[ref="node_${id}"]`);
-      if (element) {
-        element.scrollIntoView({ block: 'start' });
-      } else {
-        console.warn(`Element with ref "node_${id}" not found.`);
-      }
-    });
+    return;
   }
+  nextTick(() => {
+    const element = document.querySelector<HTMLElement>(`[ref="node_${id}"]`);
+    if (element) {
+      element.scrollIntoView({ block: 'start' });
+    } else {
+      console.warn(`[scrollToNode] Element with ref "node_${id}" not found.`);
+    }
+  });
 }
+
 function selectPrevious() {
   const qtree = tree;
   const sequence = conversationStore.getTreeSequence;
@@ -754,75 +749,162 @@ onBeforeMount(async () => {
   ready.value = true;
 });
 </script>
-<style>
+<style scoped>
+/* General Styling */
 .node-status {
   display: block;
   font-size: 0.9em;
   color: gray;
+  margin-top: 0.5em;
 }
+
 .node-title {
-  font-family: 'Times New Roman', Times, serif;
-  font-size: 10pt;
+  font-family: 'Arial', sans-serif;
+  font-size: 12pt;
+  font-weight: bold;
+  color: #333;
 }
+
 .node-creator {
-  color: black;
+  color: #555;
   font-size: 10pt;
   margin-left: 1em;
   margin-right: 1em;
+  font-style: italic;
 }
-.score {
-  font-size: small;
-}
+
 .threat-status {
   color: grey;
   font-size: small;
+  margin-left: 0.5em;
 }
+
+.score {
+  font-size: small;
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+
 .q-tree__node--selected {
   border: 1px dashed #bbb;
   margin: 2px -1px -1px -1px;
-  background-color: #f8f8f8;
-}
-.node-status-private_draft {
-  color: red;
-}
-.node-status-proposed {
-  color: green;
-}
-.node-status-role_draft {
-  color: orangered;
-}
-.node-status-guild_draft {
-  color: orange;
-}
-.node-status-published {
-  color: black;
-}
-.node-status-submitted {
-  color: purple;
-}
-.node-status-obsolete {
-  color: grey;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  padding: 4px;
 }
 
-.node-meta-meta {
-  background-color: grey;
+/* Node Status Colors */
+.node-status-private_draft {
+  color: red;
+  font-weight: bold;
 }
+
+.node-status-proposed {
+  color: green;
+  font-weight: bold;
+}
+
+.node-status-role_draft {
+  color: orangered;
+  font-weight: bold;
+}
+
+.node-status-guild_draft {
+  color: orange;
+  font-weight: bold;
+}
+
+.node-status-published {
+  color: black;
+  font-weight: bold;
+}
+
+.node-status-submitted {
+  color: purple;
+  font-weight: bold;
+}
+
+.node-status-obsolete {
+  color: grey;
+  font-weight: bold;
+  text-decoration: line-through;
+}
+
+/* Meta Node Styling */
+.node-meta-meta {
+  background-color: #e0e0e0;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+/* Score Styling */
 .score-neg.my-score {
   color: red;
+  background-color: #ffe5e5;
 }
+
 .score-pos.my-score {
   color: green;
+  background-color: #e5ffe5;
 }
+
 .score-neg.other-score {
   color: blue;
+  background-color: #e5f0ff;
 }
-.score-neg.other-score {
+
+.score-pos.other-score {
   color: orange;
+  background-color: #fff5e5;
 }
+
+/* Scrollable Div */
 .scrollable-div {
   width: 75%;
   padding: 1em;
-  color: grey;
+  color: #666;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow-y: auto;
+}
+
+/* Buttons */
+.q-btn {
+  border-radius: 1px;
+  padding: 2px;
+}
+
+.q-btn[icon="edit"] {
+  background-color: #f2f0ff;
+  color: #333333;
+  border-radius: 1px;
+  padding: 2px;
+}
+
+.q-btn[icon="add"] {
+  background-color: #f8fff0;
+  color: #333;
+  border-radius: 1px;
+  padding: 2px;
+}
+
+.q-btn:hover {
+  filter: brightness(0.9);
+}
+
+/* Tree Node Styling */
+.row.items-center {
+  align-items: center;
+  padding: 5px 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.row.q-mt-md.q-ml-lg {
+  margin-left: 1.5em;
+  font-size: 0.9em;
+  color: #888;
 }
 </style>
+
 

@@ -1,7 +1,7 @@
 <template>
-  <q-page class="bg-secondary" v-if="ready">
+  <q-page class="bg-secondary create-guild-page" v-if="ready">
     <div class="row justify-center">
-      <q-card style="width: 60%" class="q-mt-md">
+      <q-card style="width: 60%" class="q-mt-md create-guild-card">
         <div>
           <member_handle></member_handle>
         </div>
@@ -145,7 +145,20 @@ onBeforeMount(async () => {
   ready.value = true;
 });
 </script>
-<style>
+<style lang="scss">
+.create-guild-page {
+  background: url('../statics/images/questBackgroundImage.jpg') no-repeat center center fixed !important;
+  background-size: cover;
+  min-height: 100vh;
+  padding: 0rem;
+  box-sizing: border-box;
+}
+.create-guild-card {
+  background-color: transparent;
+  margin-bottom: 20px
+}
+
+
 .details {
   max-width: 960px;
   min-height: 800px;

@@ -8,6 +8,7 @@
           :val="quest.id"
           :label="quest.name"
           class="q-ml-xl"
+          id="radio"
         >
           <q-btn
             v-if="
@@ -16,7 +17,7 @@
             label="Play"
             @click="prompt = true"
             id="radio-btn"
-            size="md"
+            size="sm"
             class="bg-primary q-ml-md"
           />
           <q-btn
@@ -92,10 +93,8 @@ const router = useRouter();
 const prompt = ref(false);
 const quest_id = ref(null);
 
-watch(quest_id, (newVal, oldVal) => {
+watch(quest_id, (newVal) => {
   questStore.setCurrentQuest(newVal);
-  console.log('quest_id changed from', oldVal, 'to', newVal);
-
 })
 
 </script>

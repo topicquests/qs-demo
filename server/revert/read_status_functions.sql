@@ -1,4 +1,4 @@
--- Revert sensecraft:read_status_functions from pg
+ode -- Revert sensecraft:read_status_functions from pg
 
 BEGIN;
 
@@ -10,7 +10,8 @@ DROP FUNCTION IF EXISTS public.unread_status_list();
 DROP FUNCTION IF EXISTS public.unread_status_list(integer);
 DROP FUNCTION IF EXISTS public.node_shown_time(node_id integer, seconds float);
 DROP FUNCTION IF EXISTS public.node_set_read_status(node_id integer, new_status boolean, override boolean);
-
+DROP FUNCTION IF EXISTS public.node_set_read_status(node_id integer, new_status boolean, override boolean);
+DROP FUNCTION IF EXISTS public.guild_unread_channels(member_id integer, guild_id integer, quest_id integer);
 DROP TRIGGER IF EXISTS after_update_node_clear_read_status ON public.conversation_node;
 DROP FUNCTION IF EXISTS public.reset_read_status();
 

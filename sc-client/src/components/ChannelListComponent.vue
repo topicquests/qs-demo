@@ -54,6 +54,7 @@ import { useChannelStore } from '../stores/channel';
 import { waitUserLoaded } from '../app-access';
 import { onBeforeUpdate } from 'vue';
 import { onBeforeMount } from 'vue';
+import { useGuildStore } from 'src/stores/guilds';
 
 const ChannelListProps = defineProps<{
   guild_id?: number;
@@ -62,14 +63,14 @@ const ChannelListProps = defineProps<{
   title: string;
 }>();
 const channelStore = useChannelStore();
+const guildStore=useGuildStore();
 const ready = ref(false);
 
+guildStore.setCurrentGuild(ChannelListProps.guild_id);
 const getChannels = computed(() => {
-  console.log(ChannelListProps.quest_id, channelStore.getGameChannelsOfQuest(ChannelListProps.quest_id!))
   const channels = ChannelListProps.quest_id
     ? channelStore.getGameChannelsOfQuest(ChannelListProps.quest_id!)
-    : channelStore.getGuildChannels;
-    console.log(channels)
+    : channelStore.getRootGuildChannels;
   return channels
 });
 async function ensureData() {
