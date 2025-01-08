@@ -1,13 +1,13 @@
-import { installQuasarPlugin } from "@quasar/quasar-app-extension-testing-unit-vitest";
-import { describe, expect, it } from "vitest";
-import nodeTreeComponent from "src/components/node-tree.vue";
-import { mockGuild, mockMember, mockNode, mockQuest } from "./mocks/StoreMocks";
-import { flushPromises, mount } from "@vue/test-utils";
-import { createTestingPinia } from "@pinia/testing";
-import { nextTick } from "vue";
+import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
+import { describe, expect, it } from 'vitest';
+import nodeTreeComponent from 'src/components/node-tree.vue';
+import { mockGuild, mockMember, mockNode, mockQuest } from './mocks/StoreMocks';
+import { flushPromises, mount } from '@vue/test-utils';
+import { createTestingPinia } from '@pinia/testing';
+import { nextTick } from 'vue';
 
 installQuasarPlugin();
-function createWrapper(props={}) {
+function createWrapper(props = {}) {
   return mount(nodeTreeComponent, {
     props: {
       currentQuestId: mockQuest.id,
@@ -26,21 +26,21 @@ function createWrapper(props={}) {
           initialState: {
             quest: {
               currentQuest: mockQuest.id,
-              quests: { 1: mockQuest},
+              quests: { 1: mockQuest },
             },
             conversation: {
               conversationRoot: mockNode,
-              conversation: {1: mockNode},
-              full: true
+              conversation: { 1: mockNode },
+              full: true,
             },
             members: {
-              members: {1: mockMember}
-            }
-          }
-        })
-      ]
-    }
-  })
+              members: { 1: mockMember },
+            },
+          },
+        }),
+      ],
+    },
+  });
 }
 
 describe('NodeTree component', () => {
@@ -52,12 +52,13 @@ describe('NodeTree component', () => {
     // Check if the icon is displayed
     expect(icon.exists()).toBe(true);
     expect(icon.text()).toBe('menu');
-  })
-  it("Display QTree"), async ()=> {
-    const wrapper = createWrapper();
-    await flushPromises();
-    await nextTick();
-    const tree = wrapper.find('.q-tree')
-    expect(tree.exists()).toBe(true)
-  }
-})
+  });
+  it('Display QTree'),
+    async () => {
+      const wrapper = createWrapper();
+      await flushPromises();
+      await nextTick();
+      const tree = wrapper.find('.q-tree');
+      expect(tree.exists()).toBe(true);
+    };
+});

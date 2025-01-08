@@ -27,22 +27,22 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, } from "vue";
-import scoreboard from "../components/score-board.vue";
-import member from "../components/member-handle.vue";
-import roleCard from "../components/role-card.vue";
-import { Role } from "../types";
-import { useRoleStore } from "src/stores/role";
-import { useRoute, useRouter } from "vue-router";
-import { useQuasar } from "quasar";
+import { onBeforeMount } from 'vue';
+import scoreboard from '../components/score-board.vue';
+import member from '../components/member-handle.vue';
+import roleCard from '../components/role-card.vue';
+import { Role } from '../types';
+import { useRoleStore } from 'src/stores/role';
+import { useRoute, useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
 
 const roleStore = useRoleStore();
 const route = useRoute();
-const router = useRouter()
+const router = useRouter();
 const $q = useQuasar();
 
 const newRole: Partial<Role> = {
-  name: "",
+  name: '',
   permissions: [],
   max_pub_state: null,
   guild_id: null,
@@ -51,24 +51,24 @@ const newRole: Partial<Role> = {
 async function createNewRole(newRole: Partial<Role>) {
   try {
     const res = await roleStore.createRole(newRole);
-      $q.notify({
-        message: `Added new role`,
-        type: "positive",
-      });
-        console.log("Role id: ", res.id)
-        router.push({ name: "role_edit", params: { role_id: res.id } });
-    } catch (err) {
-      console.log("there was an error in creating role ", err);
-      $q.notify({
-        message: `There was an error creating new role.`,
-        type: "negative",
-      });
-    }
+    $q.notify({
+      message: `Added new role`,
+      type: 'positive',
+    });
+    console.log('Role id: ', res.id);
+    router.push({ name: 'role_edit', params: { role_id: res.id } });
+  } catch (err) {
+    console.log('there was an error in creating role ', err);
+    $q.notify({
+      message: `There was an error creating new role.`,
+      type: 'negative',
+    });
   }
+}
 
- onBeforeMount(() => {
-  if(typeof route.params.guild_id === 'string') {
+onBeforeMount(() => {
+  if (typeof route.params.guild_id === 'string') {
     newRole.guild_id = Number.parseInt(route.params.guild_id);
   }
-})
+});
 </script>

@@ -1,14 +1,14 @@
 <template>
   <div class="row justify-center" style="width: 100%; padding: 0; margin: 0">
-      <node-tree
-        :currentQuestId="questId"
-        :currentGuildId="guildId"
-        :initialSelectedNodeId="selectedNodeId"
-        @tree-selection="selectionChanged"
-        :channelId="undefined"
-        :isChannel="false"
-        :editable="true"
-      />
+    <node-tree
+      :currentQuestId="questId"
+      :currentGuildId="guildId"
+      :initialSelectedNodeId="selectedNodeId"
+      @tree-selection="selectionChanged"
+      :channelId="undefined"
+      :isChannel="false"
+      :editable="true"
+    />
   </div>
 </template>
 

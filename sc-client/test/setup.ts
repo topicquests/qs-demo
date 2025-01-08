@@ -82,7 +82,4 @@ app.use(pinia);
 beforeAll(() => {
   config.global.plugins = [router, pinia];
   global.router = router;
-
 });
-
-

@@ -3,7 +3,7 @@
     <div class="row justify-center">
       <q-card class="guild-card q-mt-md q-pa-md">
         <div class="col-12 justify-center">
-          <q-card class="q-mt-md q-pa-md" style="background-color: transparent;">
+          <q-card class="q-mt-md q-pa-md" style="background-color: transparent">
             <div class="row justify-end" style="width: 92%">
               <member-handle></member-handle>
             </div>
@@ -12,10 +12,10 @@
                 <scoreboard></scoreboard>
               </div>
             </div>
-            <div class="row justify-center ">
+            <div class="row justify-center">
               <div class="col-10 justify-center">
-              <guild-header class="guild-header"></guild-header>
-            </div>
+                <guild-header class="guild-header"></guild-header>
+              </div>
             </div>
             <guild-description></guild-description>
             <div class="row">
@@ -133,7 +133,14 @@ import {
   quest_status_enum,
   permission_enum,
 } from '../enums';
-import { Quest, GamePlay, Casting, Role, PublicMember, QuestData } from '../types';
+import {
+  Quest,
+  GamePlay,
+  Casting,
+  Role,
+  PublicMember,
+  QuestData,
+} from '../types';
 import { computed, ref, watch } from 'vue';
 import castingRoleEdit from '../components/casting_role_edit.vue';
 import guildMembers from '../components/guild-members.vue';
@@ -229,13 +236,14 @@ const currentGuild = computed(() => guildStore.getCurrentGuild);
 const currentQuest = computed(() => questStore.getCurrentQuest);
 const currentGuildId = computed<number>(() => guildStore.currentGuild);
 const playingQuestInGuild = computed(() => {
-  if( currentGuild.value) {
+  if (currentGuild.value) {
     return questStore.isPlayingQuestInGuild(
       currentQuest.value!.id,
       currentGuild.value!.id,
-   )}
-   return false;
-})
+    );
+  }
+  return false;
+});
 
 const availableRoles = computed<Role[]>(() => {
   if (!member || !member.value?.id || !guildId.value) {
@@ -279,14 +287,14 @@ watch(
     deep: true,
   },
 );
-  //Lifecycle Hooks
-  onBeforeMount(async () => {
+//Lifecycle Hooks
+onBeforeMount(async () => {
   await initialize();
 });
-  onBeforeRouteLeave((to, from, next) => {
-    guildStore.setCurrentGuild(0);
-    questStore.setCurrentQuest(0);
-    next();
+onBeforeRouteLeave((to, from, next) => {
+  guildStore.setCurrentGuild(0);
+  questStore.setCurrentQuest(0);
+  next();
 });
 
 // Functions
@@ -351,7 +359,7 @@ async function initialize() {
     membersStore.ensureMembersOfGuild({ guildId: guild_id }),
   ]);
   guildStore.setCurrentGuild(guild_id!);
-  channelStore.setCurrentGuild(guild_id!)
+  channelStore.setCurrentGuild(guild_id!);
   readStatusStore.ensureGuildUnreadChannels();
   await initializeStage2();
   ready.value = true;
@@ -435,13 +443,13 @@ async function initializeQuest() {
     }
     return 'success';
   }
-
 }
 </script>
 
 <style lang="scss">
 .guild-page {
-  background: url('../statics/images/questBackgroundImage.jpg') no-repeat center center fixed !important;
+  background: url('../statics/images/questBackgroundImage.jpg') no-repeat center
+    center fixed !important;
   background-size: cover;
   min-height: 100vh;
   padding: 0rem;

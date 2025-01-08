@@ -9,7 +9,6 @@ vi.mock('@/path/to/config', () => ({
 }));
 
 describe('SidebarMenu Component', () => {
-
   it('renders Signin and Registration links when the user is not authenticated', async () => {
     const wrapper = mount(SidebarMenu, {
       global: {
@@ -20,9 +19,13 @@ describe('SidebarMenu Component', () => {
       },
     });
     expect(await wrapper.find('a[href="/signin"]').exists()).toBe(true);
-    const registerItem = wrapper.findAll('.q-item')
-    .filter(item => item.find('.q-item__section').text().trim() === 'Registration')
-    .at(0);
+    const registerItem = wrapper
+      .findAll('.q-item')
+      .filter(
+        (item) =>
+          item.find('.q-item__section').text().trim() === 'Registration',
+      )
+      .at(0);
     expect(registerItem.exists()).toBe(true);
     expect(await wrapper.find('a[href="/lobby"]').exists()).toBe(false);
     expect(await wrapper.find('a[href="/create_quest"]').exists()).toBe(false);
@@ -44,22 +47,36 @@ describe('SidebarMenu Component', () => {
     });
     expect(wrapper.find('a[to="signin"]').exists()).toBe(false);
     expect(wrapper.find('a[to="register"]').exists()).toBe(false);
-    const dashboardItem = wrapper.findAll('.q-item')
-    .filter(item => item.find('.q-item__section').text().trim() === 'Dashboard')
-    .at(0);
+    const dashboardItem = wrapper
+      .findAll('.q-item')
+      .filter(
+        (item) => item.find('.q-item__section').text().trim() === 'Dashboard',
+      )
+      .at(0);
     expect(dashboardItem.exists()).toBe(true);
-    const createQuest = wrapper.findAll('.q-item')
-    .filter(item => item.find('.q-item__section').text().trim() === 'Create Quest')
-    .at(0);
+    const createQuest = wrapper
+      .findAll('.q-item')
+      .filter(
+        (item) =>
+          item.find('.q-item__section').text().trim() === 'Create Quest',
+      )
+      .at(0);
     expect(createQuest.exists()).toBe(true);
-    const createGuild = wrapper.findAll('.q-item')
-    .filter(item => item.find('.q-item__section').text().trim() === 'Create Guild')
-    .at(0);
+    const createGuild = wrapper
+      .findAll('.q-item')
+      .filter(
+        (item) =>
+          item.find('.q-item__section').text().trim() === 'Create Guild',
+      )
+      .at(0);
     expect(createGuild.exists()).toBe(true);
     expect(wrapper.find('a[to="admin"]').exists()).toBe(false);
-    const logoff = wrapper.findAll('.q-item')
-    .filter(item => item.find('.q-item__section').text().trim() === 'logoff')
-    .at(0);
+    const logoff = wrapper
+      .findAll('.q-item')
+      .filter(
+        (item) => item.find('.q-item__section').text().trim() === 'logoff',
+      )
+      .at(0);
     expect(logoff.exists()).toBe(true);
   });
 
@@ -71,9 +88,12 @@ describe('SidebarMenu Component', () => {
         },
       },
     });
-    const logoff = wrapper.findAll('.q-item')
-    .filter(item => item.find('.q-item__section').text().trim() === 'logoff')
-    .at(0);
+    const logoff = wrapper
+      .findAll('.q-item')
+      .filter(
+        (item) => item.find('.q-item__section').text().trim() === 'logoff',
+      )
+      .at(0);
     await logoff.trigger('click');
     expect(wrapper.emitted()).toHaveProperty('onLogout');
   });

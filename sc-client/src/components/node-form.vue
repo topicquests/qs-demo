@@ -30,13 +30,11 @@
     <section>
       <template v-if="NodeFormProps.editing">
         <q-editor
-        v-model="description"
-        style="width: 98%"
-        class="q-editor node-card-details scrollable-div"
-        :toolbar="[
-          ['bold', 'italic', 'underline', 'strike', 'undo', 'redo']
-        ]"
-      />
+          v-model="description"
+          style="width: 98%"
+          class="q-editor node-card-details scrollable-div"
+          :toolbar="[['bold', 'italic', 'underline', 'strike', 'undo', 'redo']]"
+        />
       </template>
       <template v-else>
         <div class="scrollable-description">

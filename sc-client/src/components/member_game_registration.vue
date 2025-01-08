@@ -85,7 +85,6 @@ async function ensureData() {
       guildId: MemberGameRegistrationProp.guildId!,
     }),
   ]);
-
 }
 
 onBeforeUpdate(async () => {

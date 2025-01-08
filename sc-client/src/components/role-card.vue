@@ -59,21 +59,21 @@
 </template>
 
 <script setup lang="ts">
-import { Role } from "../types";
-import { publication_state_enum, permission_enum, } from "../enums";
-import { ref, watch } from "vue";
+import { Role } from '../types';
+import { publication_state_enum, permission_enum } from '../enums';
+import { ref, watch } from 'vue';
 
 //Emits
 const emit = defineEmits<{
-  createNewRole: [role: Partial<Role>],
-  updateCurrentRole: [role: Partial<Role>],
-  deleteRoleById: [role: Partial<Role>]
-}>()
+  createNewRole: [role: Partial<Role>];
+  updateCurrentRole: [role: Partial<Role>];
+  deleteRoleById: [role: Partial<Role>];
+}>();
 
 const RoleCardProps = defineProps<{
-  role: Role,
-  edit: boolean,
-  guild_id?: number,
+  role: Role;
+  edit: boolean;
+  guild_id?: number;
 }>();
 
 const currentRole = ref<Partial<Role>>(RoleCardProps.role);
@@ -85,16 +85,16 @@ watch(
   (newRole) => {
     currentRole.value = { ...newRole };
   },
-  { immediate: true } // Trigger immediately on component initialization
+  { immediate: true }, // Trigger immediately on component initialization
 );
 
 function createNewRole() {
-  emit("createNewRole", currentRole.value);
+  emit('createNewRole', currentRole.value);
 }
 function updateCurrentRole() {
-  emit("updateCurrentRole", currentRole.value);
+  emit('updateCurrentRole', currentRole.value);
 }
 function deleteRoleById() {
-  emit("deleteRoleById", currentRole.value);
+  emit('deleteRoleById', currentRole.value);
 }
 </script>

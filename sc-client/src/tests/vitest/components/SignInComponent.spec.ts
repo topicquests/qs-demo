@@ -41,11 +41,11 @@ describe('SignInComponent', () => {
   it('check for email icon', async () => {
     const iconElement = wrapper.find('i.q-icon');
     expect(iconElement.exists()).toBe(true);
-  })
+  });
 
   it('toggles password visibility', async () => {
     const passwordInput = wrapper.find('input[type="password"]');
-    await passwordInput.setValue('password')
+    await passwordInput.setValue('password');
     const appendDiv = wrapper.find('div.q-field__append.q-field__marginal');
     expect(appendDiv.exists()).toBe(true);
     const iconElement = appendDiv.find('i.q-icon');

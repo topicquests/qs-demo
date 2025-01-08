@@ -1,9 +1,9 @@
-import { installQuasarPlugin } from "@quasar/quasar-app-extension-testing-unit-vitest";
-import { describe, expect, it } from "vitest";
-import memberHandleComponent from "src/components/member-handle.vue";
-import { mount } from "@vue/test-utils";
-import { createTestingPinia } from "@pinia/testing";
-import { mockMember } from "./mocks/StoreMocks";
+import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
+import { describe, expect, it } from 'vitest';
+import memberHandleComponent from 'src/components/member-handle.vue';
+import { mount } from '@vue/test-utils';
+import { createTestingPinia } from '@pinia/testing';
+import { mockMember } from './mocks/StoreMocks';
 
 installQuasarPlugin();
 
@@ -19,13 +19,13 @@ describe('MemberHandleComponent', () => {
             initialState: {
               member: {
                 member: mockMember,
-              }
-            }
-          })
-        ]
+              },
+            },
+          }),
+        ],
       },
     });
     await wrapper.vm.$nextTick();
-    expect(wrapper.text()).toContain('JohnSmith')
-  })
-})
+    expect(wrapper.text()).toContain('JohnSmith');
+  });
+});

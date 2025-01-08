@@ -75,9 +75,13 @@ const description = ref<string>('');
 
 const guild = ref<Partial<Guild>>(GuildCardProps.currentGuild || {});
 
-  watch(() => GuildCardProps.currentGuild, (newVal) => {
-  guild.value = newVal || {};
-}, { immediate: true });
+watch(
+  () => GuildCardProps.currentGuild,
+  (newVal) => {
+    guild.value = newVal || {};
+  },
+  { immediate: true },
+);
 
 const doSubmit = async () => {
   try {
@@ -94,10 +98,9 @@ const doSubmit = async () => {
       color: 'negative',
     });
   }
-}
-defineExpose({doSubmit})
+};
+defineExpose({ doSubmit });
 onBeforeMount(async () => {
   await waitUserLoaded();
 });
-
 </script>

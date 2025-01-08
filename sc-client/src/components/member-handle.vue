@@ -14,8 +14,8 @@ import { computed, onBeforeMount, ref } from 'vue';
 const memberStore = useMemberStore();
 const ready = ref(false);
 
-const user = computed(() => memberStore.getUser)
-const handle = computed(() => memberStore.getUser.handle)
+const user = computed(() => memberStore.getUser);
+const handle = computed(() => memberStore.getUser.handle);
 
 onBeforeMount(async () => {
   await memberStore.ensureLoginUser;

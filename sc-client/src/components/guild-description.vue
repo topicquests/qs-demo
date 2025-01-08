@@ -19,16 +19,18 @@
     <div class="row justify-center">
       <div class="column guild-description-col">
         <q-card class="q-mb-md">
-          <div >
+          <div>
             <!-- Apply a custom class to this div for description-specific styling -->
-            <div class="guild-description" v-html="currentGuild?.description"></div>
+            <div
+              class="guild-description"
+              v-html="currentGuild?.description"
+            ></div>
           </div>
         </q-card>
       </div>
     </div>
   </div>
 </template>
-
 
 <script setup lang="ts">
 import { computed } from 'vue';
@@ -38,9 +40,7 @@ import { useMemberStore } from '../stores/member';
 const guildStore = useGuildStore();
 const memberStore = useMemberStore();
 
-const currentGuild = computed(() =>
-  guildStore.getCurrentGuild
-);
+const currentGuild = computed(() => guildStore.getCurrentGuild);
 const member = computed(() => memberStore.member);
 const isMember = computed<boolean>({
   get: () => {

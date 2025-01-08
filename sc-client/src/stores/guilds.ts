@@ -63,14 +63,16 @@ export const useGuildStore = defineStore('guild', {
         ),
       );
     },
-    isGuildMember: (state: GuildsState) => (guild_id: number):Partial<GuildMembership> => {
-      const memberId = useMemberStore().getUserId;
-      return state.guilds[guild_id].guild_membership?.find(
-        (m: Partial<GuildMembership>) =>
-          m.member_id == memberId &&
-          m.status == registration_status_enum.confirmed,
-      );
-    },
+    isGuildMember:
+      (state: GuildsState) =>
+      (guild_id: number): Partial<GuildMembership> => {
+        const memberId = useMemberStore().getUserId;
+        return state.guilds[guild_id].guild_membership?.find(
+          (m: Partial<GuildMembership>) =>
+            m.member_id == memberId &&
+            m.status == registration_status_enum.confirmed,
+        );
+      },
     getGuildMembershipById: (state: GuildsState) => (member_id: number) => {
       if (state.currentGuild) {
         const guildId: number | boolean = state.currentGuild;
@@ -319,9 +321,13 @@ export const useGuildStore = defineStore('guild', {
     },
     async updateGuild(data: Partial<Guild>) {
       data = filterKeys(data, guildPatchKeys);
-      const res: AxiosResponse<Partial<GuildData[]>> = await api.patch('guilds', data, {
-        params: { id: `eq.${data.id}` },
-      });
+      const res: AxiosResponse<Partial<GuildData[]>> = await api.patch(
+        'guilds',
+        data,
+        {
+          params: { id: `eq.${data.id}` },
+        },
+      );
 
       if (res.status == 200) {
         const guild = res.data[0];

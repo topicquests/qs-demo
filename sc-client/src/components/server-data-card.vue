@@ -207,7 +207,7 @@ const $q = useQuasar();
 
 async function doUpdateServerData() {
   try {
-    await serverDataStore.updateServerData(serverData.value );
+    await serverDataStore.updateServerData(serverData.value);
     $q.notify({ type: 'positive', message: 'Server data updated' });
   } catch (err) {
     $q.notify({

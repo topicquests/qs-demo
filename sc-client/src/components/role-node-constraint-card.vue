@@ -42,32 +42,32 @@
 </template>
 
 <script setup lang="ts">
-import { RoleNodeConstraint } from "../types";
-import { publication_state_enum, ibis_node_type_enum } from "../enums";
-import { computed } from "vue";
+import { RoleNodeConstraint } from '../types';
+import { publication_state_enum, ibis_node_type_enum } from '../enums';
+import { computed } from 'vue';
 
 const emit = defineEmits<{
-  addRoleNodeConstraint_: [RoleNodeConstraint],
-  updateRoleNodeConstraint_: [RoleNodeConstraint],
-  deleteRoleNodeConstraint_: [RoleNodeConstraint]
-
-
-}>()
-const RoleNodeConstraintCardProps = defineProps<{
-    roleNodeConstraint: Partial<RoleNodeConstraint>,
+  addRoleNodeConstraint_: [RoleNodeConstraint];
+  updateRoleNodeConstraint_: [RoleNodeConstraint];
+  deleteRoleNodeConstraint_: [RoleNodeConstraint];
 }>();
-const nodeRoleNodeConstraint = computed(() => RoleNodeConstraintCardProps.roleNodeConstraint)
+const RoleNodeConstraintCardProps = defineProps<{
+  roleNodeConstraint: Partial<RoleNodeConstraint>;
+}>();
+const nodeRoleNodeConstraint = computed(
+  () => RoleNodeConstraintCardProps.roleNodeConstraint,
+);
 
 const publication_state = Object.keys(publication_state_enum);
 const ibis_node_type = Object.keys(ibis_node_type_enum);
 
 function addRoleNodeConstraint_(nodeRoleNodeConstraint) {
-  emit("addRoleNodeConstraint_", nodeRoleNodeConstraint);
+  emit('addRoleNodeConstraint_', nodeRoleNodeConstraint);
 }
 function updateRoleNodeConstraint_(nodeRoleNodeConstraint) {
-  emit("updateRoleNodeConstraint_", nodeRoleNodeConstraint);
+  emit('updateRoleNodeConstraint_', nodeRoleNodeConstraint);
 }
 function deleteRoleNodeConstraint_(nodeRoleNodeConstraint) {
-  emit("deleteRoleNodeConstraint_", nodeRoleNodeConstraint);
+  emit('deleteRoleNodeConstraint_', nodeRoleNodeConstraint);
 }
 </script>

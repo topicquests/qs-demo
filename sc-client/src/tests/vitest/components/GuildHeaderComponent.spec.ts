@@ -6,15 +6,15 @@ import { mockGuild, mockMember } from './mocks/StoreMocks';
 
 describe('GuildHeaderComponent', () => {
   it('renders guild-header component', async () => {
-    mockMember.permissions = ['joinQuest']
+    mockMember.permissions = ['joinQuest'];
     const wrapper = mount(GuildHeaderComponent, {
       global: {
         plugins: [
           createTestingPinia({
             initialState: {
               guild: {
-                guilds: {1:mockGuild},
-                currentGuild: 1
+                guilds: { 1: mockGuild },
+                currentGuild: 1,
               },
               member: {
                 member: mockMember,
@@ -26,6 +26,6 @@ describe('GuildHeaderComponent', () => {
     });
     const routerLink = wrapper.find('a');
     expect(routerLink.exists()).toBe(true);
-    expect (routerLink.text()).toContain('admin page')
+    expect(routerLink.text()).toContain('admin page');
   });
 });

@@ -7,7 +7,10 @@
       You can
       <router-link
         v-if="QuestActionProps.questId"
-        :to="{ name: 'quest_edit', params: { quest_id: QuestActionProps.questId } }"
+        :to="{
+          name: 'quest_edit',
+          params: { quest_id: QuestActionProps.questId },
+        }"
       >
         administer
       </router-link>
@@ -22,11 +25,19 @@
     <span v-else-if="currentQuest.status != 'registration'">
       The game has started
     </span>
-    <span v-else-if="QuestActionProps.myPlayingGuilds && QuestActionProps.myPlayingGuilds.length == 1">
+    <span
+      v-else-if="
+        QuestActionProps.myPlayingGuilds &&
+        QuestActionProps.myPlayingGuilds.length == 1
+      "
+    >
       Your guild
       <router-link
         v-if="QuestActionProps.questId"
-        :to="{ name: 'guild', params: { guild_id: QuestActionProps.myPlayingGuilds[0].id } }"
+        :to="{
+          name: 'guild',
+          params: { guild_id: QuestActionProps.myPlayingGuilds[0].id },
+        }"
       >
         {{ QuestActionProps.myPlayingGuilds[0].name }}
       </router-link>
@@ -38,7 +49,12 @@
         class="bg-primary q-ml-md"
       />
     </span>
-    <span v-else-if="QuestActionProps.myPlayingGuilds && QuestActionProps.myPlayingGuilds.length > 1">
+    <span
+      v-else-if="
+        QuestActionProps.myPlayingGuilds &&
+        QuestActionProps.myPlayingGuilds.length > 1
+      "
+    >
       You are part of many guilds which are playing this quest. Pick one:
       <ul>
         <li v-for="guild in QuestActionProps.myPlayingGuilds" :key="guild.id">
@@ -93,7 +109,12 @@
       </ul>
       You could tell the guild leader in one of them to join this quest!
     </span>
-    <span v-else-if="guildsPlayingGame(false, true) && guildsPlayingGame(false, true).length > 1">
+    <span
+      v-else-if="
+        guildsPlayingGame(false, true) &&
+        guildsPlayingGame(false, true).length > 1
+      "
+    >
       Here are guilds playing the game which you could join:
       <ul>
         <li v-for="guild in guildsPlayingGame(false, true)" :key="guild.id">
@@ -133,7 +154,7 @@ const baseStore = useBaseStore();
 
 const QuestActionProps = defineProps<{
   myPlayingGuilds: GuildData[] | undefined;
-  questId: number | undefined
+  questId: number | undefined;
 }>();
 
 const registerMemberDialog = ref(false);
@@ -144,7 +165,9 @@ const guildId = computed(() => {
   const casting = memberStore.castingPerQuest[quest_id!];
   return casting ? casting.guild_id : undefined;
 });
-const questMember = computed(() => questStore.isQuestMember(QuestActionProps.questId));
+const questMember = computed(() =>
+  questStore.isQuestMember(QuestActionProps.questId),
+);
 
 const myGuilds = (onlyAsLeader = false) => {
   let memberships = memberStore.member?.guild_membership || [];

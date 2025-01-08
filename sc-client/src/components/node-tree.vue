@@ -63,7 +63,11 @@
       :filter="searchFilter_"
     >
       <template v-slot:default-header="prop">
-        <div class="row items-center" v-if="prop.node.id" :ref="'node_' + prop.node.id">
+        <div
+          class="row items-center"
+          v-if="prop.node.id"
+          :ref="'node_' + prop.node.id"
+        >
           <q-icon :name="prop.node.icon" class="q-mr-sm" />
           <span
             :class="
@@ -311,7 +315,6 @@ const getNodesTree = () => {
 
 const nodesTree = ref<Partial<QTreeNode[]> | undefined | null>(getNodesTree());
 
-
 const canEdit = computed(() => (nodeId: number): boolean => {
   const quest = questStore.getQuestById(NodeTreeProps.currentQuestId!);
   if (quest && (!quest.is_playing || quest.status == 'finished')) return false;
@@ -338,7 +341,7 @@ watch(
 function checkIfExpanded(nodeId: QTreeNode): boolean {
   const qtree = tree.value;
   if (qtree) {
-      const isExpanded = qtree.isExpanded(nodeId);
+    const isExpanded = qtree.isExpanded(nodeId);
     if (isExpanded) {
       return true;
     } else {
@@ -509,10 +512,10 @@ async function confirmAddChild(node: ConversationNode) {
     cancel();
     nodesTree.value = getNodesTree();
   } catch (error) {
-    console.error("Error adding child node:", error);
+    console.error('Error adding child node:', error);
     $q.notify({
-      type: "negative",
-      message: "Failed to add node. Please try again.",
+      type: 'negative',
+      message: 'Failed to add node. Please try again.',
     });
   }
 }
@@ -648,7 +651,9 @@ function inSearchFilter(qnode: QTreeNode) {
 }
 function scrollToNode(id: number | null, later: number | null = null): void {
   if (id === null) {
-    console.warn('[scrollToNode] Called with null id. No action will be taken.');
+    console.warn(
+      '[scrollToNode] Called with null id. No action will be taken.',
+    );
     return;
   }
   if (later !== null) {
@@ -875,14 +880,14 @@ onBeforeMount(async () => {
   padding: 2px;
 }
 
-.q-btn[icon="edit"] {
+.q-btn[icon='edit'] {
   background-color: #f2f0ff;
   color: #333333;
   border-radius: 1px;
   padding: 2px;
 }
 
-.q-btn[icon="add"] {
+.q-btn[icon='add'] {
   background-color: #f8fff0;
   color: #333;
   border-radius: 1px;
@@ -906,5 +911,3 @@ onBeforeMount(async () => {
   color: #888;
 }
 </style>
-
-

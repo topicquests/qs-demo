@@ -30,7 +30,7 @@
                   v-model="description"
                   class="admin-content guild-description-col"
                   :toolbar="[
-                  ['bold', 'italic', 'underline', 'strike', 'undo', 'redo']
+                    ['bold', 'italic', 'underline', 'strike', 'undo', 'redo'],
                   ]"
                 >
                 </q-editor>
@@ -176,7 +176,7 @@
 
             <guild-card
               class="guilds-card"
-              :currentGuild=" currentGuild "
+              :currentGuild="currentGuild"
               :showDescription="false"
             ></guild-card>
           </div>
@@ -480,9 +480,9 @@ onBeforeMount(async () => {
   ready.value = true;
 });
 onBeforeRouteLeave((to, from, next) => {
-    guildStore.setCurrentGuild(0);
-    questStore.setCurrentQuest(0);
-    next();
+  guildStore.setCurrentGuild(0);
+  questStore.setCurrentQuest(0);
+  next();
 });
 
 // Functions
@@ -588,9 +588,6 @@ async function doSubmit() {
     });
   }
 }
-
-
-
 </script>
 <style>
 .guild-admin-card {

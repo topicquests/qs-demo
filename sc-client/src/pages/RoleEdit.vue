@@ -77,17 +77,17 @@ watch(
       await roleStore.ensureRole({ role_id: newRoleId });
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 async function updateCurrentRole(role: Partial<Role>) {
   try {
     await roleStore.updateRole(role);
     await roleStore.fetchRoles();
-      $q.notify({ message: `Role updated`, color: 'positive' });
+    $q.notify({ message: `Role updated`, color: 'positive' });
   } catch (err) {
     console.error('Error updating role:', err);
-      $q.notify({ message: `Error updating role`, color: 'negative' });
+    $q.notify({ message: `Error updating role`, color: 'negative' });
   }
 }
 
@@ -131,4 +131,3 @@ onBeforeMount(async () => {
   ready.value = true;
 });
 </script>
-

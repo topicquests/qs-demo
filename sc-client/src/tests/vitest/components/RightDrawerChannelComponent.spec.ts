@@ -16,7 +16,7 @@ describe('RightDrawer', () => {
   it('passes props to ChannelList correctly', () => {
     const currentGuild: Partial<GuildData> = {
       id: 123,
-    }
+    };
 
     const wrapper = mount(RightDrawer, {
       props: {

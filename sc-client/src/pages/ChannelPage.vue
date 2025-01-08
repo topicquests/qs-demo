@@ -18,7 +18,10 @@
         </router-link>
         <router-link
           v-if="guildId && questId"
-          :to="{ name: 'game_channel_list', params: { guild_id: guildId, quest_id: questId } }"
+          :to="{
+            name: 'game_channel_list',
+            params: { guild_id: guildId, quest_id: questId },
+          }"
         >
           more
         </router-link>
@@ -35,8 +38,8 @@
           v-if="guildId"
           :to="{ name: 'guild_channel_list', params: { guild_id: guildId } }"
         >
-          more
-        </router-link>)
+          more </router-link
+        >)
       </h3>
     </div>
     <div class="row justify-center q-mt-lg">
@@ -59,7 +62,6 @@
     <p>Loading data, please wait...</p>
   </div>
 </template>
-
 
 <script setup lang="ts">
 import nodeTree from '../components/node-tree.vue';
@@ -97,9 +99,9 @@ onBeforeMount(async () => {
   await initialize();
 });
 onBeforeRouteLeave((to, from, next) => {
-    guildStore.setCurrentGuild(0);
-    questStore.setCurrentQuest(0);
-    next();
+  guildStore.setCurrentGuild(0);
+  questStore.setCurrentQuest(0);
+  next();
 });
 
 // Functions
@@ -122,9 +124,7 @@ async function initialize() {
     guildStore.setCurrentGuild(guildId.value!);
     if (questId.value) {
       questStore.setCurrentQuest(questId.value);
-      await Promise.all([
-        questStore.ensureQuest({ quest_id: questId.value }),
-      ]);
+      await Promise.all([questStore.ensureQuest({ quest_id: questId.value })]);
     }
 
     await Promise.all([
@@ -135,11 +135,9 @@ async function initialize() {
 
     ready.value = true;
   } catch (error) {
-    console.error("Failed to initialize data:", error);
+    console.error('Failed to initialize data:', error);
   }
 }
-
-
 </script>
 
 <style scoped>

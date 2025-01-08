@@ -1,32 +1,32 @@
-import { createTestingPinia } from "@pinia/testing";
-import { installQuasarPlugin } from "@quasar/quasar-app-extension-testing-unit-vitest";
-import { mount } from "@vue/test-utils";
-import nodeCardComponent from "src/components/node-card.vue";
-import { describe, it, expect, beforeEach } from "vitest";
-import { mockNode } from "./mocks/StoreMocks";
+import { createTestingPinia } from '@pinia/testing';
+import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
+import { mount } from '@vue/test-utils';
+import nodeCardComponent from 'src/components/node-card.vue';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { mockNode } from './mocks/StoreMocks';
 
 installQuasarPlugin();
 
 describe('NodeCardComponent', () => {
   let wrapper;
-  beforeEach (() => {
+  beforeEach(() => {
     wrapper = mount(nodeCardComponent, {
       props: {
-        node: mockNode
+        node: mockNode,
       },
       global: {
         plugins: [
           createTestingPinia({
             initialState: {
               conversation: {
-                node:mockNode
-              }
-            }
-          })
-        ]
-      }
-    })
-  })
+                node: mockNode,
+              },
+            },
+          }),
+        ],
+      },
+    });
+  });
   it('renders the IbisButton with the node type icon and node title', () => {
     const icon = wrapper.find('img');
     expect(icon.exists()).toBe(true);
@@ -43,10 +43,10 @@ describe('NodeCardComponent', () => {
     expect(anchor.exists()).toBe(true);
     expect(anchor.attributes('href')).toBe('https://example.com');
     expect(anchor.text()).toBe('https://example.com');
-  })
+  });
   it('show node card description', () => {
     const descriptionDiv = wrapper.find('#node-card-details');
     expect(descriptionDiv.exists()).toBe(true);
     expect(descriptionDiv.text()).toContain('Test node');
-  })
-})
+  });
+});

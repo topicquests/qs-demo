@@ -14,7 +14,10 @@
           <div class="col-4 q-pl-md q-pb-sm" style="width: 100%">
             <q-btn
               color="primary"
-              v-if="checkForPermission(permission_enum.createQuest) || checkForPermission(permission_enum.superadmin)"
+              v-if="
+                checkForPermission(permission_enum.createQuest) ||
+                checkForPermission(permission_enum.superadmin)
+              "
               label="New Quest"
               @click="
                 router.push({
@@ -56,7 +59,6 @@ import { onBeforeMount, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import memberHandle from '../components/member-handle.vue';
 
-
 // Stores
 const questStore = useQuestStore();
 const guildStore = useGuildStore();
@@ -92,7 +94,8 @@ onBeforeMount(async () => {
 
 <style>
 .quest-page {
-  background: url('../statics/images/questBackgroundImage.jpg') no-repeat center center fixed !important;
+  background: url('../statics/images/questBackgroundImage.jpg') no-repeat center
+    center fixed !important;
   background-size: cover;
   min-height: 100vh;
   padding: 0rem;
@@ -101,7 +104,7 @@ onBeforeMount(async () => {
 
 .quest-card {
   width: 75%;
-  background-color:transparent;
+  background-color: transparent;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   padding: 1.5rem;
@@ -135,7 +138,8 @@ onBeforeMount(async () => {
   width: 100%;
   border-collapse: collapse;
 }
-.quest-table th, .quest-table td {
+.quest-table th,
+.quest-table td {
   padding: 0.75rem;
   border: 1px solid #ddd;
 }

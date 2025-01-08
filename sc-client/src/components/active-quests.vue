@@ -65,7 +65,8 @@
       />
     </q-dialog>
   </div>
-</template>085988
+</template>
+085988
 
 <script setup lang="ts">
 import { watch, ref } from 'vue';
@@ -95,10 +96,8 @@ const quest_id = ref(null);
 
 watch(quest_id, (newVal) => {
   questStore.setCurrentQuest(newVal);
-})
-
+});
 </script>
-
 
 <style scoped>
 /* Add your styles here if needed */

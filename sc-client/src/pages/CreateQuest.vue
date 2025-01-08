@@ -88,7 +88,8 @@ onBeforeMount(async () => {
 
 <style>
 .create-quest-page {
-  background: url('../statics/images/questBackgroundImage.jpg') no-repeat center center fixed !important;
+  background: url('../statics/images/questBackgroundImage.jpg') no-repeat center
+    center fixed !important;
   background-size: cover;
   min-height: 100vh;
   padding: 0rem;
@@ -96,7 +97,7 @@ onBeforeMount(async () => {
 }
 .create-quest-card {
   width: 75%;
-  background-color:transparent;
+  background-color: transparent;
 }
 
 .quest-card-1 {

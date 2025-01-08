@@ -3,13 +3,12 @@ import { mount } from '@vue/test-utils';
 import RegistrationForm from '../../../components/registration-form.vue';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 
-installQuasarPlugin()
+installQuasarPlugin();
 
 describe('RegistrationForm', () => {
   let wrapper;
   beforeEach(() => {
     wrapper = mount(RegistrationForm);
-
   });
   it('renders the form correctly', () => {
     expect(wrapper.find('input[name="email"]').exists()).toBe(true);
@@ -33,7 +32,7 @@ describe('RegistrationForm', () => {
   });
   it('toggles password visibility', async () => {
     const passwordInput = wrapper.find('input[type="password"]');
-    await passwordInput.setValue('password')
+    await passwordInput.setValue('password');
     const iconElement = wrapper.findAll('i.q-icon').at(5);
     expect(iconElement.exists()).toBe(true);
     expect(iconElement.text()).toBe('visibility_off');
@@ -42,6 +41,4 @@ describe('RegistrationForm', () => {
     await iconElement.trigger('click');
     expect(passwordInput.attributes('type')).toBe('password');
   });
-
-
 });

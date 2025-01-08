@@ -66,8 +66,8 @@ const questStore = useQuestStore();
 const cr = ref<Partial<Role>[]>(CastingRoleEditProps.castingRoles || []);
 
 // Computed Properties
-const currentQuest = computed(() =>
-  questStore.getQuestById(CastingRoleEditProps.questId!) || { name: '' },
+const currentQuest = computed(
+  () => questStore.getQuestById(CastingRoleEditProps.questId!) || { name: '' },
 );
 
 // Watches

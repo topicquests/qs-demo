@@ -208,7 +208,8 @@ onBeforeMount(async () => {
 <style>
 .admin-page {
   width: 100%;
-  background: url('../statics/images/questBackgroundImage.jpg') no-repeat center center fixed !important;
+  background: url('../statics/images/questBackgroundImage.jpg') no-repeat center
+    center fixed !important;
   background-size: cover;
   min-height: 100vh;
   padding: 1rem;
@@ -218,14 +219,15 @@ onBeforeMount(async () => {
   align-items: flex-start; /* Align to the top to allow natural height */
 }
 
-
 /* Card Styling */
 .admin-card {
   width: 100%;
   background-color: rgba(255, 255, 255, 0.9); /* Slight transparency */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
   border-radius: 8px; /* Rounded corners */
-  transition: transform 0.3s, box-shadow 0.3s; /* Smooth hover effect */
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s; /* Smooth hover effect */
 }
 
 .admin-card:hover {
@@ -266,7 +268,9 @@ onBeforeMount(async () => {
 /* Buttons */
 .q-btn {
   margin: 0.5rem 0;
-  transition: background-color 0.3s, box-shadow 0.3s;
+  transition:
+    background-color 0.3s,
+    box-shadow 0.3s;
 }
 
 .q-btn:hover {
@@ -303,4 +307,3 @@ onBeforeMount(async () => {
   }
 }
 </style>
-

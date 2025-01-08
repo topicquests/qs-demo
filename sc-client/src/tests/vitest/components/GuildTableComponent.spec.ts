@@ -3,7 +3,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import GuildsTableComponent from '../../../components/guilds-table.vue';
 import { createTestingPinia } from '@pinia/testing';
 import { useGuildStore } from '../../../stores/guilds';
-import { mockGuild, mockGuildMembership, mockQuest, mockMember } from './mocks/StoreMocks';
+import {
+  mockGuild,
+  mockGuildMembership,
+  mockQuest,
+  mockMember,
+} from './mocks/StoreMocks';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 
 installQuasarPlugin();
@@ -16,11 +21,11 @@ function createWrapper(props = {}) {
           initialState: {
             guild: {
               currentGuild: mockGuild.id,
-              guilds: {1:mockGuild}
+              guilds: { 1: mockGuild },
             },
             quest: {
               currentQuest: mockQuest.id,
-              quests: {1: mockQuest}
+              quests: { 1: mockQuest },
             },
             member: {
               member: mockMember,
@@ -42,7 +47,6 @@ function createWrapper(props = {}) {
       selectable: true,
       ...props,
     },
-
   });
 }
 
@@ -72,7 +76,9 @@ describe('GuildsTableComponent', () => {
 
   it('does not show the "Admin" link for guilds without admin permissions', () => {
     const wrapper = createWrapper();
-    const secondRowAdminLink = wrapper.find('tbody tr:nth-child(2) .admin-link');
+    const secondRowAdminLink = wrapper.find(
+      'tbody tr:nth-child(2) .admin-link',
+    );
     expect(secondRowAdminLink.exists()).toBe(false); // No admin link for guild with ID 2
   });
 
@@ -88,7 +94,7 @@ describe('GuildsTableComponent', () => {
       keys: [],
       added: true,
       evt: new Event('click'),
-    }
+    };
     await table.vm.$emit('selection', rowEvent);
     expect(setCurrentGuildSpy).toHaveBeenCalledWith(123);
   });

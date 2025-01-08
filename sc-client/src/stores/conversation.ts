@@ -281,11 +281,12 @@ export const useConversationStore = defineStore('conversation', {
     resetConversation() {
       Object.assign(this, clearBaseState);
     },
-    async fetchConversationNode(id: number ) {
+    async fetchConversationNode(id: number) {
       const params = Object();
-      params.id = `eq.${id}`
+      params.id = `eq.${id}`;
       const res: AxiosResponse<ConversationNode[]> = await api.get(
-        '/conversation_node', params ,
+        '/conversation_node',
+        params,
       );
       if (res.status == 200) {
         const node = res.data[0];

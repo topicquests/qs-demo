@@ -27,7 +27,7 @@ function createWrapper(props = {}) {
 }
 
 describe('ChannelListComponent', () => {
-  it("q-card not rendered if ready is false", async () => {
+  it('q-card not rendered if ready is false', async () => {
     const wrapper = createWrapper();
     wrapper.vm.ready = false;
     await nextTick();

@@ -51,18 +51,21 @@ describe('ActiveQuestComponent.vue', () => {
     memberStore = useMemberStore();
     memberStore.$patch({
       member: {
-        casting: [{ quest_id: 1, guild_id: 1 }, { quest_id: 2, guild_id: 2 }],
+        casting: [
+          { quest_id: 1, guild_id: 1 },
+          { quest_id: 2, guild_id: 2 },
+        ],
       },
     });
   });
 
   it('renders quests if activeQuests is not empty', () => {
-    const wrapper=createWrapper();
+    const wrapper = createWrapper();
     expect(wrapper.findAll('.q-radio').length).toBeGreaterThanOrEqual(3);
   });
 
   it('verifies there are three quests registered to guild', () => {
-    const wrapper=createWrapper();
+    const wrapper = createWrapper();
     const quests = wrapper.findAll('.q-radio');
     expect(quests.length).toBeGreaterThanOrEqual(3);
   });
@@ -70,7 +73,7 @@ describe('ActiveQuestComponent.vue', () => {
   it('Quest 1 Member can register to play', () => {
     const guildStore = useGuildStore();
     guildStore.currentGuild = 1;
-    const wrapper=createWrapper();
+    const wrapper = createWrapper();
     const radioButtons = wrapper.findAll('.q-radio');
     const quest1Button = radioButtons.at(0);
     expect(quest1Button.exists()).toBe(true);
@@ -78,7 +81,7 @@ describe('ActiveQuestComponent.vue', () => {
   });
 
   it('Quest 2 player is playing in a different guild', () => {
-    const wrapper=createWrapper({ quest: { id: 2 } });
+    const wrapper = createWrapper({ quest: { id: 2 } });
     const buttons = wrapper.findAll('.q-radio');
     const quest2Button = buttons.at(1);
     expect(quest2Button.exists()).toBe(true);
@@ -86,7 +89,7 @@ describe('ActiveQuestComponent.vue', () => {
   });
 
   it('Quest 3 is registered in a different guild', () => {
-    const wrapper=createWrapper({ quest: { id: 3 } });
+    const wrapper = createWrapper({ quest: { id: 3 } });
     const buttons = wrapper.findAll('.q-radio');
     const quest3Button = buttons.at(2);
     expect(quest3Button.exists()).toBe(true);
@@ -94,7 +97,7 @@ describe('ActiveQuestComponent.vue', () => {
   });
 
   it('shows a message if no active quests are available', async () => {
-    const wrapper = createWrapper()
+    const wrapper = createWrapper();
     await wrapper.setProps({
       activeQuests: [],
     });

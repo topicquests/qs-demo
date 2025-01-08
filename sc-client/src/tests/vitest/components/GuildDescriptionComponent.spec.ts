@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import GuildDescriptionComponent from '../../../components/guild-description.vue'; // Replace with your component path
 import { createTestingPinia } from '@pinia/testing';
 import { useGuildStore } from '../../../stores/guilds';
-import { mockGuild, mockMember} from './mocks/StoreMocks';
+import { mockGuild, mockMember } from './mocks/StoreMocks';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { useMemberStore } from 'src/stores/member';
 
@@ -12,7 +12,7 @@ describe('GuildDescriptionComponent', () => {
   let guildStore;
   let memberStore;
   it('renders join to guild button', async () => {
-    mockGuild.open_for_applications=true;
+    mockGuild.open_for_applications = true;
     const wrapper = mount(GuildDescriptionComponent, {
       global: {
         plugins: [
@@ -21,7 +21,7 @@ describe('GuildDescriptionComponent', () => {
               guild: {
                 fullFetch: false,
                 fullGuilds: {},
-                guilds: {1: mockGuild},
+                guilds: { 1: mockGuild },
                 currentGuild: 1,
               },
               member: {
@@ -31,7 +31,6 @@ describe('GuildDescriptionComponent', () => {
           }),
         ],
       },
-
     });
     const joinBtn = wrapper.findComponent({ name: 'QBtn' });
     expect(joinBtn.exists()).toBe(true);
@@ -42,26 +41,24 @@ describe('GuildDescriptionComponent', () => {
     guildStore = useGuildStore();
     guildStore.$patch({
       currentGuild: 1,
-      guilds: {1:
-        {
+      guilds: {
+        1: {
           id: 1,
           name: 'Test Guild',
           description: 'This is a test guild',
           open_for_applications: false,
-        }
-      }
+        },
+      },
     });
     const wrapper = mount(GuildDescriptionComponent, {
       global: {
-        plugins: [
-          createTestingPinia({}),
-        ],
+        plugins: [createTestingPinia({})],
       },
       initialState: {
         guild: {
           fullFetch: false,
           fullGuilds: {},
-          guilds: {1: mockGuild} ,
+          guilds: { 1: mockGuild },
         },
         member: {
           member: mockMember,
@@ -77,32 +74,30 @@ describe('GuildDescriptionComponent', () => {
     memberStore = useMemberStore();
     guildStore.$patch({
       currentGuild: 1,
-      guilds: {1:
-        {
+      guilds: {
+        1: {
           id: 1,
           name: 'Test Guild',
           description: 'This is a test guild',
           open_for_applications: true,
-        }
-      }
+        },
+      },
     });
     memberStore.$patch({
       member: undefined,
-    })
+    });
     const wrapper = mount(GuildDescriptionComponent, {
       global: {
-        plugins: [
-          createTestingPinia({}),
-        ]
+        plugins: [createTestingPinia({})],
       },
       initialState: {
         guild: {
-          guilds: {1: mockGuild} ,
+          guilds: { 1: mockGuild },
         },
         member: {
-          member: undefined
-        }
-      }
+          member: undefined,
+        },
+      },
     });
     await wrapper.vm.$nextTick();
     expect(wrapper.find('span').text()).toBe('login or register to join');

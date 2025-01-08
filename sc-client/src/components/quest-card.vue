@@ -10,27 +10,27 @@
             {{ QuestCardProps.currentQuest.name }}
           </h3>
           <q-btn
-          v-if="currentQuest.description"
-          class="q-ml-xs"
-          size="md"
-          :flat="true"
-          icon="info"
-          @click="showDialog = true"
-        />
-      <q-dialog v-model="showDialog" persistent>
-        <q-card style="max-height: 1000px">
-          <q-card-section>
-            <div class="text-h6">Quest Information</div>
-            <div>{{ currentQuest.name }}</div>
-          </q-card-section>
-          <q-card-section>
-            <div v-html="currentQuest.description"></div>
-          </q-card-section>
-          <q-card-actions align="right">
-            <q-btn flat label="Close" color="primary" v-close-popup />
-          </q-card-actions>
-        </q-card>
-      </q-dialog>
+            v-if="currentQuest.description"
+            class="q-ml-xs"
+            size="md"
+            :flat="true"
+            icon="info"
+            @click="showDialog = true"
+          />
+          <q-dialog v-model="showDialog" persistent>
+            <q-card style="max-height: 1000px">
+              <q-card-section>
+                <div class="text-h6">Quest Information</div>
+                <div>{{ currentQuest.name }}</div>
+              </q-card-section>
+              <q-card-section>
+                <div v-html="currentQuest.description"></div>
+              </q-card-section>
+              <q-card-actions align="right">
+                <q-btn flat label="Close" color="primary" v-close-popup />
+              </q-card-actions>
+            </q-card>
+          </q-dialog>
           <router-link
             v-if="currentQuest.id"
             :to="{ name: 'quest_page', params: { quest_id: currentQuest.id } }"
@@ -111,7 +111,7 @@ const QuestCardProps = defineProps<{
 // Stores
 const conversationStore = useConversationStore();
 
-const showDialog = ref(false)
+const showDialog = ref(false);
 
 // Functions
 function getDate(dte: string) {
@@ -141,9 +141,7 @@ function getLastActivity() {
     });
     if (newestDate) {
       return newestDate.updated_at;
-    }
-    else
-      return "No initial date"
+    } else return 'No initial date';
   }
 }
 </script>

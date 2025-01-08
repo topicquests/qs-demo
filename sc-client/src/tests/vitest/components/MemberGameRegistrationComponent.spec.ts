@@ -42,7 +42,11 @@ describe('memberGameRegistrationComponent', () => {
     expect(wrapper.html()).toContain('ask');
   });
   it('available roles for member', () => {
-    mockMember.guild_member_available_role.push({guild_id:1, member_id:1, role_id:1})
+    mockMember.guild_member_available_role.push({
+      guild_id: 1,
+      member_id: 1,
+      role_id: 1,
+    });
     const wrapper = mount(memberGameRegistrationComponent, {
       props: {
         questId: mockQuest.id,
@@ -53,7 +57,7 @@ describe('memberGameRegistrationComponent', () => {
           createTestingPinia({
             initialState: {
               role: {
-                role: {1:mockRole},
+                role: { 1: mockRole },
               },
               members: {
                 members: { [mockMember.id]: mockMember },

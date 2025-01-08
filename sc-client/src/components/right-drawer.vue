@@ -7,10 +7,7 @@
         title="Guild Channels"
       />
     </div>
-    <div
-      v-if="canShowBothChannels"
-      class="q-pa-md q-gutter-sm"
-    >
+    <div v-if="canShowBothChannels" class="q-pa-md q-gutter-sm">
       <channel-list
         :guild_id="rightDrawerProps.currentGuild.id"
         :quest_id="rightDrawerProps.currentQuest.id"
@@ -33,11 +30,12 @@ const rightDrawerProps = defineProps<{
   currentGuild?: GuildData;
 }>();
 
-
 const shouldShowGuildChannels = computed(() => !!rightDrawerProps.currentGuild);
-const canShowBothChannels = computed(() => !!rightDrawerProps.currentGuild && !!rightDrawerProps.currentQuest);
+const canShowBothChannels = computed(
+  () => !!rightDrawerProps.currentGuild && !!rightDrawerProps.currentQuest,
+);
 
-onBeforeMount(async() => {
-  channelStore.ensureChannels(channelStore.getChannelsCurrentGuildId)
-})
+onBeforeMount(async () => {
+  channelStore.ensureChannels(channelStore.getChannelsCurrentGuildId);
+});
 </script>

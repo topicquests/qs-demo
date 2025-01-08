@@ -65,21 +65,18 @@ export const useRoleStore = defineStore('role', {
         this.getRoleById(role_id) === undefined ||
         (full && !this.fullRole[role_id])
       ) {
-        await this.fetchRoleById(
-          role_id,
-          full,
-        );
+        await this.fetchRoleById(role_id, full);
       }
     },
     async createRole(data: Partial<Role>): Promise<Partial<Role>> {
-      console.log("Creating role with data:", data);
+      console.log('Creating role with data:', data);
       try {
         const res = await this.createRoleBase(data);
-        console.log("Role created successfully:", res);
+        console.log('Role created successfully:', res);
         await this.fetchRoles();
         return res[0];
       } catch (error) {
-        console.error("Error in createRole:", error);
+        console.error('Error in createRole:', error);
         throw error;
       }
     },
@@ -150,9 +147,7 @@ export const useRoleStore = defineStore('role', {
       return res.data;
     },
     async createRoleBase(data: Partial<Role>): Promise<Role> {
-      const res: AxiosResponse<Role> = await api.post('/role',
-        data,
-      );
+      const res: AxiosResponse<Role> = await api.post('/role', data);
       if (res.status == 200) {
         const role = res.data;
         if (typeof role.id == 'number')
@@ -165,15 +160,19 @@ export const useRoleStore = defineStore('role', {
       params.id = data.id;
       data = filterKeys(data, rolePatchKeys);
       const res: AxiosResponse<Role[]> = await api.patch(
-          `/role?id=eq.${params.id}`,
-          data
-        );
-        if (res.status === 200 && Array.isArray(res.data) && res.data.length > 0) {
-          const role = res.data[0];
-          this.role = { ...this.role, [role.id]: role };
-          this.fullRole = {...this.fullRole!, [role.id]: true };
-        }
-      },
+        `/role?id=eq.${params.id}`,
+        data,
+      );
+      if (
+        res.status === 200 &&
+        Array.isArray(res.data) &&
+        res.data.length > 0
+      ) {
+        const role = res.data[0];
+        this.role = { ...this.role, [role.id]: role };
+        this.fullRole = { ...this.fullRole!, [role.id]: true };
+      }
+    },
 
     async deleteRole(id: number): Promise<void> {
       const res: AxiosResponse = await api.delete(`roles/${id}`);
@@ -183,7 +182,7 @@ export const useRoleStore = defineStore('role', {
         console.error(`Failed to delete role with ID ${id}.`);
       }
     },
-     async createRoleNodeConstraintBase(
+    async createRoleNodeConstraintBase(
       data: Partial<RoleNodeConstraint>,
     ): Promise<RoleNodeConstraint> {
       const res: AxiosResponse<RoleNodeConstraint[]> = await api.post(

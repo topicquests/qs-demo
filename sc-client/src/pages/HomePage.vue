@@ -27,7 +27,12 @@
               <!-- Column 1: Description Text -->
               <div class="col-12 col-md-4">
                 <div class="description-text">
-                  SenseCraft is an RPG where teams co-create structured dialogues. Quest creators ask deep questions through quests, and guild members take on roles to build a shared conversation tree. Players collaborate to shape meaningful conversations, compete in quests, and foster collaborative discussions. Join SenseCraft for structured conversations and role-playing.
+                  SenseCraft is an RPG where teams co-create structured
+                  dialogues. Quest creators ask deep questions through quests,
+                  and guild members take on roles to build a shared conversation
+                  tree. Players collaborate to shape meaningful conversations,
+                  compete in quests, and foster collaborative discussions. Join
+                  SenseCraft for structured conversations and role-playing.
                 </div>
               </div>
 
@@ -63,10 +68,6 @@
   </div>
 </template>
 
-
-
-
-
 <script setup lang="ts">
 import { computed, onBeforeMount, ref } from 'vue';
 import { useQuestStore } from 'src/stores/quests';
@@ -75,8 +76,8 @@ import { QuestData } from 'src/types';
 const questStore = useQuestStore();
 
 const getFilteredQuests = computed((): QuestData[] => {
-  return questStore.getQuests.filter((quest) =>
-    quest.status === 'ongoing' || quest.status === 'registration'
+  return questStore.getQuests.filter(
+    (quest) => quest.status === 'ongoing' || quest.status === 'registration',
   );
 });
 
@@ -93,7 +94,7 @@ body {
 /* Content Wrapper */
 .content-wrapper {
   width: 80%; /* Takes up 80% of the width */
-   max-width: 1800px;  /*Optional: Add a max width to avoid excessive stretching on large screens */
+  max-width: 1800px; /*Optional: Add a max width to avoid excessive stretching on large screens */
   margin: 0 auto; /* Center the content horizontally */
 }
 
@@ -114,16 +115,16 @@ body {
   color: #2c3e50;
   font-weight: bold;
   font-size: 3.5rem;
-  margin-top:.2em;
-  margin-bottom: .2em;
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
   white-space: nowrap;
 }
 
 .subtitle {
   color: #34495e;
   font-style: italic;
-  margin-top:.2em;
-  margin-bottom: .2em;
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
   font-size: 1.8rem;
 }
 
@@ -142,7 +143,11 @@ body {
 
 /* Gradient Section */
 .gradient {
-  background: linear-gradient(90deg, rgba(0, 212, 255, 1) 35%, rgba(9, 9, 121, 1) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(0, 212, 255, 1) 35%,
+    rgba(9, 9, 121, 1) 100%
+  );
   width: 100%;
   padding: 30px 0;
 }
@@ -189,8 +194,8 @@ body {
   color: #d35400;
   font-weight: bold;
   font-size: 22px;
-  margin-bottom: .2em;
-  margin-top: .2em;
+  margin-bottom: 0.2em;
+  margin-top: 0.2em;
 }
 
 ul {
@@ -257,5 +262,3 @@ ul {
   }
 }
 </style>
-
-

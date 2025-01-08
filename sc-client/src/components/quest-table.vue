@@ -23,27 +23,35 @@
         <q-td :props="props">
           <div>
             <q-btn
-            v-if="props.row.description"
-            class="q-ml-xs"
-            size="sm"
-            :flat="true"
-            icon="info"
-            @click="openDialog(props.row)"
-          />
-          <q-dialog v-model="showDialog" persistent>
-            <q-card class="quest-info-dialog">
-              <q-card-section>
-                <div class="dialog-title">Quest Information</div>
-                <div class="quest-name">{{ selectedQuest?.name }}</div>
-              </q-card-section>
-              <q-card-section>
-                <div class="quest-description" v-html="selectedQuest?.description"></div>
-              </q-card-section>
-              <q-card-actions align="right">
-                <q-btn flat label="Close" color="primary" @click="closeDialog" />
-              </q-card-actions>
-            </q-card>
-          </q-dialog>
+              v-if="props.row.description"
+              class="q-ml-xs"
+              size="sm"
+              :flat="true"
+              icon="info"
+              @click="openDialog(props.row)"
+            />
+            <q-dialog v-model="showDialog" persistent>
+              <q-card class="quest-info-dialog">
+                <q-card-section>
+                  <div class="dialog-title">Quest Information</div>
+                  <div class="quest-name">{{ selectedQuest?.name }}</div>
+                </q-card-section>
+                <q-card-section>
+                  <div
+                    class="quest-description"
+                    v-html="selectedQuest?.description"
+                  ></div>
+                </q-card-section>
+                <q-card-actions align="right">
+                  <q-btn
+                    flat
+                    label="Close"
+                    color="primary"
+                    @click="closeDialog"
+                  />
+                </q-card-actions>
+              </q-card>
+            </q-dialog>
           </div>
         </q-td>
       </template>
@@ -366,7 +374,7 @@ q-td {
   padding: 1em;
 }
 
-.quest-table thead  {
+.quest-table thead {
   /* bg color is important for th; just specify one */
   background-color: rgb(126, 126, 54);
 }
@@ -380,12 +388,9 @@ q-td {
   background-color: #ffffff; /* White for even rows */
 }
 
-
-
 .quest-table td:nth-child(2) {
   max-width: 300px;
 }
-
 
 @media only screen and (max-width: 1000px) {
   .quest-table td:nth-child(2) {

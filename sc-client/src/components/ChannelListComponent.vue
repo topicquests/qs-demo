@@ -63,7 +63,7 @@ const ChannelListProps = defineProps<{
   title: string;
 }>();
 const channelStore = useChannelStore();
-const guildStore=useGuildStore();
+const guildStore = useGuildStore();
 const ready = ref(false);
 
 guildStore.setCurrentGuild(ChannelListProps.guild_id);
@@ -71,7 +71,7 @@ const getChannels = computed(() => {
   const channels = ChannelListProps.quest_id
     ? channelStore.getGameChannelsOfQuest(ChannelListProps.quest_id!)
     : channelStore.getRootGuildChannels;
-  return channels
+  return channels;
 });
 async function ensureData() {
   await channelStore.ensureChannels(ChannelListProps.guild_id!);
@@ -85,7 +85,7 @@ onBeforeMount(async () => {
   ensureData();
   ready.value = true;
 });
-defineExpose({getChannels})
+defineExpose({ getChannels });
 </script>
 
 <style>

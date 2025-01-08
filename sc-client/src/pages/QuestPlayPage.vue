@@ -1,14 +1,12 @@
 <template>
   <q-page v-if="ready" class="bg-secondary quest-play-page">
-    <div class="row justify-center" >
-      <q-card style="width:80%; background-color: transparent;" class="q-mt-md">
+    <div class="row justify-center">
+      <q-card style="width: 80%; background-color: transparent" class="q-mt-md">
         <div>
           <member></member>
         </div>
         <quest-details></quest-details>
-        <quest-actions
-          :myPlayingGuilds="myPlayingGuilds"
-          :questId="questId">
+        <quest-actions :myPlayingGuilds="myPlayingGuilds" :questId="questId">
         </quest-actions>
         <div class="row justify-center q-mt-lg">
           <router-link
@@ -21,14 +19,14 @@
           </router-link>
         </div>
         <div class="row justify-center">
-        <q-card class="q-pa-md" style="width: 90%;">
-          <quest-node-tree
-            :questId="questId"
-            :guildId="guildId"
-            :selectedNodeId="selectedNodeId"
-          >
-          </quest-node-tree>
-        </q-card>
+          <q-card class="q-pa-md" style="width: 90%">
+            <quest-node-tree
+              :questId="questId"
+              :guildId="guildId"
+              :selectedNodeId="selectedNodeId"
+            >
+            </quest-node-tree>
+          </q-card>
         </div>
       </q-card>
     </div>
@@ -137,11 +135,12 @@ async function initializeGuildInner() {
 
 <style scoped>
 .quest-play-page {
-    background: url('../statics/images/questBackgroundImage.jpg') no-repeat center center fixed !important;
-    background-size: cover;
-    min-height: 100vh;
-    padding: 0rem;
-    box-sizing: border-box;
+  background: url('../statics/images/questBackgroundImage.jpg') no-repeat center
+    center fixed !important;
+  background-size: cover;
+  min-height: 100vh;
+  padding: 0rem;
+  box-sizing: border-box;
 }
 .sidenav {
   height: 100%;

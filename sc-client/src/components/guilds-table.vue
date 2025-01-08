@@ -16,28 +16,36 @@
         <template v-slot:body-cell-info="props">
           <q-td :props="props">
             <div>
-               <q-btn
-                  v-if="props.row.description"
-                  class="q-ml-xs"
-                  size="sm"
-                  :flat="true"
-                  icon="info"
-                  @click="openDialog(props.row)"
-                />
-                <q-dialog v-model="showDialog" persistent>
-                  <q-card class="guild-info-dialog">
-                    <q-card-section>
-                      <div class="dialog-title">Guild Information</div>
-                      <div class="guild-name">{{ selectedGuildRow?.name }}</div>
-                    </q-card-section>
-                    <q-card-section>
-                      <div class="guild-description" v-html="selectedGuildRow?.description"></div>
-                    </q-card-section>
-                    <q-card-actions align="right">
-                      <q-btn flat label="Close" color="primary" @click="closeDialog" />
-                    </q-card-actions>
-                  </q-card>
-                </q-dialog>
+              <q-btn
+                v-if="props.row.description"
+                class="q-ml-xs"
+                size="sm"
+                :flat="true"
+                icon="info"
+                @click="openDialog(props.row)"
+              />
+              <q-dialog v-model="showDialog" persistent>
+                <q-card class="guild-info-dialog">
+                  <q-card-section>
+                    <div class="dialog-title">Guild Information</div>
+                    <div class="guild-name">{{ selectedGuildRow?.name }}</div>
+                  </q-card-section>
+                  <q-card-section>
+                    <div
+                      class="guild-description"
+                      v-html="selectedGuildRow?.description"
+                    ></div>
+                  </q-card-section>
+                  <q-card-actions align="right">
+                    <q-btn
+                      flat
+                      label="Close"
+                      color="primary"
+                      @click="closeDialog"
+                    />
+                  </q-card-actions>
+                </q-card>
+              </q-dialog>
             </div>
           </q-td>
         </template>
@@ -148,7 +156,7 @@ const extra = GuildsTableProp.extra_columns || [];
 
 // Reactive Variables
 const selectedGuild = ref<GuildRow[]>([]);
-  const selectedGuildRow = ref<GuildData | null>(null);
+const selectedGuildRow = ref<GuildData | null>(null);
 const showDialog = ref(false);
 
 // Columns
@@ -226,7 +234,7 @@ const currentQuest = computed({
   get: () => questStore.getCurrentQuest,
   set: () => {},
 });
-const hasGuildAdminPermission = computed(() => (id:number) => {
+const hasGuildAdminPermission = computed(() => (id: number) => {
   if (!id) {
     console.warn('Guild ID is undefined or invalid:', id);
     return false;
@@ -373,7 +381,8 @@ q-td {
 .guilds-table thead {
   /* bg color is important for th; just specify one */
   background-color: rgb(126, 126, 54);
-  }ilds-table td:nth-child(1) {
+}
+ilds-table td:nth-child(1) {
   max-width: 5px;
 }
 .guilds-table td:nth-child(2) {

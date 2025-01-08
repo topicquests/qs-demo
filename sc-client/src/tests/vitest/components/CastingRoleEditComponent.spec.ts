@@ -9,28 +9,33 @@ describe('CastingRoleEdit.vue', () => {
   it('renders correctly with props', () => {
     const wrapper = mount(CastingRoleEdit, {
       props: {
-        availableRoles: [{ id: 1, name: 'Role 1' }, { id: 2, name: 'Role 2' }],
+        availableRoles: [
+          { id: 1, name: 'Role 1' },
+          { id: 2, name: 'Role 2' },
+        ],
         castingRoles: [{ id: 1, name: 'Role 1' }],
         questId: 1,
         guildId: 1,
       },
       global: {
-        plugins: [createTestingPinia({
-          initialState: {
-            member: {
+        plugins: [
+          createTestingPinia({
+            initialState: {
               member: {
-                handle: 'TestUser',
+                member: {
+                  handle: 'TestUser',
+                },
+              },
+              quest: {
+                currentQuest: {
+                  name: 'Quest 1',
+                },
               },
             },
-            quest: {
-              currentQuest: {
-                name: 'Quest 1'
-              }
-            }
-          },
-        })],
+          }),
+        ],
       },
-    })
+    });
     expect(wrapper.text()).toContain('Change casting role');
     expect(wrapper.text()).toContain('Role 1');
     expect(wrapper.find('.handle').text()).toBe('TestUser');
@@ -41,7 +46,10 @@ describe('CastingRoleEdit.vue', () => {
     const castingRoleRemove = vi.fn();
     const wrapper = mount(CastingRoleEdit, {
       props: {
-        availableRoles: [{ id: 1, name: 'Role 1' }, { id: 2, name: 'Role 2' }],
+        availableRoles: [
+          { id: 1, name: 'Role 1' },
+          { id: 2, name: 'Role 2' },
+        ],
         castingRoles: [{ id: 1, name: 'Role 1' }],
         questId: 1,
         guildId: 1,

@@ -29,54 +29,52 @@
 </template>
 
 <script setup lang="ts">
-import { QTableProps } from "quasar";
-import { useRoleStore } from "src/stores/role";
-import { Role, RoleNodeConstraint } from "src/types";
+import { QTableProps } from 'quasar';
+import { useRoleStore } from 'src/stores/role';
+import { Role, RoleNodeConstraint } from 'src/types';
 
 const roleStore = useRoleStore();
 
 const emit = defineEmits<{
-  editRoleNodeConstraint: [RoleNodeConstraint[]],
-}>()
-
+  editRoleNodeConstraint: [RoleNodeConstraint[]];
+}>();
 
 const RoleNodeConstraintTableProps = defineProps<{
-    role: Role,
-    title?: string,
+  role: Role;
+  title?: string;
 }>();
-  const columns: QTableProps['columns'] = [
-    {
-      name: "node_type",
-      required: true,
-      label: "Node Type",
-      align: "left",
-      field: "node_type",
-      sortable: true,
-    },
-    {
-      name: "publish_state",
-      required: true,
-      label: "Max Publish State",
-      align: "left",
-      field: "max_pub_state",
-      sortable: true,
-    },
-    {
-      name: "roleId",
-      required: false,
-      label: "Action",
-      align: "left",
-      field: "role_id",
-      sortable: true,
-    },
-  ];
+const columns: QTableProps['columns'] = [
+  {
+    name: 'node_type',
+    required: true,
+    label: 'Node Type',
+    align: 'left',
+    field: 'node_type',
+    sortable: true,
+  },
+  {
+    name: 'publish_state',
+    required: true,
+    label: 'Max Publish State',
+    align: 'left',
+    field: 'max_pub_state',
+    sortable: true,
+  },
+  {
+    name: 'roleId',
+    required: false,
+    label: 'Action',
+    align: 'left',
+    field: 'role_id',
+    sortable: true,
+  },
+];
 
-  async function editRoleNodeConstraint(roleId: number, node_type: string) {
-    const roleConstraint = await roleStore.getRoleNodeConstraintByType(
-      roleId,
-      node_type
-    );
-    emit("editRoleNodeConstraint", roleConstraint);
-  }
-
+async function editRoleNodeConstraint(roleId: number, node_type: string) {
+  const roleConstraint = await roleStore.getRoleNodeConstraintByType(
+    roleId,
+    node_type,
+  );
+  emit('editRoleNodeConstraint', roleConstraint);
+}
 </script>
