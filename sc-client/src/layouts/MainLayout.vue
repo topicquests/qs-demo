@@ -148,7 +148,7 @@ const checkIfAuthenticated = computed(
 const hasUnreadChannels = computed(() => {
   const readStatus = readStatusStore.getReadStatus;
   if (!readStatus) return false;
-  return Object.values(readStatus).some((entry) => !entry.status);
+  return Object.values(readStatus).some((entry) => entry.unread > 0);
 });
 
 

@@ -100,9 +100,16 @@ export const useReadStatusStore = defineStore('readStatus', {
         });
 
         if (unreadChannels) {
-          this.readStatus = Object.fromEntries(
-            unreadChannels.map((channel) => [channel.node_id, channel])
-          );
+          const root_map = {};
+          for (const x of unreadChannels) {
+            if (root_map[x.root_id] == undefined)
+              root_map[x.root_id] = { quest_id: x.quest_id, read: 0, unread: 0 };
+            if (x.read_status)
+              root_map[x.root_id].read = x.count;
+            else
+              root_map[x.root_id].unread = x.count;
+          }
+          this.readStatus = root_map;
           console.log("Unread channels successfully updated.");
         } else {
           console.warn("No unread channels were returned.");

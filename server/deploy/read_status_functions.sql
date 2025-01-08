@@ -30,24 +30,18 @@ RETURNS TABLE (
 $$ LANGUAGE SQL;
 
 
-CREATE OR REPLACE FUNCTION public.guild_unread_channels(
-  member_id integer,
-  guild_id integer,
-  quest_id integer
-)
+CREATE OR REPLACE FUNCTION public.guild_unread_channels(member_id integer, guild_id integer, quest_id integer)
 RETURNS TABLE (
-  node_id integer,
   root_id integer,
   quest_id integer,
-  status boolean,
+  read_status boolean,
   count integer
 ) AS $$
   SELECT
-      cn.id AS node_id,
-      COALESCE(subltree(cn.ancestry, 0, 1)::varchar::integer, cn.id) AS root_id,
+      subltree(cn.ancestry, 0, 1)::varchar::integer as root_id,
       cn.quest_id,
-      COALESCE(rs.status, false) AS read_status,
-      COUNT(cn.id) AS count
+      coalesce(rs.status, false) as read_status,
+      count(cn.id) as count
   FROM
       conversation_node cn
   LEFT OUTER JOIN
@@ -60,11 +54,7 @@ RETURNS TABLE (
       cn.guild_id = guild_unread_channels.guild_id
       AND cn.meta = 'channel'
       AND (cn.quest_id = guild_unread_channels.quest_id OR cn.quest_id IS NULL)
-  GROUP BY
-      cn.id,
-      COALESCE(subltree(cn.ancestry, 0, 1)::varchar::integer, cn.id),
-      cn.quest_id,
-      COALESCE(rs.status, false);
+  GROUP BY subltree(cn.ancestry, 0, 1), cn.quest_id, coalesce(rs.status, false);
 $$ LANGUAGE SQL;
 
 
