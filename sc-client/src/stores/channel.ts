@@ -12,7 +12,6 @@ import { useMemberStore } from './member';
 import { useQuestStore } from './quests';
 import { useBaseStore, filterKeys } from './baseStore';
 import { useGuildStore } from './guilds';
-import { stat } from 'fs';
 
 interface ChannelMap {
   [key: number]: ConversationMap;
@@ -97,6 +96,12 @@ export const useChannelStore = defineStore('channel', {
     getChannelNode:
       (state: ChannelState) => (channel_id: number, node_id: number) =>
         state.channelData[channel_id]?.[node_id],
+    getChannelOfNode: (state: ChannelState) => (node_id: number) => {
+      for (const channel_id of Object.keys(state.channelData)) {
+        const channel = state.channelData[channel_id];
+        if (channel[node_id]) return channel_id;
+      }
+    },
     canEdit:
       (state: ChannelState) => (channel_id?: number, node_id?: number) => {
         const memberStore = useMemberStore();

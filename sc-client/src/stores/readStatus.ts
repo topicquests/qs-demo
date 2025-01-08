@@ -110,7 +110,7 @@ export const useReadStatusStore = defineStore('readStatus', {
         const guildStore = useGuildStore();
         const questStore = useQuestStore();
 
-        const member_id = memberStore.getUser.id;
+        const member_id = memberStore.getUserId;
         const guild_id = guildStore.getCurrentGuild.id;
         const quest_id = questStore.getCurrentQuest?.id ?? null;
 
@@ -212,6 +212,20 @@ export const useReadStatusStore = defineStore('readStatus', {
         this['readStatus'] = Object.fromEntries(
           res.data.map((x) => [x.node_id, x]),
         );
+        if (
+          this.channelsReadStatus !== undefined &&
+          !!this.channelsReadStatus[params.rootid]
+        ) {
+          const channelData: ChannelsReadEntry =
+            this.channelsReadStatus[params.rootid];
+          channelData.read = this.readStatus[params.rootid].read_count;
+          channelData.unread =
+            this.readStatus[params.rootid].node_count - channelData.read;
+          this.channelsReadStatus = {
+            ...this.channelsReadStatus,
+            [params.rootid]: channelData,
+          };
+        }
       }
     },
     async fetchGuildUnreadChannels(params: {
@@ -252,6 +266,7 @@ export const useReadStatusStore = defineStore('readStatus', {
       new_status: boolean;
       override: boolean;
     }) {
+      const channelStore = useChannelStore();
       const res: AxiosResponse<{
         new_node_id: number;
         new_member_id: number;
@@ -261,14 +276,6 @@ export const useReadStatusStore = defineStore('readStatus', {
         const memberStore = useMemberStore();
         const memberId = memberStore.getUserId;
         const node_id = res.data.new_node_id;
-        const newReadStatus: ReadStatusData = {
-          node_id,
-          member_id: res.data.new_member_id,
-          seconds_shown: 0,
-          status: res.data.status_new,
-          node_count: 0,
-          read_count: 0,
-        };
         if (this.readStatus) {
           const read = Object.values(this.readStatus).filter(
             (isRead: ReadStatusData) => isRead.node_id == node_id && memberId,
@@ -279,7 +286,33 @@ export const useReadStatusStore = defineStore('readStatus', {
           } else {
             this.readStatus = {
               ...this.readStatus,
-              [node_id]: newReadStatus,
+              [node_id]: {
+                node_id,
+                member_id: res.data.new_member_id,
+                seconds_shown: 0,
+                status: res.data.status_new,
+                node_count: 0,
+                read_count: 0,
+              },
+            };
+          }
+          const rootId = channelStore.getChannelOfNode(data.nodeid);
+          if (
+            this.channelsReadStatus !== undefined &&
+            !!this.channelsReadStatus[rootId]
+          ) {
+            const channelData: ChannelsReadEntry =
+              this.channelsReadStatus[rootId];
+            if (res.data.status_new) {
+              channelData.read += 1;
+              channelData.unread -= 1;
+            } else {
+              channelData.read -= 1;
+              channelData.read += 1;
+            }
+            this.channelsReadStatus = {
+              ...this.channelsReadStatus,
+              [rootId]: channelData,
             };
           }
         }
