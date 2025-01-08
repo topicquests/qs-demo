@@ -61,17 +61,21 @@
         </div>
         <div v-if="checkIfAuthenticated && showTree && currentGuild">
           <q-btn
-          flat
-          dense
-          round
-          :color="hasUnreadChannels ? 'red' : 'green'"
-          aria-label="Tree View"
-          @click="toggleNav"
-          id="channel_list"
-        >
-          <q-icon name="menu" />
-        </q-btn>
-          <q-tooltip anchor="top middle" self="bottom middle" class="custom-tooltip">
+            flat
+            dense
+            round
+            :color="readStatusStore.hasUnreadChannels ? 'red' : 'green'"
+            aria-label="Tree View"
+            @click="toggleNav"
+            id="channel_list"
+          >
+            <q-icon name="menu" />
+          </q-btn>
+          <q-tooltip
+            anchor="top middle"
+            self="bottom middle"
+            class="custom-tooltip"
+          >
             Guild and Quest conversations
           </q-tooltip>
         </div>
@@ -88,7 +92,6 @@
     >
       <right_drawer :currentGuild="currentGuild" :currentQuest="currentQuest">
       </right_drawer>
-
     </q-drawer>
     <q-drawer v-model="leftDrawer" :breakpoint="500" bordered :overlay="true">
       <q-scroll-area class="fit">
@@ -100,7 +103,8 @@
     </q-page-container>
     <q-footer class="footer bg-secondary">
       <p id="Pfooter">
-        Sensecraft — © <a href="http://topicquests.org">TopicQuests</a> and <a href="https://www.conversence.com">Conversence</a> 2022-2024.
+        Sensecraft — © <a href="http://topicquests.org">TopicQuests</a> and
+        <a href="https://www.conversence.com">Conversence</a> 2022-2024.
         <a href="https://github.com/topicquests/sensecraft">Open Source</a>
       </p>
     </q-footer>
@@ -145,38 +149,27 @@ const currentQuest = computed(() => questStore.getCurrentQuest);
 const checkIfAuthenticated = computed(
   (): boolean => memberStore.isAuthenticated,
 );
-const hasUnreadChannels = computed(() => {
-  const readStatus = readStatusStore.getReadStatus;
-  if (!readStatus) return false;
-  return Object.values(readStatus).some((entry) => entry.unread > 0);
-});
-
 
 // Watches
-watch( currentGuild,
-  () => {
-    if(currentGuild.value) {
-      hasUnreadChannels
-    }
+watch(currentGuild, () => {
+  if (currentGuild.value) {
+    readStatusStore.hasUnreadChannels;
   }
-)
-watch( currentQuest,
-  () => {
-    if(currentQuest.value) {
-      hasUnreadChannels
-    }
+});
+watch(currentQuest, () => {
+  if (currentQuest.value) {
+    readStatusStore.hasUnreadChannels;
   }
-)
-
+});
 
 // Lifecycles
 onBeforeMount(async () => {
   isAuthenticated.value = memberStore.isAuthenticated;
 });
 onBeforeRouteLeave((to, from, next) => {
-    guildStore.setCurrentGuild(0);
-    questStore.setCurrentQuest(0)
-    next();
+  guildStore.setCurrentGuild(0);
+  questStore.setCurrentQuest(0);
+  next();
 });
 
 // Functions
@@ -203,10 +196,10 @@ function toggleNav() {
 function closeNav() {
   rightDrawer.value = false;
 }
-
 </script>
 <style>
-#leftDrawer, #rightDrawer {
+#leftDrawer,
+#rightDrawer {
   border-radius: 10px;
 }
 .custom-tooltip {
@@ -293,7 +286,8 @@ footer#Pfooter a:hover {
     display: flex;
     justify-content: center;
   }
-  #leftDrawer, #rightDrawer {
+  #leftDrawer,
+  #rightDrawer {
     width: 250px;
   }
   .q-drawer {
