@@ -8,5 +8,6 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "files.watcherExclude": {
     "**/target": true
-  }
+  },
+  "prettier.configPath": ".prettierrc"
 }
