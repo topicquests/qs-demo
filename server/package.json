@@ -20,8 +20,8 @@
     "config": "config/"
   },
   "engines": {
-    "node": "~18",
-    "npm": "~9"
+    "node": "~20",
+    "npm": "~10"
   },
   "scripts": {
     "init": "tsc && ./scripts/initial_setup.py && ./scripts/db_updater.py init && ./scripts/db_updater.py deploy",
@@ -64,7 +64,7 @@
   "lint-staged": {
     "**/*": [
       "eslint",
-    "prettier --write --ignore-unknown"
+      "prettier --write --ignore-unknown"
     ]
   },
   "dependencies": {
