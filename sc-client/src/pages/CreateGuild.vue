@@ -56,7 +56,7 @@
                 color="primary"
                 class="q-mr-md q-ml-md"
               />
-              <q-btn label="Cancel" @click="$router.push({ name: 'home' })" />
+              <q-btn label="Cancel" @click="router.push({ name: 'home' })" />
             </div>
           </q-card>
         </div>
@@ -71,15 +71,13 @@ import scoreboard from '../components/score-board.vue';
 import member_handle from '../components/member-handle.vue';
 //import { userLoaded } from '../boot/userLoaded';
 import { public_private_bool } from '../enums';
-import { GuildData, Role } from './../types';
+import { Guild, GuildData, Role } from './../types';
 import { onBeforeMount } from 'vue';
 import { useRoleStore } from '../stores/role';
 import { useMembersStore } from '../stores/members';
 import { useGuildStore } from '../stores/guilds';
 import { useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
-import { AxiosResponse } from 'axios';
-import axios from 'axios';
 
 interface guildType {
   name: string;
@@ -112,30 +110,21 @@ const description = computed({
   },
 });
 
-async function doSubmit(guild: guildType) {
+async function doSubmit(guild: Partial<Guild>) {
   try {
     guild.default_role_id = role.value.id;
-    const res: AxiosResponse<GuildData[]> = await guildStore.createGuild(guild);
-
+    const res: GuildData[] = await guildStore.createGuild(guild);
     $q.notify({
       message: 'Added new guild',
       color: 'positive',
     });
-    router.push({ name: 'guild_admin', params: { guild_id: res.data[0].id } });
+    router.push({ name: 'guild_admin', params: { guild_id: res[0].id } });
   } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      console.log(error.status);
-      $q.notify({
-        message: 'There was an error creating new guild.',
-        color: 'negative',
-      });
-    } else {
-      console.log('there was an error in creating guild ', error);
-      $q.notify({
-        message: 'There was an error creating new guild.',
-        color: 'negative',
-      });
-    }
+    console.log('there was an error in creating guild ', error);
+    $q.notify({
+      message: 'There was an error creating new guild.',
+      color: 'negative',
+    });
   }
 }
 onBeforeMount(async () => {

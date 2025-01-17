@@ -1,17 +1,14 @@
 import { ConversationNode, ReadStatusData } from '../types';
 import { defineStore } from 'pinia';
+import { readStatusService } from '../services/readStatusService.js';
 import { useMemberStore } from './member';
 import { useConversationStore } from './conversation';
 import { useChannelStore } from './channel';
-import { api } from '../boot/axios';
-import { AxiosResponse } from 'axios';
 import { useGuildStore } from './guilds';
 import { useQuestStore } from './quests';
-
 export interface ReadStatusMap {
   [key: number]: ReadStatusData;
 }
-
 interface ChannelsReadEntry {
   quest_id: number;
   read: number;
@@ -21,14 +18,12 @@ interface ChannelsReadEntry {
 export interface ChannelsReadMap {
   [key: number]: ChannelsReadEntry;
 }
-
-interface guildUnreadChannelRow {
+export interface guildUnreadChannelRow {
   root_id: number;
   quest_id: number | null;
   read_status: boolean;
   count: number;
 }
-
 export interface ReadStatusState {
   fullFetch: false;
   readStatus?: ReadStatusMap;
@@ -44,7 +39,6 @@ const clearBaseState: ReadStatusState = {
   readStatus: {},
   channelsReadStatus: undefined,
 };
-
 export const useReadStatusStore = defineStore('readStatus', {
   state: () => baseState,
   getters: {
@@ -54,7 +48,6 @@ export const useReadStatusStore = defineStore('readStatus', {
         (entry) => entry.unread > 0,
       );
     },
-
     getNodeReadStatus:
       (state: ReadStatusState) =>
       (node_id: number): boolean => {
@@ -78,7 +71,6 @@ export const useReadStatusStore = defineStore('readStatus', {
       }
       return 0;
     },
-
     getNodeStatusCount: (state: ReadStatusState) => (node_id: number) => {
       if (state.readStatus) {
         return state.readStatus[node_id].node_count;
@@ -86,22 +78,67 @@ export const useReadStatusStore = defineStore('readStatus', {
     },
   },
   actions: {
-    async ensureReadStatusByGuild() {
-      const channelStore = useChannelStore();
-      const channels = channelStore.getChannels;
-      const readStatus = await this.fetchAllReadStatus();
-      const guildReadStaus = readStatus.filter((c) =>
-        channels.some((r) => c.node_id == r.id),
-      );
-      this.readStatus = guildReadStaus;
+    async updateReadStatus(
+      nodeId: number,
+      newStatus: boolean,
+      override = false,
+    ) {
+      try {
+        const response = await readStatusService.createOrUpdateReadStatus({
+          nodeid: nodeId,
+          new_status: newStatus,
+          override: override,
+        });
+        const memberStore = useMemberStore();
+        const memberId = memberStore.getUserId;
+        const channelStore = useChannelStore();
+        const { new_node_id, new_member_id, status_new } = response;
+        if (this.readStatus) {
+          const existingReadStatus = Object.values(this.readStatus).find(
+            (read: ReadStatusData) =>
+              read.node_id === new_node_id && read.member_id === memberId,
+          );
+          if (existingReadStatus) {
+            this.readStatus[new_node_id].status = status_new;
+          } else {
+            this.readStatus = {
+              ...this.readStatus,
+              [new_node_id]: {
+                node_id: new_node_id,
+                member_id: new_member_id,
+                seconds_shown: 0,
+                status: status_new,
+                node_count: 0,
+                read_count: 0,
+              },
+            };
+          }
+        }
+        const rootId = channelStore.getChannelOfNode(nodeId);
+        if (this.channelsReadStatus && this.channelsReadStatus[rootId]) {
+          const channelData = this.channelsReadStatus[rootId];
+          if (status_new) {
+            channelData.read += 1;
+            channelData.unread -= 1;
+          } else {
+            channelData.read -= 1;
+            channelData.unread += 1;
+          }
+          this.channelsReadStatus = {
+            ...this.channelsReadStatus,
+            [rootId]: channelData,
+          };
+        }
+      } catch (error) {
+        console.error('Failed to update read status:', error);
+      }
     },
     async ensureAllQuestsReadStatus() {
       const conversationStore = useConversationStore();
       if (conversationStore.conversationRoot) {
         const cn: ConversationNode = conversationStore.conversationRoot;
-
         const rootid: number = cn.id;
-        await this.fetchReadStatus({ rootid });
+        await readStatusService.fetchReadStatus({ rootid });
       }
     },
     async ensureGuildUnreadChannels() {
@@ -109,25 +146,21 @@ export const useReadStatusStore = defineStore('readStatus', {
         const memberStore = useMemberStore();
         const guildStore = useGuildStore();
         const questStore = useQuestStore();
-
         const member_id = memberStore.getUserId;
         const guild_id = guildStore.getCurrentGuild.id;
         const quest_id = questStore.getCurrentQuest?.id ?? null;
-
         if (!member_id || !guild_id) {
           console.warn(
             'Missing member_id or guild_id. Cannot fetch unread channels.',
           );
           return;
         }
-
         const unreadChannels: guildUnreadChannelRow[] =
-          await this.fetchGuildUnreadChannels({
+          await readStatusService.fetchGuildUnreadChannels({
             member_id,
             guild_id,
             quest_id,
           });
-
         if (unreadChannels) {
           const root_map: ChannelsReadMap = {};
           for (const x of unreadChannels) {
@@ -141,7 +174,6 @@ export const useReadStatusStore = defineStore('readStatus', {
             else root_map[x.root_id].unread = x.count;
           }
           this.channelsReadStatus = root_map;
-          console.log('Unread channels successfully updated.');
         } else {
           console.warn('No unread channels were returned.');
         }
@@ -149,174 +181,30 @@ export const useReadStatusStore = defineStore('readStatus', {
         console.error('Error ensuring guild unread channels:', error);
       }
     },
-
-    async ensureReadStatusOfGuild() {
-      const channelStore = useChannelStore();
-      if (channelStore.getCurrentGuild) {
-        await this.fetchReadStatus();
-      }
-    },
     async ensureAllChannelReadStatus() {
       const channelStore = useChannelStore();
       if (channelStore.getCurrentChannel) {
         const rootid = channelStore.getCurrentChannel;
-        await this.fetchReadStatus({ rootid });
+        const res = await readStatusService.fetchReadStatus({ rootid });
+        this['readStatus'] = Object.fromEntries(res.map((x) => [x.node_id, x]));
+        if (
+          this.channelsReadStatus !== undefined &&
+          !!this.channelsReadStatus[rootid]
+        ) {
+          const channelData: ChannelsReadEntry =
+            this.channelsReadStatus[rootid];
+          channelData.read = this.readStatus[rootid].read_count;
+          channelData.unread =
+            this.readStatus[rootid].node_count - channelData.read;
+          this.channelsReadStatus = {
+            ...this.channelsReadStatus,
+            [rootid]: channelData,
+          };
+        }
       }
     },
     resetReadStatus() {
       Object.assign(this, clearBaseState);
-    },
-    // Axios Calls
-    async creatReadStatus(data: Partial<ReadStatusData>) {
-      const res: AxiosResponse<ReadStatusData[]> = await api.post(
-        '/read_status',
-        {
-          data,
-        },
-      );
-      if (res.status == 201) {
-        const readStatusData: ReadStatusData = Object.assign(res.data[0], {
-          node_id: null,
-        });
-        this.readStatus = {
-          ...this.readStatus,
-          [readStatusData.node_id]: readStatusData,
-        };
-      }
-    },
-    async updateReadStatus(data: Partial<ReadStatusData>) {
-      const res: AxiosResponse<ReadStatusData[]> = await api.patch(
-        `/read_status/${data.node_id}`,
-        data,
-      );
-      if (res.status == 200) {
-        const readStatus = res.data[0];
-        if (this.readStatus) {
-          const readStatusData: ReadStatusData = Object.assign(
-            this.readStatus[readStatus.node_id],
-            readStatus,
-          );
-          this.readStatus = {
-            ...this.readStatus,
-            [readStatus.node_id]: readStatusData,
-          };
-        }
-      }
-    },
-    async fetchReadStatus(params: { rootid: number }) {
-      const res: AxiosResponse<ReadStatusData[]> = await api.post(
-        'rpc/unread_status_list',
-        params,
-      );
-      if (res.status == 200) {
-        this['readStatus'] = Object.fromEntries(
-          res.data.map((x) => [x.node_id, x]),
-        );
-        if (
-          this.channelsReadStatus !== undefined &&
-          !!this.channelsReadStatus[params.rootid]
-        ) {
-          const channelData: ChannelsReadEntry =
-            this.channelsReadStatus[params.rootid];
-          channelData.read = this.readStatus[params.rootid].read_count;
-          channelData.unread =
-            this.readStatus[params.rootid].node_count - channelData.read;
-          this.channelsReadStatus = {
-            ...this.channelsReadStatus,
-            [params.rootid]: channelData,
-          };
-        }
-      }
-    },
-    async fetchGuildUnreadChannels(params: {
-      member_id: number;
-      guild_id: number;
-      quest_id: number;
-    }): Promise<guildUnreadChannelRow[]> {
-      try {
-        const res: AxiosResponse<guildUnreadChannelRow[]> = await api.post(
-          'rpc/guild_unread_channels',
-          params,
-        );
-        if (res.status === 200) {
-          return res.data;
-        } else {
-          console.error(
-            'Failed to fetch guild unread channels. Server responded with:',
-            res.status,
-          );
-          return [];
-        }
-      } catch (error) {
-        console.error('Error fetching guild unread channels:', error);
-        return [];
-      }
-    },
-
-    async fetchAllReadStatus() {
-      const res: AxiosResponse<ReadStatusData[]> =
-        await api.get('/read_status');
-      if (res.status == 200) {
-        return res.data;
-      }
-    },
-
-    async CreateOrUpdateReadStatus(data: {
-      nodeid: number;
-      new_status: boolean;
-      override: boolean;
-    }) {
-      const channelStore = useChannelStore();
-      const res: AxiosResponse<{
-        new_node_id: number;
-        new_member_id: number;
-        status_new: boolean;
-      }> = await api.post('rpc/node_set_read_status', data);
-      if (res.status == 200 || res.status == 201) {
-        const memberStore = useMemberStore();
-        const memberId = memberStore.getUserId;
-        const node_id = res.data.new_node_id;
-        if (this.readStatus) {
-          const read = Object.values(this.readStatus).filter(
-            (isRead: ReadStatusData) => isRead.node_id == node_id && memberId,
-          );
-
-          if (read.length > 0 && this.readStatus) {
-            this.readStatus[node_id].status = res.data.status_new;
-          } else {
-            this.readStatus = {
-              ...this.readStatus,
-              [node_id]: {
-                node_id,
-                member_id: res.data.new_member_id,
-                seconds_shown: 0,
-                status: res.data.status_new,
-                node_count: 0,
-                read_count: 0,
-              },
-            };
-          }
-          const rootId = channelStore.getChannelOfNode(data.nodeid);
-          if (
-            this.channelsReadStatus !== undefined &&
-            !!this.channelsReadStatus[rootId]
-          ) {
-            const channelData: ChannelsReadEntry =
-              this.channelsReadStatus[rootId];
-            if (res.data.status_new) {
-              channelData.read += 1;
-              channelData.unread -= 1;
-            } else {
-              channelData.read -= 1;
-              channelData.read += 1;
-            }
-            this.channelsReadStatus = {
-              ...this.channelsReadStatus,
-              [rootId]: channelData,
-            };
-          }
-        }
-      }
     },
   },
 });

@@ -149,11 +149,11 @@ const getChildren = computed(
 );
 async function toggleReadStatus() {
   localRead = !localRead;
-  await readStatusStore.CreateOrUpdateReadStatus({
-    nodeid: readStatusProps.node_id,
-    new_status: localRead,
-    override: true,
-  });
+  await readStatusStore.updateReadStatus(
+    readStatusProps.node_id,
+    localRead,
+    true,
+  );
   if (readStatusProps.isChannel) {
     await readStatusStore.ensureAllChannelReadStatus();
   } else {
