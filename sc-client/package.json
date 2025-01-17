@@ -10,6 +10,7 @@
     "lint": "eslint --ext .js,.ts,.vue ./",
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
     "test": "echo \"See package.json => scripts for available tests.\" && exit 0",
+    "prepare": "quasar prepare",
     "dev": "quasar dev",
     "build": "quasar build",
     "test:scoring": "cucumber-js -t @scoring",

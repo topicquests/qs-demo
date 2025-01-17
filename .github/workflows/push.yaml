@@ -53,7 +53,9 @@ jobs:
           npx @puppeteer/browsers install chromedriver@stable
       - name: Run client unit tests
         working-directory: ./sc-client
-        run: npm run test:unit:ci
+        run: |
+          npm run prepare
+          npm run test:unit:ci
       # - name: Run scoring tests
       #   working-directory: ./sc-client
       #   run: npm run test:scoring
