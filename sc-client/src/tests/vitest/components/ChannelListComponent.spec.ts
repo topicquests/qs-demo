@@ -4,7 +4,11 @@ import { createTestingPinia } from '@pinia/testing';
 import { describe, it, expect, vi } from 'vitest';
 import { nextTick } from 'vue';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
-import { mockChannelsReadStatus } from './mocks/StoreMocks';
+import {
+  mockChannelsReadStatus,
+  mockChannelStatusMap,
+  mockChannel,
+} from './mocks/StoreMocks';
 
 installQuasarPlugin();
 
@@ -30,9 +34,24 @@ function createWrapper(props = {}) {
         createTestingPinia({
           initialState: {
             readStatus: {
-              fullFetch: false,
-              readStatus: {},
+              fullFetch: true,
+              readStatus: mockChannelStatusMap,
               channelsReadStatus: mockChannelsReadStatus,
+            },
+            guild: {
+              currentGuild: 1,
+            },
+            channels: {
+              channels: {
+                2: mockChannel,
+              },
+              channelData: {
+                2: {
+                  2: mockChannel,
+                },
+              },
+              currentGuild: 1,
+              currentChannel: 2,
             },
           },
         }),

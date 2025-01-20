@@ -9,7 +9,7 @@ import {
   QuestMembership,
   Role,
 } from 'src/types';
-import { ChannelsReadMap } from 'src/stores/readStatus';
+import { ChannelsReadMap, ReadStatusMap } from 'src/stores/readStatus';
 import { registration_status_enum } from 'src/enums';
 export const mockCasting: Casting = {
   guild_id: 1,
@@ -141,6 +141,13 @@ export const mockChannelsReadStatus: ChannelsReadMap = {
     quest_id: 1,
     read: 1,
     unread: 1,
+  },
+};
+
+export const mockChannelStatusMap: ReadStatusMap = {
+  2: {
+    node_count: 2,
+    read_count: 1,
   },
 };
 
