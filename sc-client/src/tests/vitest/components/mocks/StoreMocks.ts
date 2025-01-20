@@ -9,6 +9,7 @@ import {
   QuestMembership,
   Role,
 } from 'src/types';
+import { ChannelsReadMap } from 'src/stores/readStatus';
 import { registration_status_enum } from 'src/enums';
 export const mockCasting: Casting = {
   guild_id: 1,
@@ -134,6 +135,15 @@ export const mockChannel: ConversationNode = {
   meta: 'meta',
   draft_for_role_id: 0,
 };
+
+export const mockChannelsReadStatus: ChannelsReadMap = {
+  2: {
+    quest_id: 1,
+    read: 1,
+    unread: 1,
+  },
+};
+
 export const mockMember: Member = {
   id: 1,
   email: 'johnsmith@email.com',

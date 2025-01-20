@@ -121,6 +121,7 @@ async function initialize() {
       channelStore.setCurrentChannel(channelId.value);
     }
     await waitUserLoaded();
+    // TODO: if user not logged in, go to login page
     guildStore.setCurrentGuild(guildId.value!);
     if (questId.value) {
       questStore.setCurrentQuest(questId.value);

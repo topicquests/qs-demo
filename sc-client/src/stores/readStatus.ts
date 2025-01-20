@@ -18,7 +18,7 @@ interface ChannelsReadEntry {
   unread: number;
 }
 
-interface ChannelsReadMap {
+export interface ChannelsReadMap {
   [key: number]: ChannelsReadEntry;
 }
 

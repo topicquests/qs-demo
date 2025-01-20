@@ -1,8 +1,10 @@
 import { mount } from '@vue/test-utils';
 import ChannelListComponent from '../../../components/ChannelListComponent.vue';
+import { createTestingPinia } from '@pinia/testing';
 import { describe, it, expect, vi } from 'vitest';
 import { nextTick } from 'vue';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
+import { mockChannelsReadStatus } from './mocks/StoreMocks';
 
 installQuasarPlugin();
 
@@ -22,6 +24,19 @@ function createWrapper(props = {}) {
       quest_id: 123,
       ready: true,
       ...props,
+    },
+    global: {
+      plugins: [
+        createTestingPinia({
+          initialState: {
+            readStatus: {
+              fullFetch: false,
+              readStatus: {},
+              channelsReadStatus: mockChannelsReadStatus,
+            },
+          },
+        }),
+      ],
     },
   });
 }
