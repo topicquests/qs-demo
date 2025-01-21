@@ -42,24 +42,24 @@
   },
   "devDependencies": {
     "@tsconfig/recommended": "~1.0",
-    "@types/expect": "~24",
-    "@types/express": "~4.17",
+    "@types/expect": "~1",
+    "@types/express": "~5",
     "@types/mocha": "~10",
-    "@types/node": "~18",
+    "@types/node": "~20",
     "@types/nodemailer": "~6.4",
-    "@types/pg": "~8.10",
+    "@types/pg": "~8.11",
     "@types/properties-reader": "~2.1",
     "@types/ws": "~8.5",
-    "@typescript-eslint/eslint-plugin": "~6",
-    "@typescript-eslint/parser": "~6",
-    "eslint": "~8",
-    "eslint-config-prettier": "~9.1",
-    "eslint-plugin-mocha": "~10.2",
-    "libqp": "~2.0",
-    "prettier": "~3.1",
+    "@typescript-eslint/eslint-plugin": "~8",
+    "@typescript-eslint/parser": "~8",
+    "eslint": "~9",
+    "eslint-config-prettier": "~10",
+    "eslint-plugin-mocha": "~10.5",
+    "libqp": "~2.1",
+    "prettier": "~3.4",
     "ts-mocha": "~10.0",
     "ts-node": "TypeStrong/ts-node#main",
-    "typescript": "~5.3"
+    "typescript": "~5.7"
   },
   "lint-staged": {
     "**/*": [
@@ -68,11 +68,11 @@
     ]
   },
   "dependencies": {
-    "axios": "~1.6",
-    "express": "~4.18",
+    "axios": "~1.7",
+    "express": "~5",
     "nodemailer": "~6.9",
     "pg-listen": "~1.7",
     "properties-reader": "~2.3",
-    "ws": "~8.15"
+    "ws": "~8.18"
   }
 }
