@@ -1,7 +1,8 @@
 import { useMemberStore } from 'src/stores/member';
 import { api } from '../boot/axios';
 import { AxiosResponse } from 'axios';
-import { Guild, GuildData } from 'src/types';
+import { Guild, GuildData, guildPatchKeys } from 'src/types';
+import { filterKeys } from 'src/stores/baseStore';
 
 export const guildService = {
   async fetchGuildsById(
@@ -61,6 +62,23 @@ export const guildService = {
     } catch (error) {
       console.error('Error creating guild', error);
       return [];
+    }
+  },
+  async updateGuild(data: Partial<Guild>) {
+    try {
+      data = filterKeys(data, guildPatchKeys);
+      const res: AxiosResponse<Partial<GuildData[]>> = await api.patch(
+        'guilds',
+        data,
+        {
+          params: { id: `eq.${data.id}` },
+        },
+      );
+      if (res.status == 200) {
+        return res;
+      }
+    } catch (error) {
+      console.error('Error updating guild');
     }
   },
 };

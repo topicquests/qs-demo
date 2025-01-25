@@ -353,6 +353,7 @@ async function initialize() {
   const guild_id = guildId.value;
   await waitUserLoaded();
   await Promise.all([
+    guildStore.ensureCurrentGuild(guildId.value),
     questStore.ensureAllQuests(),
     roleStore.ensureAllRoles(),
     channelStore.ensureChannels(guild_id!),

@@ -117,30 +117,11 @@ export const useGuildStore = defineStore('guild', {
     },
   },
   actions: {
-    async ensureAllGuilds(): Promise<Partial<Guild>> {
+    async ensureAllGuilds() {
       if (Object.keys(this.guilds).length === 0 || !this.fullFetch) {
         const res = await guildService.fetchGuildsById(undefined, false);
-        const guilds = Object.fromEntries(
-          res.map((guild: GuildData) => [guild.id, guild]),
-        );
-        for (const guild of Object.values<GuildData>(this.guilds)) {
-          if (!this.fullGuilds[guild.id]) {
-            continue;
-          }
-          if (guild.casting) {
-            guilds[guild.id].casting = guild.casting;
-          }
-          if (guild.guild_membership) {
-            guilds[guild.id].guild_membership = guild.guild_membership;
-          }
-        }
-        this.guilds = {
-          ...this.guilds,
-          ...guilds,
-        };
-        this.fullFetch = undefined;
+        this.addGuildsToState(res, false, undefined);
       }
-      return this.guilds;
     },
     async ensureGuild(guild_id: number, full: boolean | undefined = true) {
       if (
@@ -148,34 +129,7 @@ export const useGuildStore = defineStore('guild', {
         (full && !this.fullGuilds[guild_id])
       ) {
         const res = await guildService.fetchGuildsById(guild_id, full);
-        const guilds = Object.fromEntries(
-          res.map((guild: GuildData) => [guild.id, guild]),
-        );
-        if (!full) {
-          for (const guild of Object.values<GuildData>(this.guilds)) {
-            if (!this.fullGuilds[guild.id]) {
-              continue;
-            }
-            if (guild.casting) {
-              guilds[guild.id].casting = guild.casting;
-            }
-            if (guild.guild_membership) {
-              guilds[guild.id].guild_membership = guild.guild_membership;
-            }
-          }
-        } else {
-          this.fullGuilds = {
-            ...this.fullGuilds,
-            ...Object.fromEntries(
-              res.map((guild: GuildData) => [guild.id, true]),
-            ),
-          };
-        }
-        this.guilds = {
-          ...this.guilds,
-          ...guilds,
-        };
-        this.fullFetch = guild_id === undefined;
+        this.addGuildsToState(res, full, guild_id);
       }
     },
     async ensureCurrentGuild(guild_id: number, full: boolean = true) {
@@ -207,35 +161,38 @@ export const useGuildStore = defineStore('guild', {
       if (guildId.length > 0) {
         const guildParam = guildId.length == 1 ? guildId[0] : guildId;
         const res = await guildService.fetchGuildsById(guildParam, full);
-        const guilds = Object.fromEntries(
-          res.map((guild: GuildData) => [guild.id, guild]),
-        );
-        if (!full) {
-          for (const guild of Object.values<GuildData>(this.guilds)) {
-            if (!this.fullGuilds[guild.id]) {
-              continue;
-            }
-            if (guild.casting) {
-              guilds[guild.id].casting = guild.casting;
-            }
-            if (guild.guild_membership) {
-              guilds[guild.id].guild_membership = guild.guild_membership;
-            }
-          }
-        } else {
-          this.fullGuilds = {
-            ...this.fullGuilds,
-            ...Object.fromEntries(
-              res.map((guild: GuildData) => [guild.id, true]),
-            ),
-          };
-        }
-        this.guilds = {
-          ...this.guilds,
-          ...guilds,
-        };
-        this.fullFetch = undefined;
+        this.addGuildsToState(res, full, guildId);
       }
+    },
+    addGuildsToState(passedGuilds: GuildData[], full: boolean, id: number) {
+      const guilds = Object.fromEntries(
+        passedGuilds.map((guild: GuildData) => [guild.id, guild]),
+      );
+      if (!full) {
+        for (const guild of Object.values<GuildData>(this.guilds)) {
+          if (!this.fullGuilds[guild.id]) {
+            continue;
+          }
+          if (guild.casting) {
+            guilds[guild.id].casting = guild.casting;
+          }
+          if (guild.guild_membership) {
+            guilds[guild.id].guild_membership = guild.guild_membership;
+          }
+        }
+      } else {
+        this.fullGuilds = {
+          ...this.fullGuilds,
+          ...Object.fromEntries(
+            passedGuilds.map((guild: GuildData) => [guild.id, true]),
+          ),
+        };
+      }
+      this.guilds = {
+        ...this.guilds,
+        ...guilds,
+      };
+      this.fullFetch = id === undefined;
     },
     setCurrentGuild(guild_id: number | boolean) {
       if (typeof guild_id === 'number') {
@@ -314,28 +271,6 @@ export const useGuildStore = defineStore('guild', {
     resetGuilds() {
       Object.assign(this, clearBaseState);
     },
-    async createGuildBase(
-      data: Partial<Guild>,
-    ): Promise<AxiosResponse<GuildData[]>> {
-      const res: AxiosResponse<GuildData[]> = await api.post('/guilds', data);
-      if (res.status == 201) {
-        const guildData: GuildData = Object.assign(res.data[0], {
-          member_count: 1,
-          member_request_count: 0,
-          is_member: true,
-          is_admin: true,
-          last_node_published_at: '',
-          node_count: 0,
-          ongoing_quests_count: 0,
-          finished_quests_count: 0,
-          recruiting_for_quest_count: 0,
-        });
-        this.guilds = { ...this.guilds, [guildData.id]: guildData };
-        this.fullGuilds = { ...this.fullGuilds, [guildData.id]: false };
-        // TODO: update memberships in member.
-      }
-      return res;
-    },
     async registerAllMembers(guildId: number, questId: number) {
       await api.post('/rpc/register_all_members', {
         questId,
@@ -343,24 +278,14 @@ export const useGuildStore = defineStore('guild', {
       });
     },
     async updateGuild(data: Partial<Guild>) {
-      data = filterKeys(data, guildPatchKeys);
-      const res: AxiosResponse<Partial<GuildData[]>> = await api.patch(
-        'guilds',
-        data,
-        {
-          params: { id: `eq.${data.id}` },
-        },
+      const res = await guildService.updateGuild(data);
+      const guild = res.data[0];
+      const guildData: GuildData = Object.assign(
+        {},
+        this.guilds[guild.id],
+        guild,
       );
-
-      if (res.status == 200) {
-        const guild = res.data[0];
-        const guildData: GuildData = Object.assign(
-          {},
-          this.guilds[guild.id],
-          guild,
-        );
-        this.guilds = { ...this.guilds, [guild.id]: guildData };
-      }
+      this.guilds = { ...this.guilds, [guild.id]: guildData };
     },
     async doAddGuildMembership(data: Partial<GuildMembership>) {
       const res: AxiosResponse<GuildMembership[]> = await api.post(
