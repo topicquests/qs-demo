@@ -64,7 +64,7 @@
             flat
             dense
             round
-            :color="readStatusStore.hasUnreadChannels ? 'red' : 'green'"
+            :color="readStatusStore.hasUnreadChannels ? 'cyan' : 'grey'"
             aria-label="Tree View"
             @click="toggleNav"
             id="channel_list"
@@ -204,7 +204,7 @@ function closeNav() {
 }
 .custom-tooltip {
   background-color: #333 !important;
-  color: white !important;
+  color: rgb(147, 200, 221) !important;
   border-radius: 8px;
   padding: 8px 16px;
   font-size: 14px;
