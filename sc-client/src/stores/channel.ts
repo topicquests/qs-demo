@@ -260,7 +260,7 @@ export const useChannelStore = defineStore('channel', {
         '/conversation_node',
         node,
       );
-      if (res.status == 200) {
+      if (res.status == 201) {
         const node = res.data[0];
         this.addToState(node);
       }
