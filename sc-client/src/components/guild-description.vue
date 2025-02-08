@@ -8,7 +8,7 @@
           label="Join Guild"
           @click="joinToGuild()"
           style="margin-right: 1em"
-          class="bg-dark-blue"
+          class="bg-blue"
         />
       </h1>
       <span v-if="!currentGuild.open_for_applications">guild closed</span>
@@ -36,9 +36,13 @@
 import { computed } from 'vue';
 import { useGuildStore } from '../stores/guilds';
 import { useMemberStore } from '../stores/member';
+import { useChannelStore } from 'src/stores/channel';
+import { useReadStatusStore } from 'src/stores/readStatus';
 
 const guildStore = useGuildStore();
 const memberStore = useMemberStore();
+const channelStore = useChannelStore();
+const readStatusStore = useReadStatusStore();
 
 const currentGuild = computed(() => guildStore.getCurrentGuild);
 const member = computed(() => memberStore.member);
@@ -58,6 +62,8 @@ const joinToGuild = async () => {
       member_id: member.value?.id,
     });
   isMember.value = true;
+  await channelStore.setCurrentGuild(currentGuild.value.id);
+  await readStatusStore.ensureAllChannelReadStatus();
 };
 </script>
 <style scoped>

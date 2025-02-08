@@ -173,7 +173,6 @@ const readStatusStore = useReadStatusStore();
 const conversationStore = useConversationStore();
 
 //Reactive Variables
-const isMember = ref(false);
 const guildId = ref<number | undefined>();
 const ready = ref(false);
 const { member } = storeToRefs(memberStore);
@@ -235,6 +234,14 @@ const currentQuestId = computed(() => questStore.currentQuest);
 const currentGuild = computed(() => guildStore.getCurrentGuild);
 const currentQuest = computed(() => questStore.getCurrentQuest);
 const currentGuildId = computed<number>(() => guildStore.currentGuild);
+const isMember = computed<boolean>({
+  get: () => {
+    return !!guildStore.isGuildMember(currentGuild.value?.id);
+  },
+  set: (value) => {
+    return value;
+  },
+});
 const playingQuestInGuild = computed(() => {
   if (currentGuild.value) {
     return questStore.isPlayingQuestInGuild(
@@ -359,8 +366,10 @@ async function initialize() {
     membersStore.ensureMembersOfGuild({ guildId: guild_id }),
   ]);
   guildStore.setCurrentGuild(guild_id!);
-  channelStore.setCurrentGuild(guild_id!);
-  readStatusStore.ensureGuildUnreadChannels();
+  if(isMember.value){
+    channelStore.setCurrentGuild(guild_id!);
+  }
+  readStatusStore.ensureGuildUnreadChannels(), 
   await initializeStage2();
   ready.value = true;
 }

@@ -59,7 +59,14 @@
           >
           </q-btn>
         </div>
-        <div v-if="checkIfAuthenticated && showTree && currentGuild">
+        <div
+          v-if="
+            checkIfAuthenticated &&
+            showTree &&
+            currentGuild &&
+            guildStore.isGuildMember(currentGuild.id)
+          "
+        >
           <q-btn
             flat
             dense
