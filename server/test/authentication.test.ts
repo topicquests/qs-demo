@@ -8,18 +8,21 @@ function delay(time) {
 }
 
 describe("authentication", function () {
-  // eslint-disable-next-line prefer-const
+   
   let memberId: number, adminToken, token;
-  const mailhog_auth = { Authorization: "Basic dGVzdDp0ZXN0" }; // test:test
+  const mailhog_auth = { Authorization: "Basic dGVzdDp0ZXN0" };
+ // test:test
   before(async function () {
     adminToken = await axiosUtil.call("get_token", {
       mail: adminInfo.email,
       pass: adminInfo.password,
     });
   });
+
   after(async function () {
     if (memberId) await delete_members({ quidam: memberId }, adminToken);
   });
+
   it("authenticates admin and creates accessToken", async function () {
     const member = await axiosUtil.get(
       "members",
@@ -29,6 +32,7 @@ describe("authentication", function () {
     assert.equal(member.length, 1);
     assert.ok(member, "Obtained user using adminToken");
   });
+
   it("creates a new user without confirmation", async function () {
     await axiosUtil.call("create_member", quidamInfo);
     const quidamData = await axiosUtil.get(
@@ -40,6 +44,7 @@ describe("authentication", function () {
     assert(quidamData[0].confirmed == false);
     memberId = quidamData[0].id;
   });
+
   it("cannot login yet", async function () {
     await assert.rejects(async () => {
       await axiosUtil.call("get_token", {
@@ -48,6 +53,7 @@ describe("authentication", function () {
       });
     }, /invalid confirmed/);
   });
+
   it("obtains a confirmation email", async function () {
     const num_trials = 10;
     this.timeout(300*(num_trials+1));
@@ -84,6 +90,7 @@ describe("authentication", function () {
     assert.ok(token_search);
     token = token_search[1];
   });
+
   it("uses the token to set confirmation", async function () {
     assert.notEqual(token, undefined);
     await axiosUtil.call("renew_token", { token });
@@ -100,24 +107,30 @@ describe("authentication", function () {
       await axiosUtil.call("renew_token", { token });
     }, /invalid old_token/);
   });
+
   it("ask for a reset password", async function () {
     // TODO: ask for a password reset. We should get an email with token.
   });
+
   it("ask for a second reset password", async function () {
     // TODO: ask for a second password reset immediately. Should fail.
   });
+
   it("login with email token", async function () {
     // TODO: login using the token obtained from first password reset as parameter
     // obtain a normal (header) token back.
   });
+
   it("change password", async function () {
     quidamInfo.password = "newPassword";
     await axiosUtil.update("members", { id: memberId }, quidamInfo, token);
   });
+
   it("cannot login with old email token", async function () {
     // TODO: try to login using the old token obtained from password reset
     // expect fail
   });
+
   it("can login with new password", async function () {
     token = await axiosUtil.call(
       "get_token",

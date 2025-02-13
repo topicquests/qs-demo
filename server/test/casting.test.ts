@@ -41,7 +41,7 @@ describe("'casting' service", function () {
         [leaderInfo, sponsorInfo, quidamInfo],
         adminToken
       ));
-      /* eslint-disable @typescript-eslint/no-non-null-assertion */
+       
       quidamToken = memberTokens[quidamInfo.handle!];
       leaderToken = memberTokens[leaderInfo.handle!];
       sponsorToken = memberTokens[sponsorInfo.handle!];
@@ -63,6 +63,7 @@ describe("'casting' service", function () {
 
     describe("guild creation by authorized user", function () {
       let game_play_id: multiId;
+
       it("creates public quest", async function () {
         const publicQuestModel = await axiosUtil.create(
           "quests",
@@ -73,6 +74,7 @@ describe("'casting' service", function () {
         const quests = await axiosUtil.get("quests", {}, sponsorToken);
         assert.equal(quests.length, 1);
       });
+
       it("creates public guild", async function () {
         const publicGuildModel = await axiosUtil.create(
           "guilds",
@@ -87,6 +89,7 @@ describe("'casting' service", function () {
           quest_id: publicQuestId,
         };
       });
+
       it("guild leader can register guild to quest", async function () {
         const register = await axiosUtil.create(
           "game_play",
@@ -102,6 +105,7 @@ describe("'casting' service", function () {
         assert.equal(game_play.length, 1);
         assert.equal(game_play[0].status, "confirmed");
       });
+
       it("guild leader can then self-register to quest", async function () {
         const register = await axiosUtil.create(
           "casting",
@@ -113,6 +117,7 @@ describe("'casting' service", function () {
         );
         assert.ok(register);
       });
+
       it("quidam cannot register to quest from outside guild", async function () {
         await assert.rejects(async () => {
           await axiosUtil.create(
@@ -125,6 +130,7 @@ describe("'casting' service", function () {
           );
         }, "GeneralError");
       });
+
       it("quidam can register to guild", async function () {
         const register = await axiosUtil.create(
           "guild_membership",
@@ -137,6 +143,7 @@ describe("'casting' service", function () {
         console.log(register);
         assert.ok(register);
       });
+
       it("guild leader can call global registration", async function () {
         await axiosUtil.call(
           "register_all_members",
@@ -158,6 +165,7 @@ describe("'casting' service", function () {
         const quidam_r = registers.find((r) => r.member_id == quidamId);
         assert.ok(quidam_r);
       });
+
       it("quidam can deregister", async function () {
         const quidam_casting = { member_id: quidamId, ...game_play_id };
         let r = await axiosUtil.delete("casting", quidam_casting, quidamToken);
@@ -165,6 +173,7 @@ describe("'casting' service", function () {
         r = await axiosUtil.get("casting", quidam_casting, quidamToken);
         assert.deepEqual(r, []);
       });
+
       it("quidam can self-register", async function () {
         const r = await axiosUtil.create(
           "casting",
@@ -176,6 +185,7 @@ describe("'casting' service", function () {
         );
         assert.ok(r);
       });
+
       it("quidam has the guild default role", async function () {
         const r = await axiosUtil.get(
           "guild_member_available_role",

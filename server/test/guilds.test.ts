@@ -55,7 +55,7 @@ describe("'guilds' service", function () {
         [quidam2Info, leaderInfo, quidamInfo],
         adminToken
       ));
-      /* eslint-disable @typescript-eslint/no-non-null-assertion */
+       
       quidamToken = memberTokens[quidamInfo.handle!];
       sponsorToken = memberTokens[leaderInfo.handle!];
       quidam2Id = memberIds[quidam2Info.handle!];
@@ -107,6 +107,7 @@ describe("'guilds' service", function () {
         const guilds = await axiosUtil.get("guilds", {}, sponsorToken);
         assert.equal(guilds.length, 1);
       });
+
       it("creates quasiPublic guild", async function () {
         // The returning false is needed because the guild is not readable until after it's created.
         // We'll probably have to apply this at all times when creating objects
@@ -120,6 +121,7 @@ describe("'guilds' service", function () {
         const guilds = await axiosUtil.get("guilds", {}, sponsorToken);
         assert.equal(guilds.length, 2);
       });
+
       it("creates private guild", async function () {
         // The returning false is needed because the guild is not readable until after it's created.
         // We'll probably have to apply this at all times when creating objects
@@ -146,6 +148,7 @@ describe("'guilds' service", function () {
         );
         assert.equal(guild_membership.status, "invitation");
       });
+
       it("sponsor can delete invitation", async function () {
         const guild_membership = await axiosUtil.delete(
           "guild_membership",
@@ -154,6 +157,7 @@ describe("'guilds' service", function () {
         );
         assert.equal(guild_membership.length, 1);
       });
+
       it("sponsor can reinvite someone else", async function () {
         const guild_membership = await axiosUtil.create(
           "guild_membership",
@@ -166,14 +170,17 @@ describe("'guilds' service", function () {
         );
         assert.equal(guild_membership.status, "invitation");
       });
+
       it("only public guild is visible w/o authentication", async function () {
         const guilds = await axiosUtil.get("guilds", {});
         assert.equal(guilds.length, 2);
       });
+
       it("only public guild is visible w/o authorization", async function () {
         const guilds = await axiosUtil.get("guilds", {}, quidamToken);
         assert.equal(guilds.length, 2);
       });
+
       it("quidam can confirm invitation", async function () {
         const memberships = await axiosUtil.update(
           "guild_membership",
@@ -184,6 +191,7 @@ describe("'guilds' service", function () {
         assert.equal(memberships.length, 1);
         assert.equal(memberships[0].status, "confirmed");
       });
+
       it("quidam can delete own membership", async function () {
         await axiosUtil.delete(
           "guild_membership",
@@ -197,6 +205,7 @@ describe("'guilds' service", function () {
         );
         assert.equal(memberships.length, 0);
       });
+
       it("quidam cannot register someone else", async function () {
         await assert.rejects(async () => {
           await axiosUtil.create(
@@ -216,6 +225,7 @@ describe("'guilds' service", function () {
         );
         assert.equal(memberships.length, 0);
       });
+
       it("quidam can self-register", async function () {
         const membership = await axiosUtil.create(
           "guild_membership",
@@ -228,6 +238,7 @@ describe("'guilds' service", function () {
         );
         assert.equal(membership.status, "confirmed");
       });
+
       it("quidam cannot self-register in quasi-public guild", async function () {
         const membership = await axiosUtil.create(
           "guild_membership",

@@ -27,7 +27,7 @@ describe("'quests' service", function () {
         [sponsorInfo, quidamInfo],
         adminToken
       ));
-      /* eslint-disable @typescript-eslint/no-non-null-assertion */
+       
       quidamToken = memberTokens[quidamInfo.handle!];
       sponsorToken = memberTokens[sponsorInfo.handle!];
       /* eslint-ensable @typescript-eslint/no-non-null-assertion */
@@ -69,6 +69,7 @@ describe("'quests' service", function () {
         const quests = await axiosUtil.get("quests", {}, sponsorToken);
         assert.equal(quests.length, 1);
       });
+
       it("creates private quest", async function () {
         const privateQuestModel = await axiosUtil.create(
           "quests",
@@ -79,14 +80,17 @@ describe("'quests' service", function () {
         const quests = await axiosUtil.get("quests", {}, sponsorToken);
         assert.equal(quests.length, 2);
       });
+
       it("draft public quest is not visible w/o authentication", async function () {
         const quests = await axiosUtil.get("quests", {});
         assert.equal(quests.length, 0);
       });
+
       it("draft public quest is not visible w/o authorization", async function () {
         const quests = await axiosUtil.get("quests", {}, quidamToken);
         assert.equal(quests.length, 0);
       });
+
       it("changes the status of the public quest", async function () {
         await axiosUtil.update(
           "quests",
@@ -95,10 +99,12 @@ describe("'quests' service", function () {
           sponsorToken
         );
       });
+
       it("only public quest is visible w/o authentication", async function () {
         const quests = await axiosUtil.get("quests", {});
         assert.equal(quests.length, 1);
       });
+
       it("only public quest is visible w/o authorization", async function () {
         const quests = await axiosUtil.get("quests", {}, quidamToken);
         assert.equal(quests.length, 1);

@@ -231,7 +231,8 @@ export async function add_members(
           pass: member.password,
         }
       );
-    } catch (err) {
+    } catch (error) {
+      console.error(error);
       break;
     }
   }

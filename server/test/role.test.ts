@@ -52,7 +52,7 @@ describe("'role' service", function () {
         [leaderInfo, sponsorInfo, quidamInfo, guildPlayerInfo],
         adminToken
       ));
-      /* eslint-disable @typescript-eslint/no-non-null-assertion */
+       
       quidamToken = memberTokens[quidamInfo.handle!];
       leaderToken = memberTokens[leaderInfo.handle!];
       sponsorToken = memberTokens[sponsorInfo.handle!];
@@ -76,6 +76,7 @@ describe("'role' service", function () {
 
     describe("guild creation by authorized user", function () {
       let game_play_id: multiId;
+
       it("creates public quest", async function () {
         const publicQuestModel = await axiosUtil.create(
           "quests",
@@ -86,6 +87,7 @@ describe("'role' service", function () {
         const quests = await axiosUtil.get("quests", {}, sponsorToken);
         assert.equal(quests.length, 1);
       });
+
       it("creates public guild", async function () {
         const publicGuildModel = await axiosUtil.create(
           "guilds",
@@ -100,6 +102,7 @@ describe("'role' service", function () {
           quest_id: publicQuestId,
         };
       });
+
       it("guild leader can register guild to quest", async function () {
         const register = await axiosUtil.create(
           "game_play",
@@ -115,6 +118,7 @@ describe("'role' service", function () {
         assert.equal(game_play.length, 1);
         assert.equal(game_play[0].status, "confirmed");
       });
+
       it("guild leader can then self-register to quest", async function () {
         const register = await axiosUtil.create(
           "casting",
@@ -126,6 +130,7 @@ describe("'role' service", function () {
         );
         assert.ok(register);
       });
+
       it("quidam can register to guild", async function () {
         const register = await axiosUtil.create(
           "guild_membership",
@@ -137,6 +142,7 @@ describe("'role' service", function () {
         );
         assert.ok(register);
       });
+
       it("player can register to guild", async function () {
         const register = await axiosUtil.create(
           "guild_membership",
@@ -148,6 +154,7 @@ describe("'role' service", function () {
         );
         assert.ok(register);
       });
+
       it("guild leader can call global registration", async function () {
         await axiosUtil.call(
           "register_all_members",
@@ -282,6 +289,7 @@ describe("'role' service", function () {
           playerToken
         );
       });
+
       it("Leader cannot delete an available role in use", async function () {
         await assert.rejects(async () => {
           await axiosUtil.delete(
@@ -295,6 +303,7 @@ describe("'role' service", function () {
           );
         }, /casting_role_available_role_fkey/);
       });
+
       it("Leader cannot delete a role in use", async function () {
         await assert.rejects(async () => {
           await axiosUtil.delete(

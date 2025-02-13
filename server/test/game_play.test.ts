@@ -38,11 +38,11 @@ describe("'game_play' service", function () {
         [leaderInfo, sponsorInfo, quidamInfo],
         adminToken
       ));
-      /* eslint-disable @typescript-eslint/no-non-null-assertion */
+       
       quidamToken = memberTokens[quidamInfo.handle!];
       leaderToken = memberTokens[leaderInfo.handle!];
       sponsorToken = memberTokens[sponsorInfo.handle!];
-      /* eslint-enable @typescript-eslint/no-non-null-assertion */
+       
       roles = await get_base_roles(adminToken);
       researcherRoleId = get_system_role_by_name(roles, "Researcher")?.id;
     });
@@ -58,6 +58,7 @@ describe("'game_play' service", function () {
 
     describe("guild creation by authorized user", function () {
       let game_play_id: multiId;
+
       it("creates public quest", async function () {
         const publicQuestModel = await axiosUtil.create(
           "quests",
@@ -68,6 +69,7 @@ describe("'game_play' service", function () {
         const quests = await axiosUtil.get("quests", {}, sponsorToken);
         assert.equal(quests.length, 1);
       });
+
       it("creates public guild", async function () {
         const publicGuildModel = await axiosUtil.create(
           "guilds",
@@ -82,16 +84,19 @@ describe("'game_play' service", function () {
           quest_id: publicQuestId,
         };
       });
+
       it("quidam cannot register to quest", async function () {
         await assert.rejects(async () => {
           await axiosUtil.create("game_play", game_play_id, quidamToken);
         }, /AxiosError/);
       });
+
       it("guild leader cannot register to draft quest", async function () {
         await assert.rejects(async () => {
           await axiosUtil.create("game_play", game_play_id, leaderToken);
         }, /AxiosError/);
       });
+
       it("sponsor can update quest", async function () {
         const update = await axiosUtil.update(
           "quests",
@@ -106,6 +111,7 @@ describe("'game_play' service", function () {
         assert.equal(update.length, 1);
         assert.equal(update[0].status, "registration");
       });
+
       it("guild leader can register to quest in registration mode", async function () {
         const register = await axiosUtil.create(
           "game_play",
@@ -121,9 +127,11 @@ describe("'game_play' service", function () {
         assert.equal(game_play.length, 1);
         assert.equal(game_play[0].status, "confirmed");
       });
+
       it("guild leader can deregister from quest", async function () {
         await axiosUtil.delete("game_play", game_play_id, leaderToken);
       });
+
       it("sponsor can invite guild", async function () {
         const register = await axiosUtil.create(
           "game_play",
@@ -139,6 +147,7 @@ describe("'game_play' service", function () {
         assert.equal(game_play.length, 1);
         assert.equal(game_play[0].status, "invitation");
       });
+
       it("leader can accept invitation", async function () {
         const update = await axiosUtil.update(
           "game_play",

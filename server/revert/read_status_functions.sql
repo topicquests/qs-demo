@@ -1,4 +1,4 @@
-ode -- Revert sensecraft:read_status_functions from pg
+-- Revert sensecraft:read_status_functions from pg
 
 BEGIN;
 

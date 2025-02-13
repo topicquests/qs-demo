@@ -45,7 +45,7 @@ function remove_ids(recNode) {
   }
 }
 
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+ 
 describe("'conversation_node' service", function () {
   describe("guild creation", function () {
     const nodeIds: { [key: string]: number } = {};
@@ -104,6 +104,7 @@ describe("'conversation_node' service", function () {
 
     describe("conversation_node tests", function () {
       let game_play_id: multiId;
+
       it("creates two public quests", async function () {
         let publicQuestModel = await axiosUtil.create(
           "quests",
@@ -122,10 +123,12 @@ describe("'conversation_node' service", function () {
         quests = await axiosUtil.get("quests", {}, leaderToken);
         assert.equal(quests.length, 2);
       });
+
       it("sponsor can ask first question", async function () {
         Object.assign(nodeIds, await my_add_node(question1Info));
         q1Id = nodeIds[question1Info.id!];
       });
+
       it("sponsor cannot create a second root", async function () {
         await assert.rejects(async () => {
           await my_add_node({
@@ -137,6 +140,7 @@ describe("'conversation_node' service", function () {
           });
         }, /Each quest must have a single root/);
       });
+
       it("creates public guild", async function () {
         const publicGuildModel = await axiosUtil.create(
           "guilds",
@@ -151,6 +155,7 @@ describe("'conversation_node' service", function () {
           quest_id: publicQuestId,
         };
       });
+
       it("quidam can register to guild", async function () {
         const register = await axiosUtil.create(
           "guild_membership",
@@ -162,6 +167,7 @@ describe("'conversation_node' service", function () {
         );
         assert.ok(register);
       });
+
       it("guild leader can register guild to quest", async function () {
         const register = await axiosUtil.create(
           "game_play",
@@ -177,6 +183,7 @@ describe("'conversation_node' service", function () {
         assert.equal(game_play.length, 1);
         assert.equal(game_play[0].status, "confirmed");
       });
+
       it("leader can self-register", async function () {
         const r = await axiosUtil.create(
           "casting",
@@ -189,6 +196,7 @@ describe("'conversation_node' service", function () {
         );
         assert.ok(r);
       });
+
       it("leader can make game leader role available for self", async function () {
         const r = await axiosUtil.create(
           "guild_member_available_role",
@@ -201,6 +209,7 @@ describe("'conversation_node' service", function () {
         );
         assert.ok(r);
       });
+
       it("leader can self-assign game leader role", async function () {
         const r = await axiosUtil.create(
           "casting_role",
@@ -214,6 +223,7 @@ describe("'conversation_node' service", function () {
         );
         assert.ok(r);
       });
+
       it("quidam can self-register", async function () {
         const r = await axiosUtil.create(
           "casting",
@@ -226,6 +236,7 @@ describe("'conversation_node' service", function () {
         );
         assert.ok(r);
       });
+
       it("quidam can self-cast with default role", async function () {
         const r = await axiosUtil.create(
           "casting_role",
@@ -239,10 +250,12 @@ describe("'conversation_node' service", function () {
         );
         assert.ok(r);
       });
+
       it("quidam can create private draft node", async function () {
         Object.assign(nodeIds, await my_add_node(answer1Info));
         a1Id = nodeIds[answer1Info.id!];
       });
+
       it("leader cannot submit node before quest is ongoing", async function () {
         await assert.rejects(async () => {
           await my_add_node({
@@ -254,6 +267,7 @@ describe("'conversation_node' service", function () {
           });
         });
       });
+
       it("sponsor can start quest", async function () {
         await axiosUtil.update(
           "quests",
@@ -262,6 +276,7 @@ describe("'conversation_node' service", function () {
           sponsorToken
         );
       });
+
       it("quidam cannot pile an argument on a question", async function () {
         await assert.rejects(async () => {
           await my_add_node({
@@ -273,6 +288,7 @@ describe("'conversation_node' service", function () {
           });
         });
       });
+
       it("leader and sponsor cannot see private draft", async function () {
         let node_model = await axiosUtil.get(
           "conversation_node",
@@ -287,6 +303,7 @@ describe("'conversation_node' service", function () {
         );
         assert.equal(node_model.length, 0);
       });
+
       it("quidam can update draft node to role_draft", async function () {
         await axiosUtil.update(
           "conversation_node",
@@ -299,6 +316,7 @@ describe("'conversation_node' service", function () {
           quidamToken
         );
       });
+
       it("sponsor cannot see role draft", async function () {
         const node_model = await axiosUtil.get(
           "conversation_node",
@@ -307,6 +325,7 @@ describe("'conversation_node' service", function () {
         );
         assert.equal(node_model.length, 0);
       });
+
       it("leader cannot see role draft", async function () {
         const node_model = await axiosUtil.get(
           "conversation_node",
@@ -315,6 +334,7 @@ describe("'conversation_node' service", function () {
         );
         assert.equal(node_model.length, 0);
       });
+
       it("leader can make philosopher role available for self", async function () {
         const r = await axiosUtil.create(
           "guild_member_available_role",
@@ -327,6 +347,7 @@ describe("'conversation_node' service", function () {
         );
         assert.ok(r);
       });
+
       it("leader can self-assign philosopher role", async function () {
         const r = await axiosUtil.create(
           "casting_role",
@@ -340,6 +361,7 @@ describe("'conversation_node' service", function () {
         );
         assert.ok(r);
       });
+
       it("leader can see role draft with appropriate role", async function () {
         const node_model = await axiosUtil.get(
           "conversation_node",
@@ -348,6 +370,7 @@ describe("'conversation_node' service", function () {
         );
         assert.equal(node_model.length, 1);
       });
+
       it("quidam can update role_draft node to guild_draft", async function () {
         await axiosUtil.update(
           "conversation_node",
@@ -368,6 +391,7 @@ describe("'conversation_node' service", function () {
         );
         assert.equal(node_model.length, 0);
       });
+
       it("leader can see guild draft", async function () {
         const node_model = await axiosUtil.get(
           "conversation_node",
@@ -376,6 +400,7 @@ describe("'conversation_node' service", function () {
         );
         assert.equal(node_model.length, 1);
       });
+
       it("guild member can update someone elses guild draft node", async function () {
         await axiosUtil.update(
           "conversation_node",
@@ -386,10 +411,12 @@ describe("'conversation_node' service", function () {
           leaderToken
         );
       });
+
       it("quidam can pile on draft nodes", async function () {
         Object.assign(nodeIds, await my_add_node(argument1Info));
         arg1Id = nodeIds["arg1"];
       });
+
       it("find subtree", async function () {
         const descModels = await axiosUtil.call(
           "node_subtree",
@@ -402,6 +429,7 @@ describe("'conversation_node' service", function () {
           [a1Id, arg1Id]
         );
       });
+
       it("see neighbourhood", async function () {
         let descModels = await axiosUtil.call(
           "node_neighbourhood",
@@ -422,6 +450,7 @@ describe("'conversation_node' service", function () {
         );
         assert.equal(descModels.length, 1);
       });
+
       it("find subtree does not trump security", async function () {
         const descModels = await axiosUtil.call(
           "node_subtree",
@@ -434,6 +463,7 @@ describe("'conversation_node' service", function () {
           [a1Id]
         );
       });
+
       it("quidam cannot unroot node", async function () {
         await assert.rejects(async () => {
           await axiosUtil.update(
@@ -446,6 +476,7 @@ describe("'conversation_node' service", function () {
           );
         }, /Root node type must be /);
       });
+
       it("quidam cannot propose child if parent is not proposed", async function () {
         const arg1Models = await axiosUtil.update(
           "conversation_node",
@@ -458,6 +489,7 @@ describe("'conversation_node' service", function () {
         assert.equal(arg1Models.length, 1);
         assert.equal(arg1Models[0].status, "guild_draft");
       });
+
       it("quidam cannot submit node", async function () {
         const arg1Models = await axiosUtil.update(
           "conversation_node",
@@ -470,6 +502,7 @@ describe("'conversation_node' service", function () {
         assert.equal(arg1Models.length, 1);
         assert.equal(arg1Models[0].status, "guild_draft");
       });
+
       it("quidam cannot update draft node to proposed as researcher", async function () {
         const arg1Models = await axiosUtil.update(
           "conversation_node",
@@ -482,6 +515,7 @@ describe("'conversation_node' service", function () {
         );
         assert.equal(arg1Models[0].status, "guild_draft");
       });
+
       it("guild leader can assign philosopher role to quidam", async function () {
         const r = await axiosUtil.create(
           "guild_member_available_role",
@@ -494,6 +528,7 @@ describe("'conversation_node' service", function () {
         );
         assert.ok(r);
       });
+
       it("quidam can self-cast", async function () {
         const r = await axiosUtil.create(
           "casting_role",
@@ -507,6 +542,7 @@ describe("'conversation_node' service", function () {
         );
         assert.ok(r);
       });
+
       it("quidam can update draft node to proposed as philosopher", async function () {
         const arg1Models = await axiosUtil.update(
           "conversation_node",
@@ -519,6 +555,7 @@ describe("'conversation_node' service", function () {
         );
         assert.equal(arg1Models[0].status, "proposed");
       });
+
       it("leader can submit node", async function () {
         const arg1Models = await axiosUtil.update(
           "conversation_node",
@@ -533,6 +570,7 @@ describe("'conversation_node' service", function () {
         assert.equal(arg1Models[0].status, "published");
         assert.ok(arg1Models[0].published_at);
       });
+
       it("cannot create a node with parent from a different quest", async function () {
         // create a node in quest2
         Object.assign(
@@ -560,6 +598,7 @@ describe("'conversation_node' service", function () {
           });
         }, /Parent node does not belong to the same quest/);
       });
+
       it("can add a meta-node to the focus node", async function () {
         // set the focus node to first answer
         await axiosUtil.update(
@@ -582,6 +621,7 @@ describe("'conversation_node' service", function () {
           })
         );
       });
+
       it("can add a meta-node to a descendant of the focus node", async function () {
         Object.assign(
           nodeIds,
@@ -596,6 +636,7 @@ describe("'conversation_node' service", function () {
           })
         );
       });
+
       it("can add a meta-node to an existing meta-node", async function () {
         Object.assign(
           nodeIds,
@@ -658,6 +699,7 @@ describe("'conversation_node' service", function () {
           )
         );
       });
+
       it("cannot add a non-root channel", async function () {
         await assert.rejects(async () => {
           await my_add_node({
@@ -671,6 +713,7 @@ describe("'conversation_node' service", function () {
           });
         }, /Channels must be at root/);
       });
+
       it("can add a meta-node to either channel", async function () {
         Object.assign(
           nodeIds,
@@ -685,6 +728,7 @@ describe("'conversation_node' service", function () {
           })
         );
       });
+
       it("cannot add a quest-less non-meta node", async function () {
         await assert.rejects(async () => {
           await my_add_node(
@@ -699,6 +743,7 @@ describe("'conversation_node' service", function () {
           );
         }, /Quest Id must be defined/);
       });
+
       it("cannot add a node in channel state outside of a channel", async function () {
         Object.assign(
           nodeIds,
@@ -719,6 +764,7 @@ describe("'conversation_node' service", function () {
         assert(node.length === 1);
         assert(node[0].meta === "conversation");
       });
+
       it("cannot add a node in non-channel state inside a channel", async function () {
         Object.assign(
           nodeIds,
@@ -739,6 +785,7 @@ describe("'conversation_node' service", function () {
         assert(node.length === 1);
         assert(node[0].meta === "channel");
       });
+
       it("can add a guild draft meta-node to a guild channel", async function () {
         Object.assign(
           nodeIds,
@@ -754,6 +801,7 @@ describe("'conversation_node' service", function () {
           })
         );
       });
+
       it("role member can see that meta-node", async function () {
         const node_model = await axiosUtil.get(
           "conversation_node",
@@ -762,6 +810,7 @@ describe("'conversation_node' service", function () {
         );
         assert.equal(node_model.length, 1);
       });
+
       it("can retrieve conversation tree", async function () {
         const result = await axiosUtil.call(
           "nodes2json",
@@ -788,6 +837,7 @@ describe("'conversation_node' service", function () {
           num_nodes_in_json(result)
         );
       });
+
       it("can reconstruct the conversation tree", async function () {
         await axiosUtil.delete(
           "conversation_node",
