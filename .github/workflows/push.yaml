@@ -12,10 +12,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js v20.18.1
+      - name: Use Node.js v20.18.3
         uses: actions/setup-node@v4
         with:
-          node-version: v20.18.1
+          node-version: v20.18.3
       - name: use postgres
         uses: Daniel-Marynicz/postgresql-action@master
         with:
@@ -32,9 +32,9 @@ jobs:
         run: python ./scripts/initial_setup.py -u postgres -p postgres --no-create-development --no-create-production --app_name sensecraft
       - name: install postgrest
         run: |
-          wget https://github.com/PostgREST/postgrest/releases/download/v12.2.5/postgrest-v12.2.5-linux-static-x86-64.tar.xz
-          tar -Jxf postgrest-v12.2.5-linux-static-x86-64.tar.xz
-          rm postgrest-v12.2.5-linux-static-x86-64.tar.xz
+          wget https://github.com/PostgREST/postgrest/releases/download/v12.2.8/postgrest-v12.2.8-linux-static-x86-64.tar.xz
+          tar -Jxf postgrest-v12.2.8-linux-static-x86-64.tar.xz
+          rm postgrest-v12.2.8-linux-static-x86-64.tar.xz
           sudo mv postgrest /usr/bin/
       - name: Install server dependencies
         working-directory: ./server
