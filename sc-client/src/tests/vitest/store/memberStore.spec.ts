@@ -59,7 +59,8 @@ describe('Member memberStore', () => {
 
     await memberStore.fetchLoginUser();
     expect(mockAxios.history.get.length).toBeGreaterThan(0);
-    console.log(mockAxios.history.get);
+    // TODO: what is the second get about? it should be mocked as well
+    // console.log(mockAxios.history.get);
     expect(memberStore.$state.member).toBeDefined();
   });
   it('resets correctly', async () => {

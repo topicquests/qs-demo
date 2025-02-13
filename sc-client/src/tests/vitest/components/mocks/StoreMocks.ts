@@ -39,7 +39,7 @@ export const mockRole: Role = {
 export const mockGuildMembership: GuildMembership = {
   guild_id: 1,
   member_id: 1,
-  permissions: undefined,
+  permissions: [],
   status: registration_status_enum.confirmed,
   created_at: undefined,
   updated_at: undefined,
@@ -102,6 +102,14 @@ export const mockGuild: GuildData = {
   finished_quests_count: 0,
   recruiting_for_quest_count: 0,
 };
+
+export const mockGuildAfterJoin = {
+  ...mockGuild,
+  guild_membership: [mockGuildMembership],
+  is_member: true,
+  member_count: 1,
+};
+
 export const mockNode: ConversationNode = {
   id: 1,
   quest_id: 1,
@@ -155,7 +163,7 @@ export const mockMember: Member = {
   id: 1,
   email: 'johnsmith@email.com',
   handle: 'JohnSmith',
-  slug: undefined,
+  slug: 'johnsmith',
   permissions: [],
   guild_membership: [],
   quest_membership: undefined,
@@ -169,6 +177,11 @@ export const mockMember: Member = {
   confirmed: true,
   last_login: undefined,
   last_login_email_sent: undefined,
+};
+
+export const mockMemberAfterJoin: Member = {
+  ...mockMember,
+  guild_membership: [mockGuildMembership],
 };
 
 export const mockQuest: QuestData = {
