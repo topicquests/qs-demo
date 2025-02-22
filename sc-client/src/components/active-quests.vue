@@ -76,6 +76,7 @@ import { QuestData } from '../types';
 import memberGameRegistration from '../components/member_game_registration.vue';
 import { useRouter } from 'vue-router';
 import { useQuestStore } from 'src/stores/quests';
+import { useReadStatusStore } from 'src/stores/readStatus';
 
 // Props
 const ActiveQuestsProps = defineProps<{
@@ -89,6 +90,7 @@ const ActiveQuestsProps = defineProps<{
 const memberStore = useMemberStore();
 const guildStore = useGuildStore();
 const questStore = useQuestStore();
+const readStatusStore = useReadStatusStore();
 const router = useRouter();
 
 const prompt = ref(false);
@@ -96,6 +98,8 @@ const quest_id = ref(null);
 
 watch(quest_id, (newVal) => {
   questStore.setCurrentQuest(newVal);
+  readStatusStore.ensureAllChannelReadStatus();
+
 });
 </script>
 

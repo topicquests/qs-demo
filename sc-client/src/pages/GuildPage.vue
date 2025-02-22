@@ -1,5 +1,5 @@
 <template>
-  <q-page class="bg-secondary guild-page" v-if="ready">
+  <q-page class="bg-secondary guild-page" v-if="ready && currentGuildId">
     <div class="row justify-center">
       <q-card class="guild-card q-mt-md q-pa-md">
         <div class="col-12 justify-center">
@@ -44,18 +44,15 @@
             <div class="row">
               <div v-if="currentQuest && playingQuestInGuild" class="col-12">
                 <castingRoleEdit
-                  class="casting-role"
-                  v-if="
-                    currentQuest.status !== 'ongoing' && availableRoles.length
-                  "
-                  :availableRoles="availableRoles"
-                  :castingRoles="castingRoles"
-                  :guildId="guildId"
-                  :questId="currentQuestId"
-                  :memberId="member!.id"
-                  v-on:castingRoleAdd="castingRoleAdded"
-                  v-on:castingRoleRemove="castingRoleRemoved"
-                ></castingRoleEdit>
+                v-if="currentQuest?.status !== 'ongoing' && availableRoles?.length && member?.id"
+                :availableRoles="availableRoles"
+                :castingRoles="castingRoles || []"
+                :guildId="guildId ?? 0"
+                :questId="currentQuestId ?? 0"
+                :memberId="member?.id ?? null"
+                v-on:castingRoleAdd="castingRoleAdded"
+                v-on:castingRoleRemove="castingRoleRemoved"
+              />
               </div>
             </div>
             <div class="row justify-center">
@@ -233,7 +230,13 @@ const allRoles = computed(() => roleStore.role);
 const currentQuestId = computed(() => questStore.currentQuest);
 const currentGuild = computed(() => guildStore.getCurrentGuild);
 const currentQuest = computed(() => questStore.getCurrentQuest);
-const currentGuildId = computed<number>(() => guildStore.currentGuild);
+const currentGuildId = computed<number>({
+  get:() => { return guildStore.currentGuild
+  },
+  set: (value) => {
+    return value
+  }
+});
 const isMember = computed<boolean>({
   get: () => {
     return !!guildStore.isGuildMember(currentGuild.value?.id);
@@ -253,13 +256,17 @@ const playingQuestInGuild = computed(() => {
 });
 
 const availableRoles = computed<Role[]>(() => {
-  if (!member || !member.value?.id || !guildId.value) {
+  if (!member?.value?.id || !guildId.value) {
     return [];
   }
-  return membersStore
-    .getAvailableRolesForMemberAndGuild(member.value.id, guildId.value)
-    .map((cr) => allRoles.value[cr.role_id]);
+  return (
+    membersStore
+      .getAvailableRolesForMemberAndGuild(member.value.id, guildId.value)
+      ?.map((cr) => allRoles.value?.[cr.role_id] || null)
+      ?.filter(Boolean) || []
+  );
 });
+
 const getGuildMembers = computed((): PublicMember[] | undefined => {
   if (currentGuild.value) {
     return guildStore.getMembersOfCurrentGuild;
@@ -299,8 +306,8 @@ onBeforeMount(async () => {
   await initialize();
 });
 onBeforeRouteLeave((to, from, next) => {
-  guildStore.setCurrentGuild(0);
-  questStore.setCurrentQuest(0);
+  guildStore.setCurrentGuild(undefined);
+  questStore.setCurrentQuest(undefined);
   next();
 });
 
@@ -369,7 +376,7 @@ async function initialize() {
   if(isMember.value){
     channelStore.setCurrentGuild(guild_id!);
   }
-  readStatusStore.ensureGuildUnreadChannels(), 
+  readStatusStore.ensureGuildUnreadChannels(),
   await initializeStage2();
   ready.value = true;
 }

@@ -29,13 +29,13 @@ export interface GuildsState {
 }
 
 const baseState: GuildsState = {
-  currentGuild: 0,
+  currentGuild: undefined,
   guilds: {},
   fullFetch: false,
   fullGuilds: {},
 };
 const clearBaseState: GuildsState = {
-  currentGuild: 0,
+  currentGuild: undefined,
   guilds: {},
   fullFetch: false,
   fullGuilds: {},
