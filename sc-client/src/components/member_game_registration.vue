@@ -32,6 +32,8 @@ import { useMemberStore } from '../stores/member';
 import { useMembersStore } from '../stores/members';
 import { useRoleStore } from '../stores/role';
 import { useQuestStore } from '../stores/quests';
+import { useReadStatusStore } from 'src/stores/readStatus';
+import { useChannelStore } from 'src/stores/channel';
 
 const MemberGameRegistrationProp = defineProps<{
   show?: boolean;
@@ -43,6 +45,8 @@ const memberStore = useMemberStore();
 const membersStore = useMembersStore();
 const roleStore = useRoleStore();
 const questStore = useQuestStore();
+const channelStore = useChannelStore()
+const readStatusStore = useReadStatusStore();
 const roleId = ref<number | undefined>(undefined);
 
 const availableRoles = computed((): Role[] => {
@@ -76,6 +80,9 @@ async function updateRole() {
     member_id,
     role_id,
   });
+  channelStore.fetchChannels(guild_id),
+  readStatusStore.ensureGuildUnreadChannels();
+  questStore.ensureCurrentQuest(quest_id);
 }
 
 async function ensureData() {

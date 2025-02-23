@@ -255,7 +255,7 @@ export const useChannelStore = defineStore('channel', {
       }
       return [];
     },
-    async createChannelNode(node: ConversationNode) {
+    async createChannelNode(node: Partial<ConversationNode>) {
       const res: AxiosResponse<ConversationNode[]> = await api.post(
         '/conversation_node',
         node,

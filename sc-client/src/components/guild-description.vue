@@ -64,7 +64,7 @@ const joinToGuild = async () => {
   isMember.value = true;
   await channelStore.setCurrentGuild(currentGuild.value.id);
   await channelStore.ensureChannels(currentGuild.value.id!)
-  await readStatusStore.ensureAllChannelReadStatus();
+  await readStatusStore.ensureGuildUnreadChannels();
 };
 </script>
 <style scoped>

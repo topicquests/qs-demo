@@ -99,7 +99,6 @@ const quest_id = ref(null);
 watch(quest_id, (newVal) => {
   questStore.setCurrentQuest(newVal);
   readStatusStore.ensureAllChannelReadStatus();
-
 });
 </script>
 

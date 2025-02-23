@@ -7,7 +7,7 @@
         title="Guild Channels"
       />
     </div>
-    <div v-if="canShowBothChannels && isMember" class="q-pa-md q-gutter-sm">
+    <div v-if="canShowBothChannels && isMember && isPlayingInQuest" class="q-pa-md q-gutter-sm">
       <channel-list
         :guild_id="rightDrawerProps.currentGuild.id"
         :quest_id="rightDrawerProps.currentQuest.id"
@@ -23,14 +23,17 @@ import channelList from '../components/ChannelListComponent.vue';
 import { computed, onBeforeMount, watch } from 'vue';
 import { useChannelStore } from 'src/stores/channel';
 import { useGuildStore } from 'src/stores/guilds';
+import { useQuestStore } from 'src/stores/quests';
 
 const channelStore = useChannelStore();
 const guildStore = useGuildStore();
+const questStore = useQuestStore();
 
 const rightDrawerProps = defineProps<{
   currentQuest?: QuestData;
   currentGuild?: GuildData;
 }>();
+
 const isMember = computed<boolean>({
   get: () => {
     if (rightDrawerProps.currentGuild) {
@@ -41,7 +44,16 @@ const isMember = computed<boolean>({
     return value;
   },
 });
-
+const isPlayingInQuest = computed<boolean>({
+  get: () => {
+    if (rightDrawerProps.currentQuest) {
+      return !!questStore.isPlayingQuestInGuild(rightDrawerProps.currentQuest.id,rightDrawerProps.currentGuild!.id);
+    }
+  },
+  set: (value) => {
+    return value;
+  },
+});
 const shouldShowGuildChannels = computed(() => !!rightDrawerProps.currentGuild);
 const canShowBothChannels = computed(
   () => !!rightDrawerProps.currentGuild && !!rightDrawerProps.currentQuest,
