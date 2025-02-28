@@ -58,76 +58,70 @@
       label-key="title"
       default-expand-all
       @update:selected="selectionChanged"
-      :selected.sync="selectedNodeId"
+      v-model:selected="selectedNodeId"
       :filter-method="filterMethod"
       :filter="searchFilter_"
     >
-      <template v-slot:default-header="prop">
+      <template v-slot:default-header="{ node }">
         <div
           class="row items-center"
-          v-if="prop.node.id"
-          :ref="'node_' + prop.node.id"
+          v-if="node.id"
+          :ref="'node_' + node.id"
         >
-          <q-icon :name="prop.node.icon" class="q-mr-sm" />
+          <q-icon :name="node.icon" class="q-mr-sm" />
           <span
             :class="
               'node-title node-status-' +
-              prop.node.status +
+              node.status +
               ' node-meta-' +
-              prop.node.meta
+              node.meta
             "
           >
-            {{ prop.node.label }}</span
+            {{ node.label }}</span
           >
           <span class="node-creator">{{
-            getMemberHandle(prop.node.creator_id)
+            getMemberHandle(node.creator_id)
           }}</span>
 
-          <span class="threat-status" v-if="threats && threats[prop.node.id]"
+          <span class="threat-status" v-if="threats && threats[node.id]"
             >&nbsp;[<span
-              v-if="scores && scores[prop.node.id]"
+              v-if="scores && scores[node.id]"
               :class="
                 'score' +
-                (currentGuildId == prop.node.guild_id
+                (currentGuildId == node.guild_id
                   ? ' my-score'
                   : ' other-score') +
-                (scores[prop.node.id] < 0 ? ' score-neg' : ' score-pos')
+                (scores[node.id] < 0 ? ' score-neg' : ' score-pos')
               "
-              >{{ scores[prop.node.id] }}</span
-            >&nbsp;{{ threats[prop.node.id] }}]</span
+              >{{ scores[node.id] }}</span
+            >&nbsp;{{ threats[node.id] }}]</span
           >
           <q-btn
             :flat="true"
             v-if="
               editable &&
-              canEdit(prop.node.id) &&
+              canEdit(node.id) &&
               !editingNodeId &&
               !addingChildToNodeId
             "
             icon="edit"
-            @click="editNode(prop.node.id)"
+            @click="editNode(node.id)"
           />
           <q-btn
-            :flat="true"
-            v-if="
-              editable &&
-              canAddTo(prop.node.id) &&
-              !editingNodeId &&
-              !addingChildToNodeId
-            "
-            icon="add"
-            @click="addChildToNode(prop.node.id)"
+            v-if="canAddChild(node.id)"
+            flat icon="add"
+            @click="addChildToNode(node.id)"
           />
           <read-status-counter-button
             class="q-ml-md"
-            :node_id="prop.node.id"
+            :node_id="node.id"
             :isChannel="isChannel"
-            :isExpanded="checkIfExpanded(prop.node.id)"
-            :isRead="readStatus(prop.node.id)"
+            :isExpanded="checkIfExpanded(node.id)"
+            :isRead="readStatus(node.id)"
           ></read-status-counter-button>
         </div>
         <div class="row q-mt-md q-ml-lg">
-          <span class="node-status">{{ prop.node.status }}</span>
+          <span class="node-status">{{ node.status }}</span>
         </div>
       </template>
       <template v-slot:default-body="prop">
@@ -258,6 +252,11 @@ const nodeFormRef = computed(
       nodeForms.value[`editForm_${nodeId}`] = el;
     },
 );
+const canAddChild = computed(() => {
+  return (nodeId) => {
+    return NodeTreeProps.editable && canAddTo(nodeId) && !editingNodeId.value && !addingChildToNodeId.value;
+  };
+});
 const searchFilter_ = computed(() => {
   return searchFilter.value + '_';
 });

@@ -80,6 +80,7 @@ async function updateRole() {
     member_id,
     role_id,
   });
+  questStore.fetchQuestById(quest_id);
   channelStore.fetchChannels(guild_id),
   readStatusStore.ensureGuildUnreadChannels();
   questStore.ensureCurrentQuest(quest_id);
