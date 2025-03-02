@@ -57,12 +57,12 @@
     "eslint": "~9",
     "eslint-config-prettier": "~10",
     "eslint-plugin-mocha": "~10.5",
-    "globals": "^15.15.0",
+    "globals": "^16",
     "libqp": "~2.1",
     "prettier": "~3.5",
-    "ts-mocha": "~10.0",
+    "ts-mocha": "~11.1",
     "ts-node": "TypeStrong/ts-node#main",
-    "typescript": "~5.7"
+    "typescript": "~5.8"
   },
   "lint-staged": {
     "**/*": [
@@ -71,7 +71,7 @@
     ]
   },
   "dependencies": {
-    "axios": "~1.7",
+    "axios": "~1.8",
     "express": "~5",
     "nodemailer": "~6.10",
     "pg-listen": "~1.7",
