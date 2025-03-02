@@ -59,6 +59,7 @@
     "eslint-plugin-mocha": "~10.5",
     "globals": "^16",
     "libqp": "~2.1",
+    "mocha": "~11.1",
     "prettier": "~3.5",
     "ts-mocha": "~11.1",
     "ts-node": "TypeStrong/ts-node#main",
@@ -74,6 +75,7 @@
     "axios": "~1.8",
     "express": "~5",
     "nodemailer": "~6.10",
+    "pg": "~8",
     "pg-listen": "~1.7",
     "properties-reader": "~2.3",
     "ws": "~8.18"
