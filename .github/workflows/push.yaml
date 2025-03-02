@@ -24,7 +24,10 @@ jobs:
       - name: Install client components
         run: |
           sudo apt update
-          sudo apt install -y postgresql-client wget golang-go
+          sudo apt install -y postgresql-client wget
+          cd /tmp
+          wget -c https://go.dev/dl/go1.24.0.linux-amd64.tar.gz
+          sudo tar -C /usr/local/ -xzf go1.24.0.linux-amd64.tar.gz
           go install github.com/mailhog/MailHog@latest
           echo "${HOME}/go/bin" >> $GITHUB_PATH
       - name: Initialize test DB
