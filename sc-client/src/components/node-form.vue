@@ -67,7 +67,7 @@
         style="width: 25%"
       />
       <q-select
-        v-if="node!.status == 'role_draft'"
+        v-if="selectedStatusType == 'role_draft'"
         v-model="node!.draft_for_role_id"
         :options="roles"
         option-label="name"
