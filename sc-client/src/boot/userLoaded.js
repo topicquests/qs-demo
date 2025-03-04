@@ -1,10 +1,10 @@
 import { boot } from 'quasar/wrappers';
-import { useMemberStore } from 'stores/member';
-import { useConversationStore } from 'stores/conversation';
-import { useQuestStore } from 'stores/quests';
-import { useGuildStore } from 'stores/guilds';
-import { useChannelStore } from 'stores/channel';
-import { trackStores } from 'stores/baseStore';
+import { useMemberStore } from '../stores/member';
+import { useConversationStore } from '../stores/conversation';
+import { useQuestStore } from '../stores/quests';
+import { useGuildStore } from '../stores/guilds';
+import { useChannelStore } from '../stores/channel';
+import { trackStores } from '../stores/baseStore';
 // import { useRouter } from 'vue-router';
 
 export default boot(async ({ app }) => {

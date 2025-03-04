@@ -1,5 +1,5 @@
 import { getCurrentInstance } from 'vue';
-import { resetIfMemberChanged } from 'boot/userLoaded';
+import { resetIfMemberChanged } from './boot/userLoaded';
 import { Member } from './types';
 export function useCurrentApp() {
   return getCurrentInstance()?.appContext.app;
