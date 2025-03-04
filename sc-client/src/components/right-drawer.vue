@@ -7,7 +7,10 @@
         title="Guild Channels"
       />
     </div>
-    <div v-if="canShowBothChannels && isMember && isPlayingInQuest" class="q-pa-md q-gutter-sm">
+    <div
+      v-if="canShowBothChannels && isMember && isPlayingInQuest"
+      class="q-pa-md q-gutter-sm"
+    >
       <channel-list
         :guild_id="rightDrawerProps.currentGuild.id"
         :quest_id="rightDrawerProps.currentQuest.id"
@@ -24,6 +27,7 @@ import { computed, onBeforeMount, watch } from 'vue';
 import { useChannelStore } from 'src/stores/channel';
 import { useGuildStore } from 'src/stores/guilds';
 import { useQuestStore } from 'src/stores/quests';
+import { waitUserLoaded } from '../app-access';
 
 const channelStore = useChannelStore();
 const guildStore = useGuildStore();
@@ -47,7 +51,10 @@ const isMember = computed<boolean>({
 const isPlayingInQuest = computed<boolean>({
   get: () => {
     if (rightDrawerProps.currentQuest) {
-      return !!questStore.isPlayingQuestInGuild(rightDrawerProps.currentQuest.id,rightDrawerProps.currentGuild!.id);
+      return !!questStore.isPlayingQuestInGuild(
+        rightDrawerProps.currentQuest.id,
+        rightDrawerProps.currentGuild!.id,
+      );
     }
   },
   set: (value) => {
@@ -63,6 +70,7 @@ watch(isMember, (newVal) => {
 });
 
 onBeforeMount(async () => {
-  channelStore.ensureChannels(channelStore.getChannelsCurrentGuildId);
+  await waitUserLoaded();
+  await channelStore.ensureChannels(channelStore.getChannelsCurrentGuildId);
 });
 </script>

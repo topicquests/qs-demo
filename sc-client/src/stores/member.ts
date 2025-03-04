@@ -16,6 +16,11 @@ export interface MemberState {
 
 const TOKEN_RENEWAL = (TOKEN_EXPIRATION * 9) / 10;
 
+type decodedToken = {
+  role: string;
+  exp: number;
+};
+
 const baseState: MemberState = {
   member: undefined,
   isAuthenticated: false,
@@ -106,14 +111,14 @@ export const useMemberStore = defineStore('member', {
           this.tokenExpiry || window.localStorage.getItem('tokenExpiry');
         if (typeof expiry === 'string') {
           if (expiry && Date.now() < Number.parseInt(expiry)) {
-            this.fetchLoginUser();
+            await this.fetchLoginUser();
             if (!this.tokenExpiry) {
               // add a commit for expiry?
             }
           }
         }
-        return this.member;
       }
+      return this.member;
     },
     resetMember() {
       token_store.clearToken();
@@ -127,7 +132,7 @@ export const useMemberStore = defineStore('member', {
       if (!token) {
         return undefined;
       }
-      const token_payload = jwtDecode<JwtPayload | string[]>(token); //jwtDecode(token);
+      const token_payload = jwtDecode<decodedToken>(token); //jwtDecode(token);
       const parts: string[] = token_payload.role.split('_');
       const role = parts[parts.length - 1];
       const res: AxiosResponse<Member[]> = await api.get('/members', {
@@ -140,6 +145,7 @@ export const useMemberStore = defineStore('member', {
       if (res.status == 200) {
         this.member = res.data[0];
         this.isAuthenticated = true;
+        this.token = token;
       } else {
         this.resetMember();
         console.error(res.status);

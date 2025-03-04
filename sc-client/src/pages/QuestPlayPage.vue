@@ -103,10 +103,10 @@ function guildsPlayingGame(onlyMine = false, recruiting = false) {
 }
 
 async function initialize() {
+  await waitUserLoaded();
   if (typeof route.params.quest_id === 'string') {
     questId.value = Number.parseInt(route.params.quest_id);
   }
-  await waitUserLoaded();
   await questStore.setCurrentQuest(questId.value!);
   await Promise.all([
     questStore.ensureQuest({ quest_id: questId.value! }),

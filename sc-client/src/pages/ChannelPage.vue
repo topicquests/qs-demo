@@ -110,6 +110,8 @@ function selectionChanged(id: number) {
 }
 
 async function initialize() {
+  await waitUserLoaded();
+  // TODO: if user not logged in, go to login page
   try {
     if (typeof route.params.guild_id === 'string')
       guildId.value = Number.parseInt(route.params.guild_id);
@@ -120,8 +122,6 @@ async function initialize() {
     if (channelId.value) {
       channelStore.setCurrentChannel(channelId.value);
     }
-    await waitUserLoaded();
-    // TODO: if user not logged in, go to login page
     guildStore.setCurrentGuild(guildId.value!);
     if (questId.value) {
       questStore.setCurrentQuest(questId.value);

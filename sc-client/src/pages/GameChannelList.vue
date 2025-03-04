@@ -125,11 +125,11 @@ function confirmCreateGameChannel() {
   creatingGameC.value = false;
 }
 onBeforeMount(async () => {
+  await waitUserLoaded;
   if (typeof route.params.guild_id === 'string')
     guildId.value = Number.parseInt(route.params.guild_id);
   if (typeof route.params.quest_id === 'string')
     questId.value = Number.parseInt(route.params.quest_id);
-  await waitUserLoaded;
   guildStore.setCurrentGuild(guildId.value!);
   questStore.setCurrentQuest(questId.value!);
   await Promise.all([

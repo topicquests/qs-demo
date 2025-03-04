@@ -466,9 +466,9 @@ async function initialize() {
 
 // Lifecycle Hooks
 onBeforeMount(async () => {
+  await waitUserLoaded();
   if (typeof route.params.quest_id === 'string')
     questId.value = Number(route.params.quest_id);
-  await waitUserLoaded();
   await conversationStore.ensureConversation(questId.value!);
   const rootNode = await conversationStore.getRootNode;
   nodeId.value = rootNode?.id;

@@ -107,9 +107,9 @@ async function confirmCreateGuildChannel() {
   creating.value = false;
 }
 onBeforeMount(async () => {
+  await waitUserLoaded();
   if (typeof route.params.guild_id === 'string')
     guildId.value = Number.parseInt(route.params.guild_id);
-  await waitUserLoaded();
   guildStore.setCurrentGuild(guildId.value!);
   const promises = [
     guildStore.ensureGuild(guildId.value!),

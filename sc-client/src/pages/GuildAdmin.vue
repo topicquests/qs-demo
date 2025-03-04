@@ -440,10 +440,10 @@ const findPlayOfGuild = computed(() => (gamePlays: GamePlay[]) => {
 });
 // Lifecycle Hooks
 onBeforeMount(async () => {
+  await waitUserLoaded();
   if (typeof route.params.guild_id === 'string') {
     guildId = Number.parseInt(route.params.guild_id);
   }
-  await waitUserLoaded();
   currentGuildId.value = guildId!;
   await Promise.all([
     guildStore.setCurrentGuild(guildId!),

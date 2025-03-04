@@ -145,6 +145,7 @@ import { useGuildStore } from '../stores/guilds';
 import { useMemberStore } from '../stores/member';
 import { useBaseStore } from '../stores/baseStore';
 import { permission_enum } from '../enums';
+import { GuildData } from '../types';
 import memberGameRegistration from '../components/member_game_registration.vue';
 
 const questStore = useQuestStore();
@@ -158,6 +159,7 @@ const QuestActionProps = defineProps<{
 }>();
 
 const registerMemberDialog = ref(false);
+const mySelectedPlayingGuildId = ref(undefined); // TODO
 const memberId = computed(() => memberStore.member?.id);
 const currentQuest = computed(() => questStore.getCurrentQuest!);
 const guildId = computed(() => {

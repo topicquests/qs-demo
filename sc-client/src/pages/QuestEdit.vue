@@ -197,11 +197,11 @@ async function doSubmitQuest(quest: Partial<Quest>) {
 
 // Lifecycle Hooks
 onBeforeMount(async () => {
+  await waitUserLoaded();
   if (typeof route.params.quest_id === 'string') {
     quest_id.value = Number.parseInt(route.params.quest_id);
   }
   const questId = quest_id.value;
-  await waitUserLoaded();
   if (typeof questId === 'number') {
     await questStore.setCurrentQuest(questId);
     await questStore.ensureQuest({ quest_id: questId });

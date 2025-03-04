@@ -44,15 +44,19 @@
             <div class="row">
               <div v-if="currentQuest && playingQuestInGuild" class="col-12">
                 <castingRoleEdit
-                v-if="currentQuest?.status !== 'ongoing' && availableRoles?.length && member?.id"
-                :availableRoles="availableRoles"
-                :castingRoles="castingRoles || []"
-                :guildId="guildId ?? 0"
-                :questId="currentQuestId ?? 0"
-                :memberId="member?.id ?? null"
-                v-on:castingRoleAdd="castingRoleAdded"
-                v-on:castingRoleRemove="castingRoleRemoved"
-              />
+                  v-if="
+                    currentQuest?.status !== 'ongoing' &&
+                    availableRoles?.length &&
+                    member?.id
+                  "
+                  :availableRoles="availableRoles"
+                  :castingRoles="castingRoles || []"
+                  :guildId="guildId ?? 0"
+                  :questId="currentQuestId ?? 0"
+                  :memberId="member?.id ?? null"
+                  v-on:castingRoleAdd="castingRoleAdded"
+                  v-on:castingRoleRemove="castingRoleRemoved"
+                />
               </div>
             </div>
             <div class="row justify-center">
@@ -231,11 +235,12 @@ const currentQuestId = computed(() => questStore.currentQuest);
 const currentGuild = computed(() => guildStore.getCurrentGuild);
 const currentQuest = computed(() => questStore.getCurrentQuest);
 const currentGuildId = computed<number>({
-  get:() => { return guildStore.currentGuild
+  get: () => {
+    return guildStore.currentGuild;
   },
   set: (value) => {
-    return value
-  }
+    return value;
+  },
 });
 const isMember = computed<boolean>({
   get: () => {
@@ -361,11 +366,11 @@ async function castingRoleRemoved(role_id: number) {
   await questStore.deleteCastingRole(member_id, guild_id!, role_id, quest_id);
 }
 async function initialize() {
+  await waitUserLoaded();
   if (typeof route.params.guild_id === 'string') {
     guildId.value = Number.parseInt(route.params.guild_id);
   }
   const guild_id = guildId.value;
-  await waitUserLoaded();
   await Promise.all([
     questStore.ensureAllQuests(),
     roleStore.ensureAllRoles(),
@@ -373,11 +378,10 @@ async function initialize() {
     membersStore.ensureMembersOfGuild({ guildId: guild_id }),
   ]);
   guildStore.setCurrentGuild(guild_id!);
-  if(isMember.value){
+  if (isMember.value) {
     channelStore.setCurrentGuild(guild_id!);
   }
-  readStatusStore.ensureGuildUnreadChannels(),
-  await initializeStage2();
+  readStatusStore.ensureGuildUnreadChannels(), await initializeStage2();
   ready.value = true;
 }
 async function initializeStage2() {
