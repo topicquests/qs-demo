@@ -51,7 +51,7 @@
     "@types/nodemailer": "~6.4",
     "@types/pg": "~8.11",
     "@types/properties-reader": "~2.1",
-    "@types/ws": "~8.5",
+    "@types/ws": "~8.18",
     "@typescript-eslint/eslint-plugin": "~8",
     "@typescript-eslint/parser": "~8",
     "eslint": "~9",
