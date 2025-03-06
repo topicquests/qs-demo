@@ -4,7 +4,6 @@
       <!--Node is read has children and folded then transparent-->
       <!--Node is not read has children and folded then blue-->
       <q-btn
-        round
         v-if="
           getChannelUnreadCount(readStatusProps.node_id)! > 0 &&
           channelStore.getChannelChildrenOf(readStatusProps.node_id) &&
@@ -12,7 +11,8 @@
             0 &&
           !isExpanded
         "
-        size="9px"
+       round
+       size="12px"
         :color="localRead ? 'transparent' : 'blue'"
         text-color="black"
         @click="toggleReadStatus()"
@@ -23,25 +23,23 @@
       <!--Node is read has children and unfolded then transparent-->
       <!--Node is not read has children and unfolded then blue-->
       <q-btn
-        round
         v-else-if="
           channelStore.getChannelChildrenOf(readStatusProps.node_id) &&
           channelStore.getChannelChildrenOf(readStatusProps.node_id)!.length >
             0 &&
           isExpanded
         "
+        round
         size="9px"
         :color="localRead ? 'transparent' : 'blue'"
-        text-color="black"
         @click="toggleReadStatus()"
       >
       </q-btn>
       <q-btn
-        round
         v-else
-        size="7px"
         :color="localRead ? 'transparent' : 'blue'"
-        text-color="black"
+        round
+        size="9px"
         @click="toggleReadStatus()"
       >
       </q-btn>
@@ -50,13 +48,13 @@
       <!--Node is read has children and folded then transparent-->
       <!--Node is not read has children and folded then blue-->
       <q-btn
-        round
         v-if="
           getUnreadCount(readStatusProps.node_id)! > 0 &&
           getChildren(readStatusProps.node_id).length > 0 &&
           !isExpanded
         "
-        size="9px"
+        round
+        size="12px"
         :color="localRead ? 'transparent' : 'blue'"
         text-color="black"
         @click="toggleReadStatus()"
@@ -67,22 +65,20 @@
       <!--Node is read has children and unfolded then transparent-->
       <!--Node is not read has children and unfolded then blue-->
       <q-btn
-        round
         v-else-if="
           getChildren(readStatusProps.node_id).length > 0 && isExpanded
         "
+        round
         size="9px"
         :color="localRead ? 'transparent' : 'blue'"
-        text-color="black"
         @click="toggleReadStatus()"
       >
       </q-btn>
       <q-btn
         round
-        v-else
         size="9px"
+        v-else
         :color="localRead ? 'transparent' : 'blue'"
-        text-color="black"
         @click="toggleReadStatus()"
       >
       </q-btn>
@@ -161,4 +157,33 @@ async function toggleReadStatus() {
   }
 }
 </script>
-<style scoped></style>
+<style>
+.round-btn {
+  border-radius: 50%;
+  padding: 0; /* Removes extra space */
+  display: flex; /* Ensures perfect alignment */
+  align-items: center;
+  justify-content: center;
+}
+
+.round-btn.small {
+  border-radius: 50%;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.round-btn.medium {
+  border-radius: 50%;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+}
+
+.round-btn.large {
+  border-radius: 50%;
+  padding: 0;
+  width: 48px;
+  height: 48px;
+}
+</style>

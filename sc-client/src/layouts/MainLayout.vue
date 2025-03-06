@@ -238,14 +238,6 @@ function closeNav() {
   margin-right: 8px;
 }
 
-.q-btn {
-  border-radius: 12px;
-  font-size: 14px;
-  padding: 4px 12px;
-  min-width: 120px;
-  text-transform: none;
-}
-
 .q-btn.q-mr-sm {
   margin-right: 8px;
 }
@@ -283,11 +275,6 @@ footer#Pfooter a:hover {
 @media only screen and (max-width: 768px) {
   #home_image {
     display: none;
-  }
-  .q-btn {
-    font-size: 12px;
-    padding: 4px 12px;
-    min-width: unset;
   }
   .q-toolbar-title {
     display: flex;

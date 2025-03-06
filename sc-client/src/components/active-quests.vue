@@ -14,11 +14,12 @@
             v-if="
               ActiveQuestsProps.isMember && !memberStore.guildPerQuest[quest.id]
             "
+            rounded
             label="Play"
             @click="prompt = true"
             id="radio-btn"
             size="sm"
-            class="bg-primary q-ml-md"
+            class="bg-primary q-ma-sm"
           />
           <q-btn
             v-else-if="
@@ -26,7 +27,8 @@
               memberStore.guildPerQuest[quest.id] == guildStore.currentGuild &&
               quest.id
             "
-            class="q-ml-md bg-primary"
+            rounded
+            class="bg-primary q-ma-sm"
             label="Go To Quest"
             id="radio-btn"
             size="sm"
