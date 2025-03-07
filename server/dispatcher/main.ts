@@ -205,6 +205,7 @@ class Client {
     }
   }
   checkConstraint(constraint: string[]) {
+    console.log(`checkConstraint ${constraint} for ${this.member}, ${this.currentGuild}, ${this.currentQuest}`)
     const [type, id, _, subtype, subname] = constraint
     const id_num = Number(id)
     let casting: Casting | undefined;
@@ -248,6 +249,7 @@ class Client {
 
   async onReceive(base: string, member_id: number, constraints_conj_disj: string[][][]) {
     // constraints is a conjunction of disjunctions of constraints
+    console.log(`onReceive ${base}, ${member_id}, ${constraints_conj_disj}`);
     const [crud, type, id] = base.split(' ')
     if (type === 'role') {
       // update roles
@@ -269,6 +271,7 @@ class Client {
         if (!disjunction) return;
       }
     }
+    console.log("sending "+base);
     await this.ws.send(base);
   }
 }
@@ -349,6 +352,7 @@ class Dispatcher {
   }
 
   async onReceive(message: string) {
+    console.log("received "+message)
     const parts = Client.messageRe.exec(message)
     if (parts === null) {
       throw new Error(`invalid message: ${message}`)

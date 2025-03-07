@@ -95,9 +95,7 @@ export class WSClient {
         if (crud == 'D') {
           // TODO
         } else {
-          await this.conversationStore.fetchConversationNode({
-            id,
-          });
+          await this.conversationStore.fetchConversationNode(id);
         }
         break;
       case 'quests':

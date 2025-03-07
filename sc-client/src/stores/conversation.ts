@@ -286,10 +286,14 @@ export const useConversationStore = defineStore('conversation', {
       params.id = `eq.${id}`;
       const res: AxiosResponse<ConversationNode[]> = await api.get(
         '/conversation_node',
-        params,
+        { params },
       );
       if (res.status == 200) {
         const node = res.data[0];
+        if (!node) {
+          console.error(`Missing node ${id}`);
+          return;
+        }
         if (node.meta == 'channel') {
           // maybe we came here through the websocket
           this.addToState(node);
@@ -317,7 +321,13 @@ export const useConversationStore = defineStore('conversation', {
     },
     async fetchConversation(params: { quest_id: number }) {
       const res: AxiosResponse<QTreeNode[]> = await api.get(
-        `/conversation_node?quest_id=eq.${params.quest_id}&meta=not.eq.channel`,
+        '/conversation_node',
+        {
+          params: {
+            quest_id: `eq.${params.quest_id}`,
+            meta: 'not.eq.channel',
+          },
+        },
       );
       if (res.status == 200) {
         if (this.currentQuest !== params.quest_id) {
@@ -336,7 +346,14 @@ export const useConversationStore = defineStore('conversation', {
     },
     async fetchRootNode(params: { quest_id: number | undefined }) {
       const res: AxiosResponse<ConversationNode[]> = await api.get(
-        `/conversation_node?quest_id=eq.${params.quest_id}&parent_id=is.null&meta=eq.conversation`,
+        '/conversation_node',
+        {
+          params: {
+            quest_id: `eq.${params.quest_id}`,
+            parent_id: 'is.null',
+            meta: 'eq.conversation',
+          },
+        },
       );
       if (res.status == 200) {
         if (this.currentQuest !== params.quest_id) {
@@ -382,7 +399,8 @@ export const useConversationStore = defineStore('conversation', {
       node_id: number;
     }): Promise<ConversationNode[] | undefined> {
       const res: AxiosResponse<ConversationNode[]> = await api.get(
-        `rpc/node_subtree?node_id=${params.node_id}`,
+        'rpc/node_subtree',
+        { params },
       );
       if (res.status == 200) {
         const firstNode = res.data[0];
