@@ -15,11 +15,11 @@ Individual permission constraints take one of these forms:
 1. `M:<id>` (specific member)
 2. `Q:<qid>` (quest member)
 3. `G:<gid>[:r<rid>|p<permission>]` (guild member with role/permision)
-4. `P:<qid>[:r<rid>|p<permission>]` (gamePlay member with role/permision)
+4. `P:<gid>:<qid>[:r<rid>|p<permission>]` (gamePlay member with role/permision)
 
 We also have messages which are not notifications, currently the form `E user_id token` for emailing confirmation and password reset.
 
-Focus restrictions constraints use the same form but use lower case (g/p/q) initially. Note that neither implies the other. (you can focus on a game you're not playing etc.) You can use "*" to have "universal focus" as opposed to no focus.
+Focus restrictions constraints use the same form but use lower case (g/p/q) initially. The 'p' focus does not include `<gid>`. Note that neither implies the other. (you can focus on a game you're not playing etc.) You can use "*" to have "universal focus" as opposed to no focus.
 
 Multiple constraints are separated by " " (conjunction) or "|" (disjunction). Unusually, we will assume conjunctive normal form, i.e. a conjunction of disjunctions. (Note that the disjunction operator cannot be surrounded by space.)
 

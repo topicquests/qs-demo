@@ -44,8 +44,8 @@ const memberQueryString = '*,quest_membership!member_id(*),guild_membership!memb
 class Client {
   // The member-specific websocket and member-focused information
   static clients = new Set<Client>();
-  static constraintRe = /^([gqpm])(\d+)(:([pr])(\w+))?$/i;
-  static messageRe = /^(([CUD] \w+ \d+) (\d+)([ |][gqpGPQM]\d+(:(p\w+|r\d+))?)*)|(E (\w+) (\d+ .*))$/;
+  static constraintRe = /^([gqpm])(\d+)(\:\d+)?(:([pr])(\w+))?$/i;
+  static messageRe = /^(([CUD] \w+ \d+) (\d+)([ |][gqpGPQM]\d+(?:\:\d+)?(:(p\w+|r\d+))?)*)|(E (\w+) (\d+ .*))$/;
   static roles: Map<number, Role> = new Map();
   static guildRolesLoaded: Set<number> = new Set();
   static systemRolesLoaded = false;
@@ -133,14 +133,14 @@ class Client {
     if (typeof message === 'object') {
       message = message.toString();
     }
-    console.log(message)
+    // console.log(message)
     const parts = message.split(' ')
     try {
       if (parts[0] === 'LOGIN') {
         if (parts.length !== 3) {
           throw new Error(`invalid message: ${message}`)
         }
-        const [_, id_s, token] = parts
+        const [, id_s, token] = parts
         const id = Number(id_s)
         this.token = token
         if (id !== this.member?.id) {
@@ -205,9 +205,13 @@ class Client {
     }
   }
   checkConstraint(constraint: string[]) {
-    console.log(`checkConstraint ${constraint} for ${this.member}, ${this.currentGuild}, ${this.currentQuest}`)
-    const [type, id, _, subtype, subname] = constraint
+    // console.log(`checkConstraint ${constraint} for user ${this.member?this.member.id:'anonymous'}, ${this.currentGuild}, ${this.currentQuest}`)
+    const [type, id, id2, , subtype, subname] = constraint
     const id_num = Number(id)
+    const gid = id2 ? Number(id2.substring(1)) : undefined;
+    if ((gid !== undefined) != (type === 'P')) {
+      console.error(`malformed constraint: ${constraint}`)
+    }
     let casting: Casting | undefined;
     switch (type) {
     case 'g':
@@ -237,7 +241,7 @@ class Client {
         return this.hasPermission(subname, id_num)
       break;
     case 'P':
-      casting = this.member?.casting?.find(c => c.quest_id === id_num);
+      casting = this.member?.casting?.find(c => c.quest_id === id_num && c.guild_id === gid);
       if (!casting) return false;
       if (subtype === 'r')
         return this.hasRole(Number(subname), id_num, casting.guild_id);
@@ -249,8 +253,8 @@ class Client {
 
   async onReceive(base: string, member_id: number, constraints_conj_disj: string[][][]) {
     // constraints is a conjunction of disjunctions of constraints
-    console.log(`onReceive ${base}, ${member_id}, ${constraints_conj_disj}`);
-    const [crud, type, id] = base.split(' ')
+    // console.log(`onReceive ${base}, ${member_id}, ${constraints_conj_disj}`);
+    const [, type, ] = base.split(' ')
     if (type === 'role') {
       // update roles
     } else if (this.member?.id === member_id &&
@@ -262,7 +266,7 @@ class Client {
       if (constraint_dis.length) {
         let disjunction = false
         for (const constraint of constraint_dis) {
-          const [type, id, _, subtype, subname] = constraint
+          // const [type, id, _, subtype, subname] = constraint
           if (this.checkConstraint(constraint)) {
             disjunction = true;
             break;  // inner
@@ -271,7 +275,7 @@ class Client {
         if (!disjunction) return;
       }
     }
-    console.log("sending "+base);
+    // console.log("sending "+base);
     await this.ws.send(base);
   }
 }
@@ -352,20 +356,21 @@ class Dispatcher {
   }
 
   async onReceive(message: string) {
-    console.log("received "+message)
+    // console.log("received "+message)
     const parts = Client.messageRe.exec(message)
     if (parts === null) {
       throw new Error(`invalid message: ${message}`)
     }
-    // /^(([CUD] \w+ \d+) (\d+)([ |][gqpGPQM]\d+(:(p\w+|r\d+))?)*)|(E (\w+) (\d+ .*))$/;
-    const [_, _0, base, member_id_s, constraints_s, _1, _2, _3, command, commandArgs] = parts
+    // /^(([CUD] \w+ \d+) (\d+)([ |][gqpGPQM]\d+(:\:\d+)?(:(p\w+|r\d+))?)*)|(E (\w+) (\d+ .*))$/;
+    const [, , base, member_id_s, constraints_s, , , , command, commandArgs] = parts
     if (base) {
+      // /^([gqpm])(\d+)(\:\d+)?(:([pr])(\w+))?$/i;
       const constraints = (constraints_s || '').trim().split(' ').map(c => c.split('|').map(s => {
         const result = ((s != null) ? Client.constraintRe.exec(s) : null);
-        return (result !== null) ? result.slice(1, 6) : null;
+        return (result !== null) ? result.slice(1, 7) : null;
       }).filter(x => x !== null)) as string[][][];
       const member_id = Number(member_id_s)
-      const [crud, type, id] = base.split(' ')
+      const [, type, ] = base.split(' ')
       if (type === 'quests') {
         this.automation();
       }

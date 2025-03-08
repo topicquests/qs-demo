@@ -547,20 +547,32 @@ BEGIN
   ELSE
     SELECT public INTO STRICT public_quest FROM public.quests q WHERE id = node.quest_id;
     CASE node.status
+      WHEN 'obsolete' THEN
+        IF public_quest THEN
+          RETURN concat('p', node.quest_id);
+        ELSE
+          RETURN concat('p', node.quest_id, ' P', node.quest_id, ':', node.guild_id, '|Q', node.quest_id);
+        END IF;
+      WHEN 'private_draft' THEN
+        RETURN concat('p', node.quest_id, ' M', node.creator_id);
+      WHEN 'role_draft' THEN
+        RETURN concat('p', node.quest_id, ' P', node.quest_id, ':', node.guild_id, ':r', node.draft_for_role_id);
+      WHEN 'guild_draft' THEN
+        RETURN concat('p', node.quest_id, ' P', node.quest_id, ':', node.guild_id);
+      WHEN 'proposed' THEN
+        RETURN concat('p', node.quest_id, ' P', node.quest_id, ':', node.guild_id);
+      WHEN 'submitted' THEN
+        RETURN concat('p', node.quest_id, ' P', node.quest_id, ':', node.guild_id);
       WHEN 'published' THEN
         -- published game node only allowed if public quest or playing or quest member (Q), only visible if looking at game (p)
         IF public_quest THEN
           RETURN concat('p', node.quest_id);
         ELSE
-          RETURN concat('p', node.quest_id, ' P', node.quest_id, '|Q', node.quest_id);
+          RETURN concat('p', node.quest_id, ' P', node.quest_id, ':', node.guild_id, '|Q', node.quest_id);
         END IF;
       -- non-published game node (or play channel node) only allowed if playing as that guild (P,P+R,M), only visible if looking at game (p)
-      WHEN 'private_draft' THEN
-        RETURN concat('p', node.quest_id, ' M', node.creator_id);
-      WHEN 'role_draft' THEN
-        RETURN concat('p', node.quest_id, ' P', node.quest_id, ':r', node.draft_for_role_id);
       ELSE
-        RETURN concat('p', node.quest_id, ' P', node.quest_id);
+        RAISE EXCEPTION 'unknown node_status';
     END CASE;
   END IF;
 END$$;
